@@ -2391,7 +2391,10 @@
                         </div>
                     </div>
                 </div>
-                <button type="button" style="background: var(--bg-muted); border: 1px solid var(--border-color); color: var(--text-muted); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;" onclick="hideBranchSummary()">&times;</button>
+                                <button type="button" class="update-btn-top" style="padding: 0.4rem 1.25rem; font-size: 0.8rem; border-radius: 0.75rem;" onclick="hideBranchSummary(); loadBranchRegistry(_currentSummaryUnitDesc, _currentSummaryUnitCode, _currentSummaryUnitTin, _currentSummaryUnitId)">
+                    UPDATE
+                </button>
+
             </div>
             <!-- Compact Action Area -->
             <div id="summaryActionArea"></div>
@@ -2400,47 +2403,34 @@
                 <i class="fas fa-search" style="color: var(--text-muted); font-size: 0.8rem;"></i>
                 <input type="text" id="summarySearchInput" placeholder="Search registry fields..." oninput="filterSummaryFields()" />
             </div>
-            <!-- Category Filter Chips -->
-            <div class="detail-filter-chips" id="summaryFilterChips">
-                <span class="detail-chip active" data-cat="all" onclick="filterByCategory(this)">All</span>
-                <span class="detail-chip" data-cat="basic" onclick="filterByCategory(this)"><i class="fas fa-id-card"></i> Basic</span>
-                <span class="detail-chip" data-cat="accommodation" onclick="filterByCategory(this)"><i class="fas fa-bed"></i> Rooms</span>
-                <span class="detail-chip" data-cat="food_beverage" onclick="filterByCategory(this)"><i class="fas fa-utensils"></i> F&B</span>
-                <span class="detail-chip" data-cat="meetings_events" onclick="filterByCategory(this)"><i class="fas fa-handshake"></i> Events</span>
-                <span class="detail-chip" data-cat="public_facilities" onclick="filterByCategory(this)"><i class="fas fa-building"></i> Facilities</span>
-                <span class="detail-chip" data-cat="accessibility" onclick="filterByCategory(this)"><i class="fas fa-wheelchair"></i> Access</span>
-                <span class="detail-chip" data-cat="security_safety" onclick="filterByCategory(this)"><i class="fas fa-shield-halved"></i> Security</span>
-                <span class="detail-chip" data-cat="transport_parking" onclick="filterByCategory(this)"><i class="fas fa-car"></i> Transport</span>
-                <span class="detail-chip" data-cat="ict_services" onclick="filterByCategory(this)"><i class="fas fa-wifi"></i> ICT</span>
-                <span class="detail-chip" data-cat="utilities_resilience" onclick="filterByCategory(this)"><i class="fas fa-bolt"></i> Utilities</span>
-                <span class="detail-chip" data-cat="sustainability" onclick="filterByCategory(this)"><i class="fas fa-leaf"></i> Green</span>
-                <span class="detail-chip" data-cat="staffing" onclick="filterByCategory(this)"><i class="fas fa-users"></i> Staff</span>
+            <!-- Category Filter Dropdown + Collapse/Expand All -->
+            <div style="display: flex; gap: 0.5rem; align-items: flex-end; margin-bottom: 0.25rem;">
+                <div style="flex: 1;">
+                    <label class="form-label" style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 0.2rem;">FILTER BY TYPE</label>
+                    <select id="summaryCategorySelect" class="form-control" style="font-size: 0.85rem; border-radius: 0.6rem; background-color: white;" onchange="filterByCategoryDropdown(this.value)">
+                        <option value="all">All Identifying Fields</option>
+                        <option value="basic">Basic Information</option>
+                        <option value="accommodation">Accommodation &amp; Capacity</option>
+                        <option value="food_beverage">Food &amp; Beverage</option>
+                        <option value="meetings_events">Meetings &amp; Events</option>
+                        <option value="public_facilities">Public Facilities</option>
+                        <option value="accessibility">Accessibility Features</option>
+                        <option value="security_safety">Security &amp; Safety</option>
+                        <option value="transport_parking">Transport &amp; Parking</option>
+                        <option value="ict_services">ICT &amp; Guest Services</option>
+                        <option value="utilities_resilience">Utilities &amp; Resilience</option>
+                        <option value="sustainability">Sustainability &amp; Eco</option>
+                        <option value="staffing">Staffing &amp; Languages</option>
+                    </select>
+                </div>
+                <button type="button" id="toggleAllCardsBtn" onclick="toggleAllDetailCats()" style="height: 38px; padding: 0 0.85rem; background: var(--bg-muted); border: 1.5px solid var(--border-color); border-radius: 0.6rem; font-size: 0.75rem; font-weight: 700; color: var(--navy-deep); cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 0.35rem; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--primary-color)'" onmouseout="this.style.borderColor='var(--border-color)'">
+                    <i class="fas fa-compress-alt" id="toggleAllCardsIcon"></i> <span id="toggleAllCardsText">Collapse All</span>
+                </button>
             </div>
+
         </div>
         <!-- Scrollable Body -->
         <div class="detail-panel-body">
-            <!-- Core Info -->
-            <div class="detail-cat-card open" data-category="basic">
-                <div class="detail-cat-header" onclick="toggleDetailCat(this)">
-                    <span class="detail-cat-title"><i class="fas fa-info-circle"></i> Registry Summary</span>
-                    <i class="fas fa-chevron-down detail-cat-chevron"></i>
-                </div>
-                <div class="detail-cat-body">
-                    <div class="detail-row"><span class="detail-label">Location</span><span id="summaryLocation" class="detail-value">Addis Ababa</span></div>
-                    <div class="detail-row"><span class="detail-label">Property Code</span><span id="summaryCode" class="detail-value">ET-001</span></div>
-                    <div class="detail-row"><span class="detail-label">Category</span><span id="summaryCategory" class="detail-value">5 Star</span></div>
-                </div>
-            </div>
-            <div class="detail-cat-card open" data-category="accommodation">
-                <div class="detail-cat-header" onclick="toggleDetailCat(this)">
-                    <span class="detail-cat-title"><i class="fas fa-bed"></i> Capacity Highlights</span>
-                    <i class="fas fa-chevron-down detail-cat-chevron"></i>
-                </div>
-                <div class="detail-cat-body">
-                    <div class="detail-row"><span class="detail-label">Total Rooms</span><span id="summaryRooms" class="detail-value">0 Units</span></div>
-                    <div class="detail-row"><span class="detail-label">Total Beds</span><span id="summaryBeds" class="detail-value">0 Units</span></div>
-                </div>
-            </div>
             <!-- Dynamic Sections rendered by JS -->
             <div id="summaryDynamicSections"></div>
         </div>
@@ -2541,13 +2531,7 @@
             $('#summaryRooms').text((rooms || '0') + ' Units');
             $('#summaryBeds').text((beds || '0') + ' Units');
             
-            // Compact action button at top
-            $('#summaryActionArea').html(`
-                <button type="button" class="update-btn-top" style="width:100%; margin-bottom: 0.75rem; justify-content: center;" onclick="loadBranchRegistry('${unitDesc.replace(/'/g, "\\'")}', '${code}', '${tin}', '${unitId}')">
-                    <i class="fas fa-edit"></i> See & Update Registry
-                </button>
-            `);
-
+           
             // Reset filter chips and search
             $('#summarySearchInput').val('');
             $('.detail-chip').removeClass('active');
@@ -2564,15 +2548,52 @@
             const container = $('#summaryDynamicSections');
             container.empty();
             
-            // Group identifications by category
-            const grouped = {};
+            // 1. Gather existing data Map
+            const dataMap = {};
             (_currentIdentifications || []).forEach(id => {
-                const cat = fieldCatMap[id.Description] || 'basic';
-                if (!grouped[cat]) grouped[cat] = [];
-                grouped[cat].push(id);
+                dataMap[id.Description] = id.IdNumber;
             });
 
-            // Render each category group
+            // 2. Group all fields from fieldCatMap (the master list)
+            const grouped = {};
+            Object.keys(fieldCatMap).forEach(fieldName => {
+                const catKey = fieldCatMap[fieldName];
+                if (!grouped[catKey]) grouped[catKey] = [];
+                
+                let rawVal = dataMap[fieldName];
+                let displayVal = '';
+                
+                if (rawVal === undefined || rawVal === null || rawVal === '') {
+                    // Fallback logic for hidden/zero fields
+                    if (fieldName.toLowerCase().includes('count') || fieldName.toLowerCase().includes('rooms') || fieldName.toLowerCase().includes('beds') || fieldName.toLowerCase().includes('capacity')) {
+                        displayVal = '0';
+                    } else {
+                        displayVal = '<span style="color:#94a3b8; font-style:italic;">Not Specified</span>';
+                    }
+                } else if (rawVal === 'True') {
+                    displayVal = '<span style="color:#059669;font-weight:800;"><i class="fas fa-check-circle"></i> Yes</span>';
+                } else if (rawVal === 'False') {
+                    displayVal = '<span style="color:#94a3b8;font-weight:700;"><i class="fas fa-minus-circle"></i> No</span>';
+                } else {
+                    displayVal = rawVal;
+                }
+
+                const labelDisplay = fieldName.replace(/([A-Z])/g, ' $1').trim();
+                
+                // Search filter
+                const isMatch = !searchTerm || 
+                                labelDisplay.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                String(rawVal || '').toLowerCase().includes(searchTerm.toLowerCase());
+
+                if (isMatch) {
+                    grouped[catKey].push({
+                        label: labelDisplay,
+                        value: displayVal
+                    });
+                }
+            });
+
+            // 3. Render Categories following the display order in catMeta
             Object.keys(catMeta).forEach(catKey => {
                 const items = grouped[catKey] || [];
                 if (items.length === 0) return;
@@ -2580,25 +2601,12 @@
                 // Category filter
                 if (activeCat !== 'all' && catKey !== activeCat) return;
 
-                // Search filter
-                const filtered = items.filter(id => {
-                    if (!searchTerm) return true;
-                    const q = searchTerm.toLowerCase();
-                    return (id.Description || '').toLowerCase().includes(q) || (id.IdNumber || '').toLowerCase().includes(q);
-                });
-                if (filtered.length === 0) return;
-
                 const meta = catMeta[catKey];
-                let rowsHtml = filtered.map(id => {
-                    let val = id.IdNumber || '';
-                    if (val === 'True') val = '<span style="color:#059669;font-weight:800;"><i class="fas fa-check-circle"></i> Yes</span>';
-                    else if (val === 'False') val = '<span style="color:#94a3b8;font-weight:700;"><i class="fas fa-minus-circle"></i> No</span>';
-                    const labelDisplay = (id.Description || '').replace(/([A-Z])/g, ' $1').trim();
-                    return `<div class="detail-row" data-field="${id.Description}">
-                        <span class="detail-label" style="font-size:0.8rem;">${labelDisplay}</span>
-                        <span class="detail-value" style="font-size:0.8rem;">${val}</span>
-                    </div>`;
-                }).join('');
+                let rowsHtml = items.map(item => `
+                    <div class="detail-row">
+                        <span class="detail-label" style="font-size:0.8rem;">${item.label}</span>
+                        <span class="detail-value" style="font-size:0.8rem;">${item.value}</span>
+                    </div>`).join('');
 
                 container.append(`
                     <div class="detail-cat-card open" data-category="${catKey}">
@@ -2606,39 +2614,85 @@
                             <span class="detail-cat-title"><i class="${meta.icon}"></i> ${meta.label}</span>
                             <i class="fas fa-chevron-down detail-cat-chevron"></i>
                         </div>
-                        <div class="detail-cat-body">${rowsHtml}</div>
+                        <div class="detail-cat-body" style="display:block;">${rowsHtml}</div>
                     </div>
                 `);
             });
+            // Reset collapse/expand button state
+            $('#toggleAllCardsText').text('Collapse All');
+            $('#toggleAllCardsIcon').removeClass('fa-expand-alt').addClass('fa-compress-alt');
 
             if (container.children().length === 0) {
-                container.html(`<div style="text-align:center; padding: 1.5rem; color: var(--text-muted); font-size:0.85rem;"><i class="fas fa-inbox" style="font-size:2rem; opacity:0.2; display:block; margin-bottom:0.5rem;"></i>No data found</div>`);
+                container.html(`<div style="text-align:center; padding: 2rem; color: var(--text-muted); font-size:0.85rem;"><i class="fas fa-search" style="font-size:1.5rem; opacity:0.2; display:block; margin-bottom:0.5rem;"></i>No matching fields found</div>`);
             }
         }
 
-        function toggleDetailCat(header) {
-            const card = $(header).closest('.detail-cat-card');
-            card.toggleClass('open');
-            if (card.hasClass('open')) {
-                card.find('.detail-cat-body').slideDown(200);
-            } else {
-                card.find('.detail-cat-body').slideUp(200);
-            }
-        }
-
-        function filterByCategory(chip) {
-            $('.detail-chip').removeClass('active');
-            $(chip).addClass('active');
-            const cat = $(chip).data('cat');
+        function filterByCategoryDropdown(val) {
             const search = $('#summarySearchInput').val();
-            renderDynamicSections(cat, search);
+            if (val === 'all') {
+                renderDynamicSections('all', search);
+            } else {
+                // Re-render but only show selected category card
+                renderDynamicSections('all', search);
+                $('#summaryDynamicSections .detail-cat-card').each(function() {
+                    if ($(this).data('category') !== val) {
+                        $(this).hide();
+                    } else {
+                        $(this).show();
+                        // Ensure it stays open
+                        $(this).addClass('open');
+                        $(this).find('.detail-cat-body').show();
+                        $(this).find('.detail-cat-chevron').css('transform', 'rotate(180deg)');
+                    }
+                });
+            }
         }
 
         function filterSummaryFields() {
             const search = $('#summarySearchInput').val();
-            const activeCat = $('.detail-chip.active').data('cat') || 'all';
-            renderDynamicSections(activeCat, search);
+            const activeCat = $('#summaryCategorySelect').val() || 'all';
+            filterByCategoryDropdown(activeCat);
         }
+
+        function toggleDetailCat(header) {
+            const card = $(header).closest('.detail-cat-card');
+            const body = card.find('.detail-cat-body');
+            const chevron = card.find('.detail-cat-chevron');
+            if (card.hasClass('open')) {
+                card.removeClass('open');
+                body.slideUp(200);
+                chevron.css('transform', 'rotate(0deg)').css('color', 'var(--text-muted)');
+            } else {
+                card.addClass('open');
+                body.slideDown(200);
+                chevron.css('transform', 'rotate(180deg)').css('color', 'var(--primary-color)');
+            }
+        }
+
+        function toggleAllDetailCats() {
+            const cards = $('#summaryDynamicSections .detail-cat-card:visible');
+            const anyOpen = cards.filter('.open').length > 0;
+            if (anyOpen) {
+                // Collapse all
+                cards.each(function() {
+                    $(this).removeClass('open');
+                    $(this).find('.detail-cat-body').slideUp(200);
+                    $(this).find('.detail-cat-chevron').css('transform', 'rotate(0deg)').css('color', 'var(--text-muted)');
+                });
+                $('#toggleAllCardsText').text('Expand All');
+                $('#toggleAllCardsIcon').removeClass('fa-compress-alt').addClass('fa-expand-alt');
+            } else {
+                // Expand all
+                cards.each(function() {
+                    $(this).addClass('open');
+                    $(this).find('.detail-cat-body').slideDown(200);
+                    $(this).find('.detail-cat-chevron').css('transform', 'rotate(180deg)').css('color', 'var(--primary-color)');
+                });
+                $('#toggleAllCardsText').text('Collapse All');
+                $('#toggleAllCardsIcon').removeClass('fa-expand-alt').addClass('fa-compress-alt');
+            }
+        }
+
 
         function hideBranchSummary() {
             $('#detailBackdrop').fadeOut(300);
