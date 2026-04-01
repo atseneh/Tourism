@@ -272,7 +272,7 @@ namespace Ministry_of_Tourism_pro.Controllers
                 switch (mode.ToLower())
                 {
                     case "basic":
-                        await SyncInfrastructure(model, new[] { "RegistrationName", "DistanceFromAirport", "StarCategory", "TotalRooms", "TotalBeds", "ContactInformation", "ReservationsContact", "SustainabilityFocalPoint" });
+                        await SyncInfrastructure(model, new[] { "RegistrationName", "SpecificAddress", "Subcity", "DistanceFromAirport", "StarCategory", "TotalRooms", "TotalBeds", "ContactInformation", "ReservationsContact", "SustainabilityFocalPoint" });
                         break;
 
                     case "accommodation":

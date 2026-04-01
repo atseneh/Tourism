@@ -743,7 +743,21 @@
                         </div>
                         <div class="form-group-inline">
                             <label class="form-label">Sub City</label>
-                            <input type="text" name="Subcity" id="form-subcity-basic" value="@hotel.Subcity" class="form-control" />
+                            <select name="Subcity" id="form-subcity-basic" class="form-control">
+                                <option value="">Select Subcity</option>
+                                <option value="16" selected="@(hotel.Subcity == "16")">Addis Ababa</option>
+                                <option value="17" selected="@(hotel.Subcity == "17")">Addis Ketema</option>
+                                <option value="18" selected="@(hotel.Subcity == "18")">Akaky Kaliti</option>
+                                <option value="19" selected="@(hotel.Subcity == "19")">Arada</option>
+                                <option value="20" selected="@(hotel.Subcity == "20")">Bole</option>
+                                <option value="21" selected="@(hotel.Subcity == "21")">Gullele</option>
+                                <option value="22" selected="@(hotel.Subcity == "22")">Kirkos</option>
+                                <option value="23" selected="@(hotel.Subcity == "23")">Kolfe Keranio</option>
+                                <option value="24" selected="@(hotel.Subcity == "24")">Lideta</option>
+                                <option value="25" selected="@(hotel.Subcity == "25")">Nifas Silk-Lafto</option>
+                                <option value="26" selected="@(hotel.Subcity == "26")">Yeka</option>
+                                <option value="27" selected="@(hotel.Subcity == "27")">Lemi kura</option>
+                            </select>
                         </div>
                         <div class="form-group-inline">
                             <label class="form-label">Airport Distance (km)</label>
