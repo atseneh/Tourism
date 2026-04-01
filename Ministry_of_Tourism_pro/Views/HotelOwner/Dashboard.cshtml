@@ -643,14 +643,17 @@
                         {
                             var jsonIds = Newtonsoft.Json.JsonConvert.SerializeObject(b.RawIdentifications.Select(id => new { id.Description, id.IdNumber }));
                             <!-- Branch @(index + 1) -->
-                            <div class="btn-branch-long" onclick='showBranchSummary("@b.TradeName", "@b.ConsigneeUnitDescription", "@b.Code", "@b.TIN", "@b.ConsigneeUnitId", "@b.City", "@b.StarCategory", "@b.TotalRooms", "@b.TotalBeds", @Html.Raw(jsonIds))'>
+                            <div class="btn-branch-long" 
+                                 id="branch-card-@b.ConsigneeUnitId"
+                                 data-unit-id="@b.ConsigneeUnitId"
+                                 onclick='showBranchSummary("@b.ConsigneeUnitId")'>
                                 <div class="branch-icon">@((index + 1).ToString("D2"))</div>
                                 <div style="flex: 1;">
-                                    <div style="font-weight: 800; color: var(--navy-deep); font-size: 1.05rem; margin-bottom: 0.25rem;">@b.TradeName - @b.ConsigneeUnitDescription</div>
+                                    <div class="branch-card-name" style="font-weight: 800; color: var(--navy-deep); font-size: 1.05rem; margin-bottom: 0.25rem;">@b.TradeName - @b.ConsigneeUnitDescription</div>
                                     <div style="display: flex; gap: 1rem; font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">
                                         <span>RID: #@b.Id.ToString("D5")</span>
-                                        @if (!string.IsNullOrEmpty(b.TIN)) { <span>TIN: @b.TIN</span> }
-                                        <span><i class="fas fa-location-dot"></i> @b.City</span>
+                                        <span class="branch-card-tin">@(!string.IsNullOrEmpty(b.TIN) ? "TIN: " + b.TIN : "")</span>
+                                        <span class="branch-card-city"><i class="fas fa-location-dot"></i> @b.City</span>
                                     </div>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 0.75rem;">
@@ -1729,6 +1732,20 @@
         }
     }
 
+    // Global Branch Data Store for real-time UI synchronization
+    window.allBranchesData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.ToDictionary(b => b.ConsigneeUnitId.ToString(), b => new {
+        b.TradeName,
+        b.ConsigneeUnitDescription,
+        b.Code,
+        b.TIN,
+        b.ConsigneeUnitId,
+        b.City,
+        b.StarCategory,
+        b.TotalRooms,
+        b.TotalBeds,
+        Identifications = b.RawIdentifications.Select(id => new { id.Description, id.IdNumber })
+    })));
+
     // Checkbox Sync Logic
     $(document).on('change', '.sync-checkbox', function() {
         const isChecked = $(this).is(':checked');
@@ -2298,9 +2315,12 @@
                         icon: 'success',
                         title: 'Success!',
                         text: 'Registry updated successfully.',
-                        timer: 2000,
+                        timer: 1500,
                         showConfirmButton: false
                     });
+
+                    // Update Local State for immediate visibility
+                    syncLocalStateOnSave(mode);
                 } else {
                     Swal.fire('Error', result.message || 'Failed to update registry.', 'error');
                 }
@@ -2313,6 +2333,54 @@
         } finally {
             btn.innerHTML = btnText;
             btn.disabled = false;
+        }
+    }
+
+    function syncLocalStateOnSave(mode) {
+        const unitId = $('#editorConsigneeUnitId').val();
+        const data = window.allBranchesData[unitId];
+        if (!data) return;
+
+        // 1. Update Global Data Object
+        data.TradeName = $('#form-trade-name').val();
+        data.RegistrationName = $('#form-registration-name').val();
+        data.City = $('#form-address').val().split(',').pop().trim(); 
+        data.TotalRooms = $('#form-total-rooms').val();
+        data.TotalBeds = $('#form-total-beds').val();
+        data.StarCategory = $('#form-star-cat').val();
+
+        // Sync Identifications in global data
+        const formFields = $('#registryForm').serializeArray();
+        const updatedIds = [...(data.Identifications || [])];
+        
+        formFields.forEach(field => {
+            const existing = updatedIds.find(id => id.Description === field.name);
+            if (existing) {
+                existing.IdNumber = field.value;
+            } else if (field.value && field.name !== "__RequestVerificationToken" && !field.name.includes("Consignee")) {
+                updatedIds.push({
+                    Description: field.name,
+                    IdNumber: field.value
+                });
+            }
+        });
+        data.Identifications = updatedIds;
+
+        // 2. Update Portfolio Card in Overview Tab
+        const card = $(`#branch-card-${unitId}`);
+        if (card.length) {
+            card.find('.branch-card-name').text(data.TradeName + ' - ' + data.ConsigneeUnitDescription);
+            card.find('.branch-card-city').html('<i class="fas fa-location-dot"></i> ' + data.City);
+            // Optionally update TIN if it was in the form
+        }
+
+        // 3. Update the displayed summary panel if it matches
+        if (_currentSummaryUnitId === unitId) {
+            _currentIdentifications = updatedIds;
+            $('#summaryTradeName').text(data.TradeName);
+            $('#summaryRooms').text(data.TotalRooms + ' Units');
+            $('#summaryBeds').text(data.TotalBeds + ' Units');
+            renderDynamicSections('all');
         }
     }
 
@@ -2493,21 +2561,24 @@
         let _currentSummaryUnitTin = '';
         let _currentSummaryUnitDesc = '';
 
-        function showBranchSummary(tradeName, unitDesc, code, tin, unitId, city, category, rooms, beds, identifications) {
-            _currentIdentifications = identifications || [];
-            _currentSummaryUnitId = unitId;
-            _currentSummaryUnitCode = code;
-            _currentSummaryUnitTin = tin;
-            _currentSummaryUnitDesc = unitDesc;
+        function showBranchSummary(unitId) {
+            const data = window.allBranchesData[unitId];
+            if (!data) return;
 
-            $('#summaryTradeName').text(tradeName);
-            $('#summaryUnitDesc').text(unitDesc);
-            $('#summaryCode').text(code || 'N/A');
-            $('#summaryTin').text('TIN: ' + (tin || 'N/A'));
-            $('#summaryLocation').text(city || 'Addis Ababa');
-            $('#summaryCategory').text(category || 'General Sector');
-            $('#summaryRooms').text((rooms || '0') + ' Units');
-            $('#summaryBeds').text((beds || '0') + ' Units');
+            _currentIdentifications = data.Identifications || [];
+            _currentSummaryUnitId = unitId;
+            _currentSummaryUnitCode = data.Code;
+            _currentSummaryUnitTin = data.TIN;
+            _currentSummaryUnitDesc = data.ConsigneeUnitDescription;
+
+            $('#summaryTradeName').text(data.TradeName);
+            $('#summaryUnitDesc').text(data.ConsigneeUnitDescription);
+            $('#summaryCode').text(data.Code || 'N/A');
+            $('#summaryTin').text('TIN: ' + (data.TIN || 'N/A'));
+            $('#summaryLocation').text(data.City || 'Addis Ababa');
+            $('#summaryCategory').text(data.StarCategory || 'General Sector');
+            $('#summaryRooms').text((data.TotalRooms || '0') + ' Units');
+            $('#summaryBeds').text((data.TotalBeds || '0') + ' Units');
             
            
             // Reset filter chips and search
