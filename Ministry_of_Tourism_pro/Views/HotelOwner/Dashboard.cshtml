@@ -425,25 +425,7 @@
         overflow-y: auto;
         padding: 1rem 1.5rem 2rem;
     }
-    .detail-search-bar {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        background: var(--bg-muted);
-        border: 1px solid var(--border-color);
-        border-radius: 0.6rem;
-        padding: 0.4rem 0.75rem;
-        margin-bottom: 0.75rem;
-    }
-    .detail-search-bar input {
-        border: none;
-        background: transparent;
-        outline: none;
-        font-size: 0.85rem;
-        color: var(--text-dark);
-        flex: 1;
-        font-family: inherit;
-    }
+
     .detail-filter-chips {
         display: flex;
         flex-wrap: wrap;
@@ -652,7 +634,7 @@
                 <!-- Branch Registry Section (Replaces Narrative as requested) -->
                 <div class="glass-card" style="padding: 2.5rem; margin-bottom: 2rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                        <h3 style="color: var(--navy-deep); font-weight: 800; margin: 0;"><i class="fas fa-code-branch" style="color: var(--primary-color);"></i> Branch Portfolio</h3>
+                        <h3 style="color: var(--navy-deep); font-weight: 800; margin: 0;"> Portfolio</h3>
                         <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">ACTIVE BRANCHES: 2</div>
                     </div>
                     
@@ -2398,15 +2380,11 @@
             </div>
             <!-- Compact Action Area -->
             <div id="summaryActionArea"></div>
-            <!-- Search Bar -->
-            <div class="detail-search-bar">
-                <i class="fas fa-search" style="color: var(--text-muted); font-size: 0.8rem;"></i>
-                <input type="text" id="summarySearchInput" placeholder="Search registry fields..." oninput="filterSummaryFields()" />
-            </div>
+
             <!-- Category Filter Dropdown + Collapse/Expand All -->
             <div style="display: flex; gap: 0.5rem; align-items: flex-end; margin-bottom: 0.25rem;">
                 <div style="flex: 1;">
-                    <label class="form-label" style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 0.2rem;">FILTER BY TYPE</label>
+                    <label class="form-label" style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 0.2rem;">FILTER</label>
                     <select id="summaryCategorySelect" class="form-control" style="font-size: 0.85rem; border-radius: 0.6rem; background-color: white;" onchange="filterByCategoryDropdown(this.value)">
                         <option value="all">All Identifying Fields</option>
                         <option value="basic">Basic Information</option>
@@ -2544,7 +2522,7 @@
             $('body').css('overflow', 'hidden');
         }
 
-        function renderDynamicSections(activeCat, searchTerm) {
+        function renderDynamicSections(activeCat) {
             const container = $('#summaryDynamicSections');
             container.empty();
             
@@ -2580,17 +2558,10 @@
 
                 const labelDisplay = fieldName.replace(/([A-Z])/g, ' $1').trim();
                 
-                // Search filter
-                const isMatch = !searchTerm || 
-                                labelDisplay.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                                String(rawVal || '').toLowerCase().includes(searchTerm.toLowerCase());
-
-                if (isMatch) {
-                    grouped[catKey].push({
-                        label: labelDisplay,
-                        value: displayVal
-                    });
-                }
+                grouped[catKey].push({
+                    label: labelDisplay,
+                    value: displayVal
+                });
             });
 
             // 3. Render Categories following the display order in catMeta
@@ -2623,17 +2594,16 @@
             $('#toggleAllCardsIcon').removeClass('fa-expand-alt').addClass('fa-compress-alt');
 
             if (container.children().length === 0) {
-                container.html(`<div style="text-align:center; padding: 2rem; color: var(--text-muted); font-size:0.85rem;"><i class="fas fa-search" style="font-size:1.5rem; opacity:0.2; display:block; margin-bottom:0.5rem;"></i>No matching fields found</div>`);
+                container.html(`<div style="text-align:center; padding: 2rem; color: var(--text-muted); font-size:0.85rem;">No fields found</div>`);
             }
         }
 
         function filterByCategoryDropdown(val) {
-            const search = $('#summarySearchInput').val();
             if (val === 'all') {
-                renderDynamicSections('all', search);
+                renderDynamicSections('all');
             } else {
                 // Re-render but only show selected category card
-                renderDynamicSections('all', search);
+                renderDynamicSections('all');
                 $('#summaryDynamicSections .detail-cat-card').each(function() {
                     if ($(this).data('category') !== val) {
                         $(this).hide();
@@ -2648,11 +2618,7 @@
             }
         }
 
-        function filterSummaryFields() {
-            const search = $('#summarySearchInput').val();
-            const activeCat = $('#summaryCategorySelect').val() || 'all';
-            filterByCategoryDropdown(activeCat);
-        }
+
 
         function toggleDetailCat(header) {
             const card = $(header).closest('.detail-cat-card');
