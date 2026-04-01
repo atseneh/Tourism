@@ -44,8 +44,8 @@ namespace Ministry_of_Tourism_pro.Controllers
             var parameters = new Dictionary<string, string>
             {
                 //{ "childpreferenceID", "62" },
-                { "[consigneeIsActive]", "true" },
-                { "gslType", "0" },
+                // { "[consigneeIsActive]", "true" },
+                { "gslType", "28" },
             };
 
             // Using GetFilterDynamic for view-based data
