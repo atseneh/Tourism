@@ -319,9 +319,9 @@
             switchTab('editor');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-        var map = L.map('editor-map').setView([@(Model.Latitude ?? 9.0192), @(Model.Longitude ?? 38.7525)], 15);
+        var map = L.map('editor-map').setView([@(Model.Latitude ?? 9.0192m), @(Model.Longitude ?? 38.7525m)], 15);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-        var marker = L.marker([@(Model.Latitude ?? 9.0192), @(Model.Longitude ?? 38.7525)], { draggable: true }).addTo(map);
+        var marker = L.marker([@(Model.Latitude ?? 9.0192m), @(Model.Longitude ?? 38.7525m)], { draggable: true }).addTo(map);
         marker.on('dragend', function() {
             var pos = marker.getLatLng(); $('#lat-input').val(pos.lat.toFixed(6)); $('#lng-input').val(pos.lng.toFixed(6));
         });

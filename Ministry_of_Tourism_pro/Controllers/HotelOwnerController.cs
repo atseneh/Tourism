@@ -354,7 +354,8 @@ namespace Ministry_of_Tourism_pro.Controllers
                 TIN = branchView.Tin,
                 Code = branchView.Code,
                 Category = branchView.ChildPreferenceDescrption ?? "General Sector",
-                ConsigneeUnitId = branchView.ConsigneeUnitId
+                ConsigneeUnitId = branchView.ConsigneeUnitId,
+                Subcity = branchView.Subcity?.ToString() ?? ""
             };
 
             // 2. Fetch and map all identifications for this specific branch
@@ -414,8 +415,10 @@ namespace Ministry_of_Tourism_pro.Controllers
                 if (units != null && units.Any())
                 {
                     var unit = units.First();
-                    // Assuming Latitude/Longitude are updated on the unit
-                    await _sharedHelpers.SendReqAsync<ConsigneeUnitDTO, ConsigneeUnitDTO>("ConsigneeUnit", HttpMethod.Put, unit);
+                    unit.Subcity = int.TryParse(model.Subcity, out int subcityId) ? subcityId : (int?)null;
+                    unit.Latitude = model.Latitude;
+                    unit.Longitude = model.Longitude;
+                    await _sharedHelpers.SendReqAsync<CNET_V7_Domain.Domain.ConsigneeSchema.ConsigneeUnitDTO, CNET_V7_Domain.Domain.ConsigneeSchema.ConsigneeUnitDTO>("ConsigneeUnit", HttpMethod.Put, unit);
                 }
 
                 // 3. Persist Infrastructure via IdentificationDTO (Type 1)

@@ -426,11 +426,15 @@
                 report.generalRegistry.forEach(h => {
                     const type = h.category.toLowerCase().includes("resort") ? "Resort" : (h.category.toLowerCase().includes("lodge") ? "Lodge" : "Hotel");
                     generalBody.append(`
-                        <tr class="report-row" data-rating="${h.category}" data-name="${h.propertyName.toLowerCase()}" data-location="${h.region.toLowerCase()} ${h.city.toLowerCase()} ${h.tin}" data-type="${type}">
                             <td>
                                 <div style="font-weight: 800; color: var(--navy-deep); font-size: 0.85rem;">${h.propertyName}</div>
                                 <div style="display: flex; align-items: center; gap: 0.4rem; margin-top: 2px;">
-                                    ${h.category === "General Sector" ? '<span style="color: #94a3b8; font-size: 0.6rem; font-weight: 800;">UNASSIGNED</span>' : h.category.includes("Tourist Recommended") ? '<span style="color: #059669; font-size: 0.6rem; font-weight: 800;"><i class="fas fa-thumbs-up" style="margin-right: 3px;"></i> RECOMMENDED</span>' : `<div style="display: flex; gap: 1px; color: #f59e0b; font-size: 0.55rem;">${[1,2,3,4,5].map(i => `<i class="fas ${h.category.includes(i.toString()) ? "fa-star" : "fa-star fa-regular"}"></i>`).join('')}</div>`}
+                                    ${h.starRating && h.starRating !== "" ? 
+                                        `<div style="display: flex; gap: 1px; color: #f59e0b; font-size: 0.55rem;">${[1,2,3,4,5].map(i => `<i class="fas ${h.starRating.includes(i.toString()) ? "fa-star" : "fa-star fa-regular"}"></i>`).join('')}</div>` :
+                                        (h.category === "General Sector" ? '<span style="color: #94a3b8; font-size: 0.6rem; font-weight: 800;">UNASSIGNED</span>' : 
+                                         h.category.includes("Tourist Recommended") ? '<span style="color: #059669; font-size: 0.6rem; font-weight: 800;"><i class="fas fa-thumbs-up" style="margin-right: 3px;"></i> RECOMMENDED</span>' : 
+                                         `<div style="display: flex; gap: 1px; color: #f59e0b; font-size: 0.55rem;">${[1,2,3,4,5].map(i => `<i class="fas ${h.category.includes(i.toString()) ? "fa-star" : "fa-star fa-regular"}"></i>`).join('')}</div>`)
+                                    }
                                 </div>
                             </td>
                             <td>

@@ -94,9 +94,7 @@ namespace Ministry_of_Tourism_pro.Controllers
                     // Fetch Identifications for this establishment
                     var identifications = await _sharedHelpers.GetFilterData<List<IdentificationDTO>>("Identification", new Dictionary<string, string> 
                     { 
-                        { "consignee", c.Id.ToString() },
-                        { "remark", c.ConsigneeUnitId?.ToString() ?? "" },
-                        { "type", "1" } 
+                        { "consignee", c.Id.ToString() }
                     }) ?? new List<IdentificationDTO>();
 
                     var category = c.ChildPreferenceDescrption ?? "General Sector";
@@ -114,7 +112,8 @@ namespace Ministry_of_Tourism_pro.Controllers
                         Phone = c.Phone1 ?? "N/A",
                         TotalRooms = int.TryParse(identifications.FirstOrDefault(x => x.Description == "TotalRooms")?.IdNumber, out var tr) ? tr : 0,
                         TotalUnits = c.ConsigneeUnitId.HasValue ? 1 : 0, // Simplified: one unit per record in this view
-                        TotalSpaces = int.TryParse(identifications.FirstOrDefault(x => x.Description == "MeetingRoomsCount")?.IdNumber, out var ms) ? ms : 0
+                        TotalSpaces = int.TryParse(identifications.FirstOrDefault(x => x.Description == "MeetingRoomsCount")?.IdNumber, out var ms) ? ms : 0,
+                        StarRating = identifications.FirstOrDefault(x => x.Description == "StarCategory")?.IdNumber ?? string.Empty
                     };
                     report.GeneralRegistry.Add(generalItem);
 

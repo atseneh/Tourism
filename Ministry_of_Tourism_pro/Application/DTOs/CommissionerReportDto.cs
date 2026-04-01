@@ -21,6 +21,7 @@ namespace Ministry_of_Tourism_pro.Application.DTOs
         public int TotalRooms { get; set; }
         public int TotalUnits { get; set; }
         public int TotalSpaces { get; set; }
+        public string StarRating { get; set; } = string.Empty;
     }
 
     public class AccommodationReportItem

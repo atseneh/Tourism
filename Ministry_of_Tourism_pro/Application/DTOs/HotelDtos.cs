@@ -41,8 +41,8 @@ namespace Ministry_of_Tourism_pro.Application.DTOs
         public string? AddressLine3 { get; set; }
         public string ContactEmail { get => Email; set => Email = value; }
         public string ContactPhone { get => Phone1; set => Phone1 = value; }
-        public double? Latitude { get; set; }
-        public double? Longitude { get; set; }
+        public decimal? Latitude { get; set; }
+        public decimal? Longitude { get; set; }
         public List<string> ImagePaths { get; set; } = new List<string>();
         public string? RejectionComment { get; set; }
 
@@ -201,8 +201,8 @@ namespace Ministry_of_Tourism_pro.Application.DTOs
         public string? AddressLine3 { get; set; }
 
         // Location Info
-        public double? Latitude { get; set; }
-        public double? Longitude { get; set; }
+        public decimal? Latitude { get; set; }
+        public decimal? Longitude { get; set; }
 
         // All Excel specific fields should also be in CreateHotelDto (simplified for brevity here, but usually identical to HotelDto)
         // [Add matching fields from HotelDto here if necessary for creation flow]

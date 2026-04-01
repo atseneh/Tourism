@@ -2411,9 +2411,9 @@
             const mapContainer = document.getElementById('editor-map');
             if (!mapContainer) return;
 
-            map = L.map('editor-map').setView([@(hotel.Latitude ?? 9.0192), @(hotel.Longitude ?? 38.7525)], 15);
+            map = L.map('editor-map').setView([@(hotel.Latitude ?? 9.0192m), @(hotel.Longitude ?? 38.7525m)], 15);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-            marker = L.marker([@(hotel.Latitude ?? 9.0192), @(hotel.Longitude ?? 38.7525)], { draggable: true }).addTo(map);
+            marker = L.marker([@(hotel.Latitude ?? 9.0192m), @(hotel.Longitude ?? 38.7525m)], { draggable: true }).addTo(map);
 
             marker.on('dragend', function() {
                 var pos = marker.getLatLng();

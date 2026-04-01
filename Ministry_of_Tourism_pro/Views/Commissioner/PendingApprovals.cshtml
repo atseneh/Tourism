@@ -293,9 +293,18 @@
                             </td>
                             <!-- State column -->
                             <td>
-                                <span id="state-@consignee.Id" class="state-badge state-pending">
-                                    <i class="fas fa-clock"></i> Pending
-                                </span>
+                                @if (consignee.ConsigneeIsActive == true)
+                                {
+                                    <span id="state-@consignee.Id" class="state-badge state-approved">
+                                        <i class="fas fa-check-circle"></i> Approved
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span id="state-@consignee.Id" class="state-badge state-pending">
+                                        <i class="fas fa-clock"></i> Pending
+                                    </span>
+                                }
                             </td>
                             <!-- Actions: single dropdown button -->
                             <td style="padding-right: 2rem !important; text-align: right;">
