@@ -1,0 +1,234 @@
+@model Ministry_of_Tourism_pro.Models.PreRegisterViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Pre-Registration";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pre-Registration - AATMCDP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy-deep: #0f172a;
+            --primary-color: #3b82f6;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--navy-deep);
+            overflow-x: hidden;
+        }
+
+        .auth-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 2rem;
+        }
+
+        .bg-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.3) 0%, rgba(70, 76, 92, 0.8) 100%);
+            z-index: 1;
+        }
+
+        .bg-image {
+            position: absolute;
+            inset: 0;
+            background-image: url('/images/backgrounds/skyline.png');
+            background-size: cover;
+            background-position: center;
+            z-index: 0;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 500px;
+            padding: 3rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.3);
+        }
+
+        .brand-logo-circle {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+        }
+
+        .brand-logo-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .portal-title {
+            color: var(--navy-deep);
+            margin: 0;
+            font-weight: 800;
+            font-size: 1.5rem;
+            line-height: 1.25;
+            letter-spacing: -0.5px;
+            text-align: center;
+        }
+
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label { display: block; font-weight: 700; font-size: 0.75rem; color: var(--navy-deep); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.85rem 1.15rem;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            background: rgba(248, 250, 252, 0.8);
+            color: var(--navy-deep);
+            font-family: inherit;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            transition: all 0.3s;
+        }
+        .form-control:focus { outline: none; border-color: var(--primary-color); background: white; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+
+        .btn-premium {
+            width: 100%;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-family: inherit;
+            margin-top: 1rem;
+            box-shadow: 0 8px 20px -5px rgba(37, 99, 235, 0.4);
+        }
+        .btn-premium:hover { transform: translateY(-2px); box-shadow: 0 12px 25px -5px rgba(37, 99, 235, 0.5); }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: var(--navy-deep); }
+
+        .animate-fade-in { animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        @@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .validation-message { color: #ef4444; font-size: 0.75rem; margin-top: 0.25rem; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="bg-image"></div>
+        <div class="bg-overlay"></div>
+        
+        <div class="glass-card auth-card animate-fade-in">
+            <a asp-action="Login" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                Back to Login
+            </a>
+
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <div class="brand-logo-circle">
+                    <img src="/logo/logo.svg" alt="AATMCDP Logo" />
+                </div>
+                <h1 class="portal-title">Organization Pre-Registration</h1>
+                <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.9rem;">Submit your basic details to begin the registration process.</p>
+            </div>
+
+            <form asp-action="PreRegister" method="post">
+                <div asp-validation-summary="ModelOnly" style="color: #ef4444; font-size: 0.85rem; margin-bottom: 1rem; text-align: center; font-weight: 700;"></div>
+                
+                <div class="form-group">
+                    <label asp-for="Name" class="form-label">Legal Name / Establishment</label>
+                    <input asp-for="Name" class="form-control" placeholder="e.g. Grand Addis Hotel" />
+                    <span asp-validation-for="Name" class="validation-message"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="TIN" class="form-label">TIN Number (10 Digits)</label>
+                    <input asp-for="TIN" class="form-control" placeholder="0000000000" maxlength="10" />
+                    <span asp-validation-for="TIN" class="validation-message"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Category" class="form-label">Sector Category</label>
+                    <select asp-for="Category" class="form-control">
+                        <option value="">-- Select Category --</option>
+                        @if (ViewBag.Categories != null)
+                        {
+                            foreach (var pref in (IEnumerable<CNET_V7_Domain.Domain.SettingSchema.PreferenceDTO>)ViewBag.Categories)
+                            {
+                                <option value="@pref.Id">@pref.Description</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="Category" class="validation-message"></span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label asp-for="Email" class="form-label">Email Address</label>
+                        <input asp-for="Email" class="form-control" placeholder="contact@org.com" />
+                        <span asp-validation-for="Email" class="validation-message"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Phone" class="form-label">Phone Number</label>
+                        <input asp-for="Phone" class="form-control" placeholder="0911..." />
+                        <span asp-validation-for="Phone" class="validation-message"></span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-premium">
+                    <span>Submit Registration</span>
+                    <i class="fas fa-paper-plane" style="margin-left: 0.75rem; font-size: 0.85rem;"></i>
+                </button>
+            </form>
+
+            <div style="text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                <p style="color: var(--text-muted); font-size: 0.8rem; font-weight: 500;">&copy; @DateTime.Now.Year AATMCDP </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Ministry of Tourism</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a class="sidebar-brand" asp-controller="Home" asp-action="Index">
+                <div class="brand-icon" style="background: white; overflow: hidden; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); padding: 5px;">
+                    <img src="~/logo/logo.svg" alt="Logo" style="width: 100%; height: 100%; object-fit: contain;" />
+                </div>
+                <span class="brand-name">AATMCDP</span>
+            </a>
+        </div>
+
+        <div class="sidebar-content">
+            @if (IsSectionDefined("SidebarProfile"))
+            {
+                <div class="sidebar-profile-container">
+                    @RenderSection("SidebarProfile")
+                </div>
+            }
+            <div class="nav-section-title">Main Menu</div>
+            <ul class="nav-list">
+                @if (!(User.Identity?.IsAuthenticated == true && (User.IsInRole("Commissioner") || User.IsInRole("HotelOwner") || User.IsInRole("SystemAdmin"))))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")" asp-controller="Home" asp-action="Index">
+                            <i class="fas fa-th-large"></i>Dashboard
+                        </a>
+                    </li>
+                }
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    @if (User.IsInRole("SystemAdmin"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "SystemAdmin" ? "active" : "")" asp-controller="SystemAdmin" asp-action="Index">
+                                <i class="fas fa-microchip"></i>System Management
+                            </a>
+                        </li>
+                    }
+                    else if (User.IsInRole("Admin"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")" asp-controller="Admin" asp-action="Index">
+                                <i class="fas fa-screwdriver-wrench"></i>Control Center
+                            </a>
+                        </li>
+                    }
+                    else if (User.IsInRole("Commissioner"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "PendingApprovals" ? "active" : "")"
+                               asp-controller="Commissioner"
+                               asp-action="PendingApprovals">
+                                <i class="fas fa-clipboard-check"></i> Approvals
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Reports" ? "active" : "")"
+                               asp-controller="Commissioner"
+                               asp-action="Reports">
+                                <i class="fas fa-chart-pie"></i> Reports
+                            </a>
+                        </li>
+
+                      @*   <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Overview" ? "active" : "")"
+                               asp-controller="Commissioner"
+                               asp-action="Overview">
+                                <i class="fas fa-chart-line"></i> Overview
+                            </a>
+                        </li> *@
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "HotelOwner" && ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")" asp-controller="HotelOwner" asp-action="Dashboard">
+                                <i class="fas fa-id-card-clip"></i>Property Profile
+                            </a>
+                            @RenderSection("SidebarSubNav", required: false)
+                        </li>
+                    }
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")" asp-controller="Home" asp-action="Index">
+                            <i class="fas fa-globe"></i>Portal Home
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+
+        <footer style="padding: 1.5rem; text-align: center; border-top: 1px solid var(--bg-muted); margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+            <img src="~/logo/RED logo png-08.ico" alt="Ministry Seal" style="height: 60px; filter: grayscale(1) opacity(0.5); transition: var(--transition);" onmouseover="this.style.filter='grayscale(0) opacity(1)'" onmouseout="this.style.filter='grayscale(1) opacity(0.5)'" />
+            <div class="smallest text-muted">&copy; 2026 Ministry of Tourism</div>
+        </footer>
+    </aside>
+
+    <div class="wrapper">
+        <header class="top-navbar">
+            <button id="sidebarToggle" class="btn-sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="account-section">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <div class="text-end d-none d-md-block">
+                        <div class="fw-bold small" style="color: var(--navy-deep); font-weight: 700;">@User.Identity.Name</div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted);">
+                            @if (User.IsInRole("SystemAdmin")) { @:System Administrator
+                            } else if (User.IsInRole("Commissioner")) { @:Commissioner
+                            } else { @:Hotel Owner
+                            }
+                        </div>
+                    </div>
+                    <div class="user-avatar">
+                        @(User.Identity.Name?.Substring(0, Math.Min(2, User.Identity.Name.Length)).ToUpper() ?? "U")
+                    </div>
+                    <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline">
+                        <button type="submit" class="btn-premium" style="padding: 0.4rem 1rem; font-size: 0.75rem; border-radius: 8px;">Logout</button>
+                    </form>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Login" class="nav-link" style="color: var(--primary-color) !important;">Staff Login</a>
+                    <a asp-controller="Account" asp-action="Register" class="btn-premium">Register</a>
+                }
+            </div>
+        </header>
+
+        <div class="main-content">
+            <main role="main">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#sidebarToggle').on('click', function () {
+                $('.sidebar').toggleClass('collapsed');
+                $('.wrapper').toggleClass('expanded');
+                $(this).find('i').toggleClass('fa-bars fa-times');
+            });
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

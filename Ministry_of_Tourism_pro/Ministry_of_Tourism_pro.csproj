@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="CNET_V7_Domain">
+      <HintPath>..\Ref\CNET_V7_Domain.dll</HintPath>
+    </Reference>
+    <Reference Include="CNET_V7_Entities">
+      <HintPath>..\Ref\CNET_V7_Entities.dll</HintPath>
+    </Reference>
+    <Reference Include="Cnetv7BufferHolder">
+      <HintPath>..\Ref\Cnetv7BufferHolder.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,518 @@
+@model Ministry_of_Tourism_pro.Models.EvaluationViewModel
+@{
+    ViewData["Title"] = "Hotel Standard Evaluation";
+}
+
+<style>
+    /* Hiding global layouts for a true full-screen experience */
+    .sidebar, .top-navbar { display: none !important; }
+    .wrapper { margin-left: 0 !important; width: 100% !important; margin-top: 0 !important; }
+    .main-content { padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; }
+    body { background-color: #f8fafc; overflow: hidden; margin: 0; padding: 0; }
+
+    :root {
+        --eval-primary: #1e3a8a;
+        --eval-accent: #3b82f6;
+        --eval-sidebar: #ffffff;
+        --eval-sidebar-text: #1e293b;
+        --eval-gold: #fbbf24;
+        --sidebar-width: 260px;
+    }
+
+    .evaluation-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 1000;
+        background: #f8fafc;
+        display: flex;
+        overflow: hidden;
+    }
+
+    .evaluation-grid {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Sidebar Navigation Styles */
+    .category-sidebar {
+        width: var(--sidebar-width);
+        background: var(--eval-sidebar);
+        display: flex;
+        flex-direction: column;
+        color: var(--eval-sidebar-text);
+        box-shadow: 4px 0 20px rgba(0,0,0,0.05);
+        height: 100vh;
+        flex-shrink: 0;
+        border-right: 1px solid #e2e8f0;
+    }
+
+    .sidebar-branding {
+        padding: 1.5rem 1rem;
+        text-align: center;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .agency-logo-wrapper {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 0.75rem;
+    }
+
+    .agency-logo { width: 100%; height: 100%; object-fit: contain; }
+
+    .agency-name {
+        display: block;
+        font-weight: 800;
+        font-size: 0.9rem;
+        color: var(--eval-sidebar-text);
+        margin-bottom: 2px;
+    }
+
+    .agency-sub {
+        display: block;
+        font-size: 0.65rem;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .sidebar-user-info {
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        border-bottom: 1px solid #e2e8f0;
+        background: #f8fafc;
+    }
+
+    .user-avatar-small {
+        width: 36px;
+        height: 36px;
+        background: var(--eval-accent);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 0.8rem;
+        color: white;
+        flex-shrink: 0;
+    }
+
+    .user-details { flex: 1; display: flex; flex-direction: column; }
+    .user-name { font-weight: 700; font-size: 0.8rem; }
+    .user-role { font-size: 0.65rem; opacity: 0.6; }
+
+    .category-nav { flex: 1; padding: 1.5rem 1rem; overflow-y: auto; }
+    .cat-link {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 0.75rem;
+        color: #64748b;
+        text-decoration: none;
+        border-radius: 8px;
+        margin-bottom: 0.2rem;
+        font-size: 0.8rem;
+        transition: all 0.2s;
+    }
+
+    .cat-link:hover { background: #f1f5f9; color: var(--eval-primary); }
+    .cat-link.active {
+        background: #eff6ff;
+        color: var(--eval-accent);
+        border-left: 3px solid var(--eval-accent);
+        border-radius: 0 8px 8px 0;
+        font-weight: 700;
+    }
+
+    .cat-icon-wrapper {
+        width: 28px;
+        height: 28px;
+        background: #f1f5f9;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+    }
+
+    .cat-link.active .cat-icon-wrapper { background: white; color: var(--eval-accent); }
+
+    .sidebar-footer { padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; background: #f8fafc; }
+    .btn-submit-report {
+        background: #059669; color: white; border: none; padding: 0.75rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer;
+        display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.3s;
+    }
+    .btn-submit-report:hover { background: #047857; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2); }
+
+    .btn-back-home {
+        background: white; color: #1e293b; border: 1px solid #e2e8f0; padding: 0.6rem; border-radius: 8px; font-size: 0.8rem; text-align: center; text-decoration: none; font-weight: 600;
+    }
+
+    /* Main Evaluation Content Body */
+    .evaluation-content {
+        padding: 1.5rem 2.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+        flex: 1;
+        height: 100vh;
+        overflow-y: auto;
+        background: #fafaf9;
+        box-sizing: border-box;
+        position: relative;
+    }
+
+    .evaluation-content .bg-pattern {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 0;
+        background-image: url('/logo/mark.svg');
+        opacity: 0.12;
+        background-repeat: repeat;
+        background-size: 200px;
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(8px);
+        border-radius: 12px;
+        border: 1px solid rgba(231, 229, 228, 0.6);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        padding: 1.25rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Establishment Header Card - Sticky at the top */
+    .header-card { 
+        border-left: 5px solid var(--eval-primary); 
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        margin-bottom: 1.5rem;
+        background: rgba(255, 255, 255, 0.98);
+        border-bottom: 2px solid #e2e8f0;
+    }
+    .card-title-bar { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+    .card-title { font-weight: 800; color: var(--eval-primary); font-size: 1.15rem; display: flex; align-items: center; gap: 0.75rem; }
+    
+    .header-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-top: 1.25rem;
+    }
+
+    @@media (max-width: 1200px) { .header-grid { grid-template-columns: repeat(2, 1fr); } }
+    @@media (max-width: 800px) { .header-grid { grid-template-columns: 1fr; } }
+
+    .header-card.collapsed .header-grid { display: none !important; }
+
+    .input-group { display: flex; flex-direction: column; gap: 0.4rem; }
+    .input-group label { font-size: 0.75rem; font-weight: 700; color: #64748b; }
+    .input-group input, .input-group select {
+        padding: 0.6rem 0.8rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .toggle-icon { color: var(--eval-accent); transition: transform 0.3s ease; }
+    .header-card.collapsed .toggle-icon { transform: rotate(-90deg); }
+
+    /* Evaluation Sections Styles */
+    .section-card { margin-bottom: 1.5rem; transition: all 0.3s ease; }
+    .section-header { display: flex; align-items: center; gap: 1rem; cursor: pointer; margin-bottom: 1rem; }
+    .section-card.collapsed .section-header { margin-bottom: 0; }
+    .section-card.collapsed .questions-list { display: none; }
+    .section-icon { width: 44px; height: 44px; background: #eff6ff; color: var(--eval-accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+    .section-title { font-weight: 800; font-size: 1.3rem; color: var(--eval-primary); margin: 0; }
+    .section-toggle { margin-left: auto; color: #94a3b8; transition: transform 0.3s ease; }
+    .section-card.collapsed .section-toggle { transform: rotate(-90deg); }
+
+    .question-row { background: white; border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem; border: 1px solid #f1f5f9; display: grid; grid-template-columns: 1fr auto; gap: 1.5rem; align-items: center; }
+    .q-code { font-weight: 800; font-size: 0.75rem; color: var(--eval-accent); background: #eff6ff; padding: 2px 8px; border-radius: 6px; margin-bottom: 0.25rem; display: inline-block; }
+    .q-text { font-weight: 600; color: var(--eval-primary); line-height: 1.5; font-size: 0.95rem; }
+    
+    .q-actions { display: flex; align-items: center; gap: 1rem; }
+    .compliance-toggle { display: flex; background: #f8fafc; padding: 4px; border-radius: 12px; border: 1px solid #e2e8f0; }
+    .toggle-option input { display: none; }
+    .toggle-btn { padding: 0.5rem 1.25rem; border-radius: 8px; font-weight: 700; font-size: 0.8rem; color: #94a3b8; cursor: pointer; transition: all 0.2s; }
+    input[type="radio"]:checked + .toggle-btn.yes { background: #16a34a; color: white; }
+    input[type="radio"]:checked + .toggle-btn.no { background: #dc2626; color: white; }
+    
+    .btn-remark-icon { width: 40px; height: 40px; border-radius: 10px; border: 1px solid #e2e8f0; background: white; color: #94a3b8; cursor: pointer; transition: all 0.3s; }
+    .btn-remark-icon.active { background: var(--eval-accent); color: white; border-color: var(--eval-accent); }
+
+    .remark-box { 
+        grid-column: 1 / -1; 
+        margin-top: 0.5rem; 
+        display: none; 
+    }
+    .remark-box textarea { width: 100%; height: 80px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.75rem; font-size: 0.85rem; resize: none; }
+
+    /* Success Message Toast */
+    .success-toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #059669;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        z-index: 2000;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        animation: slideInDown 0.4s ease, fadeOut 0.4s ease 5s forwards;
+    }
+    @@keyframes slideInDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; visibility: hidden; } }
+</style>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="success-toast">
+        <i class="fas fa-check-circle"></i>
+        <span>@TempData["SuccessMessage"]</span>
+    </div>
+}
+
+<div class="evaluation-container">
+    <form asp-controller="Admin" asp-action="Index" method="post" id="evaluationForm" style="width: 100%; display: flex;">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="category-sidebar">
+            <div class="sidebar-branding">
+                <div class="agency-logo-wrapper">
+                    <img src="/logo/logo.svg" alt="Commission" class="agency-logo" />
+                </div>
+                <div class="agency-info">
+                    <span class="agency-name">አዲስ አበባ ቱሪዝም ኮሚሽን</span>
+                    <span class="agency-sub">Tourism Commission</span>
+                </div>
+            </div>
+
+            <div class="sidebar-user-info">
+                <div class="user-avatar-small">Service Quality Control:</div>
+                <div class="user-details">
+                    <span class="user-name">@User.Identity.Name</span>
+                    <span class="user-role">Administrator</span>
+                </div>
+            </div>
+
+            <nav class="category-nav">
+                @for (int i = 0; i < Model.Categories.Count; i++)
+                {
+                    var cat = Model.Categories[i];
+                    <a href="#cat-@cat.Id" class="cat-link @(i == 0 ? "active" : "")">
+                        <div class="cat-icon-wrapper">
+                            <i class="fas @cat.Icon"></i>
+                        </div>
+                        <div class="cat-label-group">
+                            <span class="cat-name" style="font-weight: 600;">@cat.Name</span>
+                            <span class="cat-status" id="status-@cat.Id">0/@cat.Questions.Count ተጠናቅቋል</span>
+                        </div>
+                    </a>
+                }
+            </nav>
+
+            <div class="sidebar-footer">
+                <button type="submit" class="btn-submit-report">
+                    <i class="fas fa-paper-plane"></i> ሪፖርት አቅርብ / Submit
+                </button>
+                <a asp-controller="Home" asp-action="Index" class="btn-back-home">
+                    <i class="fas fa-arrow-left"></i> ወደ ዳሽቦርድ
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content (Full Remaining Width) -->
+        <main class="evaluation-content">
+            <div class="bg-pattern"></div>
+            
+            <!-- 1. Establishment Identification - FORCED VISIBLE -->
+            <div class="glass-card header-card" id="headerCard">
+                <div class="card-title-bar" onclick="toggleHeaderCard()">
+                    <div class="card-title">
+                        <i class="fas fa-hotel"></i> ተቋሙን ይለዩ / Identification
+                    </div>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+                
+                <div class="header-grid" id="headerGrid">
+                    <div class="input-group">
+                        <label>የተቋሙ ስም / Establishment Name</label>
+                        <input type="text" asp-for="EstablishmentName" />
+                    </div>
+                    <div class="input-group">
+                        <label>አድራሻ / Address</label>
+                        <input type="text" asp-for="Address" placeholder="አድራሻ..." />
+                    </div>
+                    <div class="input-group">
+                        <label>ምድብ / Category</label>
+                        <select asp-for="Category">
+                            <option value="">ይምረጡ / Select</option>
+                            <option>Star Rated Hotel</option>
+                            <option>Pension</option>
+                            <option>Apartment Hotel</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>ደረጃ / Grade</label>
+                        <select asp-for="Grade">
+                            <option value="">ይምረጡ / Select</option>
+                            <option>5 Star</option>
+                            <option>4 Star</option>
+                            <option>3 Star</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>ገምጋሚ ስም / Evaluator Name</label>
+                        <input type="text" asp-for="EvaluatorName" placeholder="ገምጋሚ ስም..." />
+                    </div>
+                    <div class="input-group">
+                        <label>ቀን / Date</label>
+                        <input type="date" asp-for="Date" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Evaluation Categories -->
+            <div class="scroll-sections">
+                @for (int i = 0; i < Model.Categories.Count; i++)
+                {
+                    <input type="hidden" name="Categories[@i].Id" value="@Model.Categories[i].Id" />
+                    <input type="hidden" name="Categories[@i].Name" value="@Model.Categories[i].Name" />
+                    
+                    <section id="cat-@Model.Categories[i].Id" class="glass-card section-card collapsed">
+                        <div class="section-header" onclick="toggleSection('@Model.Categories[i].Id')">
+                            <div class="section-icon"><i class="fas @Model.Categories[i].Icon"></i></div>
+                            <h2 class="section-title">@Model.Categories[i].Name</h2>
+                            <i class="fas fa-chevron-down section-toggle"></i>
+                        </div>
+
+                        <div class="questions-list" id="questions-@Model.Categories[i].Id">
+                            @for (int j = 0; j < Model.Categories[i].Questions.Count; j++)
+                            {
+                                var q = Model.Categories[i].Questions[j];
+                                <div class="question-row">
+                                    <input type="hidden" name="Categories[@i].Questions[@j].Id" value="@q.Id" />
+                                    <input type="hidden" name="Categories[@i].Questions[@j].Code" value="@q.Code" />
+                                    <input type="hidden" name="Categories[@i].Questions[@j].QuestionText" value="@q.QuestionText" />
+                                    
+                                    <div class="q-content">
+                                        <span class="q-code">@q.Code</span>
+                                        <div class="q-text">@q.QuestionText</div>
+                                    </div>
+
+                                    <div class="q-actions">
+                                        <div class="compliance-toggle">
+                                            <label class="toggle-option">
+                                                <input type="radio" name="Categories[@i].Questions[@j].Status" value="yes" @(q.Status == "yes" ? "checked" : "") />
+                                                <span class="toggle-btn yes">Yes</span>
+                                            </label>
+                                            <label class="toggle-option">
+                                                <input type="radio" name="Categories[@i].Questions[@j].Status" value="no" @(q.Status == "no" ? "checked" : "") />
+                                                <span class="toggle-btn no">No</span>
+                                            </label>
+                                        </div>
+                                        <button type="button" class="btn-remark-icon @(!string.IsNullOrEmpty(q.Remarks) ? "active" : "")" onclick="toggleNote('@q.Id')">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </div>
+
+                                    <div class="remark-box" id="remark-@q.Id">
+                                        <textarea name="Categories[@i].Questions[@j].Remarks" placeholder="ተጨማሪ አስተያየት እዚህ ይፃፉ... / Write remarks here...">@q.Remarks</textarea>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </section>
+                }
+            </div>
+            
+            <div style="height: 120px;"></div>
+        </main>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function toggleHeaderCard() {
+        const card = document.getElementById('headerCard');
+        card.classList.toggle('collapsed');
+    }
+
+    function toggleSection(id) {
+        const section = document.getElementById('cat-' + id);
+        section.classList.toggle('collapsed');
+    }
+
+    function toggleNote(id) {
+        const box = document.getElementById('remark-' + id);
+        const btn = box.previousElementSibling.querySelector('.btn-remark-icon');
+        $(box).slideToggle(200);
+        btn.classList.toggle('active');
+    }
+
+    $(document).ready(function() {
+        // Navigation clicks
+        $('.cat-link').on('click', function(e) {
+            e.preventDefault();
+            const targetId = $(this).attr('href');
+            $('.cat-link').removeClass('active');
+            $(this).addClass('active');
+
+            const targetElement = document.querySelector(targetId);
+            const container = document.querySelector('.evaluation-content');
+            
+            targetElement.classList.remove('collapsed');
+            container.scrollTo({
+                top: targetElement.offsetTop - 100,
+                behavior: 'smooth'
+            });
+        });
+
+        // Scroll sync for nav
+        const container = document.querySelector('.evaluation-content');
+        container.addEventListener('scroll', () => {
+            let current = '';
+            document.querySelectorAll('section').forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (container.scrollTop >= sectionTop - 150) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            if (current) {
+                $('.cat-link').removeClass('active');
+                $('.cat-link[href="#' + current + '"]').addClass('active');
+            }
+        });
+
+        // Update progress counts
+        $('input[type="radio"]').on('change', function() {
+            const section = $(this).closest('section');
+            const total = section.find('.question-row').length;
+            const answered = section.find('input[type="radio"]:checked').length;
+            const catId = section.attr('id').split('-')[1];
+            $('#status-' + catId).text(`${answered}/${total} ተጠናቅቋል`);
+        });
+    });
+</script>

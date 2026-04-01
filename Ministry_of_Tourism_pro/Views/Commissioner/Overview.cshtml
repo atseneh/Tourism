@@ -1,0 +1,202 @@
+@model IEnumerable<Ministry_of_Tourism_pro.Application.DTOs.HotelDto>
+@{
+    ViewData["Title"] = "Commissioner Overview";
+    var pendingCount = Model.Count(h => h.Status == Ministry_of_Tourism_pro.Domain.Enums.HotelStatus.Pending);
+    var approvedCount = Model.Count(h => h.Status == Ministry_of_Tourism_pro.Domain.Enums.HotelStatus.Approved);
+    var totalInventory = Model.Count();
+}
+
+<div class="animate-fade-in">
+    <!-- Main Dashboard Integration Container -->
+    <div class="glass-card" style="padding: 0; overflow: visible; border-radius: 1.5rem;">
+        
+        <div class="sticky-header" style="background: white; border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem; border-bottom: 2px solid var(--border-color);">
+            <!-- Integrated Header & Stats Bar -->
+            <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 1.5rem 2.5rem; color: white;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h1 style="font-weight: 800; color: white; margin: 0; letter-spacing: -1px; font-size: 1.75rem;">Commissioner Control Center</h1>
+                        <p style="color: rgba(255,255,255,0.6); margin-top: 0.25rem; font-size: 0.95rem; font-weight: 500; margin-bottom: 0;">
+                            National Governance • <span style="color: white; font-weight: 700;">@totalInventory</span> Properties
+                        </p>
+                    </div>
+                    
+                    <!-- Compact Stats Bar -->
+                    <div style="display: flex; gap: 1.5rem;">
+                        <div style="text-align: right;">
+                            <div style="font-size: 0.65rem; color: rgba(255,255,255,0.5); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Pending</div>
+                            <div style="font-size: 1.25rem; font-weight: 800; color: #f59e0b; line-height: 1;">@pendingCount</div>
+                        </div>
+                        <div style="width: 1px; background: rgba(255,255,255,0.1); align-self: stretch;"></div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 0.65rem; color: rgba(255,255,255,0.5); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Approved</div>
+                            <div style="font-size: 1.25rem; font-weight: 800; color: #10b981; line-height: 1;">@approvedCount</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab & Filter Area -->
+            <div style="padding: 1.25rem 2.5rem; display: flex; justify-content: space-between; align-items: center; background: white;">
+                <div class="dashboard-tabs" style="margin-bottom: 0; border: none; padding-bottom: 0; gap: 2rem;">
+                    <button class="tab-link active" data-tab="pending" style="padding: 0 0 0.5rem 0; font-size: 1rem; font-weight: 700;">
+                        Queue (@pendingCount)
+                    </button>
+                    <button class="tab-link" data-tab="approved" style="padding: 0 0 0.5rem 0; font-size: 1rem; font-weight: 700;">
+                        Certified (@approvedCount)
+                    </button>
+                </div>
+
+                <div style="display: flex; gap: 0.75rem; align-items: center;">
+                    <div class="search-input-wrapper" style="margin: 0; width: 280px;">
+                        <i class="fas fa-search" style="font-size: 0.8rem;"></i>
+                        <input type="text" id="hotelSearch" placeholder="Filter fleet..." style="background: var(--bg-muted); border-color: transparent; padding: 0.5rem 1rem 0.5rem 2.25rem; font-size: 0.85rem;">
+                    </div>
+                    <select id="regionFilter" style="padding: 0.5rem 1rem; border-radius: 0.5rem; border: 1px solid var(--border-color); font-weight: 600; font-size: 0.85rem; color: var(--navy-deep); background: white;">
+                        <option value="">All Regions</option>
+                        @foreach (var region in Model.Select(h => h.Region).Distinct().OrderBy(r => r))
+                        {
+                            <option value="@region">@region</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Working Area -->
+        <div style="padding: 2.5rem;">
+
+            <!-- Tab Content: Pending -->
+            <div id="pendingContainer" class="tab-content animate-fade-in">
+                <div class="hotel-card-grid">
+                    @foreach (var hotel in Model.Where(h => h.Status == Ministry_of_Tourism_pro.Domain.Enums.HotelStatus.Pending))
+                    {
+                        <div class="hotel-card" data-name="@hotel.Name.ToLower()" data-location="@($"{hotel.City} {hotel.Region}".ToLower())" data-region="@hotel.Region">
+                            <div class="hotel-card-img" style="width: 260px; min-width: 260px;">
+                                <img src="@(hotel.ImagePaths.Any() ? hotel.ImagePaths.First() : "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800")" alt="@hotel.Name">
+                                <span class="badge badge-pending" style="position: absolute; top: 1rem; left: 1rem; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);">NEW SUBMISSION</span>
+                            </div>
+                            <div class="hotel-card-body">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                    <div>
+                                        <h3 class="hotel-card-title">@hotel.Name</h3>
+                                        <div class="hotel-card-meta">
+                                            <i class="fas fa-location-dot"></i> @hotel.City, @hotel.Region
+                                        </div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Scale</div>
+                                        <div style="font-weight: 800; color: var(--navy-deep); font-size: 1.25rem;">@hotel.NumberOfRooms <small style="font-size: 0.8rem; opacity: 0.6;">RMS</small></div>
+                                    </div>
+                                </div>
+                                <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; margin: 0.5rem 0 1.5rem 0; flex: 1;">
+                                    @(hotel.Description.Length > 220 ? hotel.Description.Substring(0, 217) + "..." : hotel.Description)
+                                </p>
+                                <div class="hotel-card-footer">
+                                    <div style="display: flex; gap: 1.5rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 600;">
+                                        <span><i class="fas fa-at" style="margin-right: 0.4rem; color: var(--primary-color);"></i>@hotel.ContactEmail</span>
+                                        <span><i class="fas fa-phone" style="margin-right: 0.4rem; color: var(--primary-color);"></i>@hotel.ContactPhone</span>
+                                    </div>
+                                    <a asp-action="Review" asp-route-id="@hotel.Id" class="btn-premium" style="padding: 0.75rem 2rem;">
+                                        Review Details <i class="fas fa-chevron-right" style="margin-left: 0.75rem; font-size: 0.8rem;"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Tab Content: Approved -->
+            <div id="approvedContainer" class="tab-content animate-fade-in" style="display: none;">
+                <div class="hotel-card-grid">
+                    @foreach (var hotel in Model.Where(h => h.Status == Ministry_of_Tourism_pro.Domain.Enums.HotelStatus.Approved))
+                    {
+                        <div class="hotel-card" data-name="@hotel.Name.ToLower()" data-location="@($"{hotel.City} {hotel.Region}".ToLower())" data-region="@hotel.Region">
+                            <div class="hotel-card-img" style="width: 260px; min-width: 260px;">
+                                <img src="@(hotel.ImagePaths.Any() ? hotel.ImagePaths.First() : "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800")" alt="@hotel.Name">
+                                <span class="badge badge-approved" style="position: absolute; top: 1rem; left: 1rem; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">CERTIFIED</span>
+                            </div>
+                            <div class="hotel-card-body">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                    <div>
+                                        <h3 class="hotel-card-title">@hotel.Name</h3>
+                                        <div class="hotel-card-meta">
+                                            <i class="fas fa-check-double" style="color: #10b981;"></i> Verified Property • @hotel.City
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; color: #f59e0b; gap: 0.25rem;">
+                                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                    </div>
+                                </div>
+                                <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; margin: 0.5rem 0 1.5rem 0; flex: 1;">
+                                    @(hotel.Description.Length > 220 ? hotel.Description.Substring(0, 217) + "..." : hotel.Description)
+                                </p>
+                                <div class="hotel-card-footer">
+                                    <div style="display: flex; gap: 1.5rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 600;">
+                                        <span><i class="fas fa-bed" style="margin-right: 0.5rem;"></i>@hotel.NumberOfRooms Units</span>
+                                        <span><i class="fas fa-map" style="margin-right: 0.5rem;"></i>@hotel.Region Zone</span>
+                                    </div>
+                                    <a asp-action="Review" asp-route-id="@hotel.Id" class="btn-premium btn-secondary" style="padding: 0.75rem 2rem;">
+                                        View Details <i class="fas fa-chart-line" style="margin-left: 0.75rem; font-size: 0.8rem;"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Tab Switching Logic
+            $('.tab-link').on('click', function () {
+                const target = $(this).data('tab');
+                $('.tab-link').removeClass('active');
+                $(this).addClass('active');
+
+                $('.tab-content').hide();
+                if (target === 'pending') {
+                    $('#pendingContainer').show();
+                } else {
+                    $('#approvedContainer').show();
+                }
+
+                // Smooth scroll reset
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                // Reset search when switching tabs
+                $('#hotelSearch').val('');
+                $('#regionFilter').val('');
+                $('.hotel-card').show();
+            });
+
+            // Unified Filter Function
+            function performFilter() {
+                const searchTerm = $('#hotelSearch').val().toLowerCase();
+                const regionFilter = $('#regionFilter').val();
+                const activeTab = $('.tab-link.active').data('tab');
+                const containerId = activeTab === 'pending' ? '#pendingContainer' : '#approvedContainer';
+
+                $(containerId + ' .hotel-card').each(function () {
+                    const name = $(this).data('name');
+                    const location = $(this).data('location');
+                    const region = $(this).data('region');
+
+                    const matchesSearch = name.includes(searchTerm) || location.includes(searchTerm);
+                    const matchesRegion = !regionFilter || region === regionFilter;
+
+                    $(this).toggle(matchesSearch && matchesRegion);
+                });
+            }
+
+            // Bind events
+            $('#hotelSearch').on('input', performFilter);
+            $('#regionFilter').on('change', performFilter);
+        });
+    </script>
+}

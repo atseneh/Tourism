@@ -1,0 +1,336 @@
+@model Ministry_of_Tourism_pro.Application.DTOs.HotelDto
+@using Ministry_of_Tourism_pro.WebConstants
+@{
+    ViewData["Title"] = Model.Name + " - Property Management";
+
+    var categories = new List<(int Id, string Name, string Icon, List<string> Props)>
+    {
+        (CNET_WebConstantes.CAT_PROPERTY_PROFILE, "Property Profile", "fa-id-card", new List<string> { "RegistrationName", "DistanceFromAirport", "StarCategory", "TotalRooms", "TotalBeds", "ContactInformation", "ReservationsContact", "SustainabilityFocalPoint" }),
+        (CNET_WebConstantes.CAT_ROOM_INVENTORY, "Room Inventory", "fa-bed", new List<string> { "KingSizeRooms", "TwinBedRooms", "JuniorSuites", "Suites", "PresidentialSuites", "AccessibleRooms" }),
+        (CNET_WebConstantes.CAT_FOOD_BEVERAGE_RETAIL, "Food & Beverage", "fa-utensils", new List<string> { "AllDayDining", "AllDayDiningSeats", "SpecialtyRestaurants", "CoffeeShop", "BarsCount", "NightClub", "SouvenirShops", "DelegationCatering", "DelegationCateringMaxPax", "RefillWaterStations", "VegVeganOptions", "NoSingleUsePlastics" }),
+        (CNET_WebConstantes.CAT_MEETINGS_EVENTS, "Meetings & Events", "fa-calendar-check", new List<string> { "MeetingRoomsCount", "LargestRoomCapacityTheatre", "LargestRoomCapacityClassroom", "LargestRoomCapacityBanquet", "TotalMeetingSpaceSqm" }),
+        (CNET_WebConstantes.CAT_PUBLIC_FACILITIES, "Public Facilities", "fa-swimming-pool", new List<string> { "InternetBandwidthDown", "InternetBandwidthUp", "LobbyAreaSqm", "GreenAreaSqm", "PoolAvailable", "PoolType", "SpaAvailable", "SpaGender", "MassageService", "ChildrensPlayground", "ChildrenDayCare", "StaffCanteen" }),
+        (CNET_WebConstantes.CAT_ACCESSIBILITY, "Accessibility", "fa-wheelchair", new List<string> { "WheelchairRamps", "ElevatorsCount", "ElevatorsWheelchairSized", "PublicAccessibleBathroom" }),
+        (CNET_WebConstantes.CAT_SECURITY_SAFETY, "Security & Safety", "fa-shield-halved", new List<string> { "CCTVPublicAreas", "FireExtinguishersLastInspection", "HoseReels", "SmokeDetectorsInRooms", "SmokeDetectorsInPublicAreas", "SprinklerCoverage", "FireAlarmControlPanel", "EmergencyExitsCount", "BagScanner", "WalkThroughScanner", "HandScanner" }),
+        (CNET_WebConstantes.CAT_TRANSPORT_PARKING, "Transport & Parking", "fa-car", new List<string> { "ParkingSpacesCount", "BusParkingCount", "ShuttleToCop", "ShuttleToAirport", "PublicTransportWithin500m", "EvChargingPoints", "EvChargerTypes" }),
+        (CNET_WebConstantes.CAT_ICT_GUEST_SERVICES, "ICT & Guest Services", "fa-wifi", new List<string> { "WifiPropertyWide", "WifiAvgSpeed", "InHouseLaundry", "Reception24hr", "VipCheckIn", "PassportScanner", "CurrencyScanner" }),
+        (CNET_WebConstantes.CAT_UTILITIES_RESILIENCE, "Utilities & Resilience", "fa-bolt", new List<string> { "StandbyGeneratorCapacityKva", "StandbyGeneratorCoverage", "WaterTreatment", "WasteSegregation", "Recycling", "HazardousWasteHandling" }),
+        (CNET_WebConstantes.CAT_SUSTAINABILITY_CERTIFICATIONS, "Sustainability", "fa-leaf", new List<string> { "SustainabilityCertification", "OtherEcoLabels", "FoodWasteProgram", "SustainabilityRefillWaterStations" }),
+        (CNET_WebConstantes.CAT_STAFFING_LANGUAGES, "Staffing & Languages", "fa-users-gears", new List<string> { "TotalStaff", "InternationalLanguagesFrontDesk" })
+    };
+}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+<style>
+    /* Premium Management Aesthetic */
+    .management-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        padding: 1.75rem 2.5rem; border-radius: 1.5rem; margin-bottom: 2rem; color: white; box-shadow: var(--shadow-xl);
+    }
+    .dashboard-tabs { display: flex; gap: 2.5rem; border-bottom: 2px solid var(--border-color); margin-bottom: 2.5rem; }
+    .tab-link {
+        background: none; border: none; padding: 1rem 0; font-weight: 700; color: var(--text-muted); cursor: pointer;
+        position: relative; font-size: 1rem; display: flex; align-items: center; gap: 0.75rem; transition: var(--transition);
+    }
+    .tab-link.active { color: var(--primary-color); }
+    .tab-link.active::after {
+        content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 4px; background: var(--primary-color); border-radius: 10px 10px 0 0;
+    }
+    .collapsible-card { background: white; border-radius: 1rem; border: 1px solid var(--border-color); margin-bottom: 1.25rem; overflow: hidden; transition: all 0.3s ease; }
+    .collapsible-card.active { border-color: var(--primary-color); box-shadow: var(--shadow-md); }
+    .collapsible-header { padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+    .collapsible-header h3 { margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--navy-deep); display: flex; align-items: center; gap: 0.85rem; }
+    .collapsible-content { border-top: 1px solid var(--border-color); padding: 1.25rem 1.5rem; display: none; }
+    .collapsible-card.active .collapsible-content { display: block; }
+    
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem 1.5rem; }
+    .form-label { font-weight: 700; color: var(--navy-deep); margin-bottom: 0.25rem; display: block; font-size: 0.8rem; }
+    .form-control { border-radius: 0.6rem; padding: 0.45rem 0.85rem; border: 1.5px solid var(--border-color); width: 100%; transition: var(--transition); font-size: 0.9rem; }
+    .map-container { height: 350px; border-radius: 1rem; border: 1.5px solid var(--border-color); overflow: hidden; margin-top: 10px; }
+    
+    /* Branch styles */
+    .btn-branch-long {
+        width: 100%; background: white; border: 1.5px solid var(--border-color); border-radius: 1.25rem; padding: 1.25rem 1.75rem;
+        display: flex; align-items: center; gap: 1.5rem; cursor: pointer; transition: all 0.23s ease; margin-bottom: 1rem; text-align: left;
+    }
+    .btn-branch-long:hover { border-color: var(--primary-color); background: var(--bg-muted); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .branch-icon-circle {
+        width: 50px; height: 50px; background: var(--bg-muted); border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-weight: 800; color: var(--primary-color); border: 1.5px solid var(--border-color);
+    }
+    .btn-create-branch {
+        width: 100%; background: transparent; border: 2px dashed var(--border-color); border-radius: 1.25rem; padding: 1.5rem;
+        color: var(--text-muted); font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.75rem;
+    }
+    .btn-create-branch:hover { border-color: var(--primary-color); color: var(--primary-color); background: var(--bg-muted); }
+
+    /* Attachment Old Format Support */
+    .attach-cat-btn {
+        width: 100%; text-align: left; background: transparent; border: none; border-left: 3px solid transparent; 
+        padding: 0.65rem 1.25rem; font-size: 0.875rem; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: all .15s;
+    }
+    .attach-cat-btn.active { background: white; border-left-color: var(--primary-color); font-weight: 700; color: var(--navy-deep); }
+    .attach-dropzone {
+        border: 2px dashed var(--border-color); border-radius: 0.75rem; padding: 1.75rem; text-align: center; background: var(--bg-muted); cursor: pointer; transition: border-color .2s;
+    }
+
+    /* Category Specific Styling */
+    .category-card { transition: all 0.3s ease; }
+    .category-card.alt-bg { background-color: #f8fafc; }
+    .category-card .collapsible-header { border-left: 4px solid transparent; }
+    .category-card.active .collapsible-header { border-left-color: var(--primary-color); }
+    
+    .detail-row {
+        display: flex; justify-content: space-between; padding: 0.6rem 0; border-bottom: 1px solid rgba(0,0,0,0.03); font-size: 0.9rem;
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { color: var(--text-muted); font-weight: 600; }
+    .detail-value { color: var(--navy-deep); font-weight: 700; text-align: right; }
+    
+    .summary-section-title {
+        font-size: 0.8rem; font-weight: 800; color: var(--primary-color); text-transform: uppercase; letter-spacing: 0.5px;
+        margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;
+    }
+</style>
+
+<div class="animate-fade-in" style="max-width: 1200px; margin: 0 auto;">
+    <!-- Management Header -->
+    <div class="management-header">
+        <div style="display: flex; align-items: center; gap: 2rem;">
+            <div style="width: 100px; height: 100px; border-radius: 50%; border: 4px solid rgba(255,255,255,0.15); overflow: hidden;">
+                <img src="@(Model.ImagePaths.Any() ? Model.ImagePaths.First() : "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800")" 
+                     style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <div style="flex: 1;">
+                <h1 style="font-weight: 800; margin: 0; font-size: 2.25rem; letter-spacing: -1px;">@Model.Name</h1>
+                <div style="display: flex; gap: 1.5rem; margin-top: 0.5rem; color: rgba(255,255,255,0.7); font-weight: 500;">
+                    <span><i class="fas fa-map-marker-alt"></i> @Model.City, @Model.Region</span>
+                    <span><i class="fas fa-id-card"></i> TID: @Model.TIN</span>
+                </div>
+            </div>
+            <div style="text-align: right;">
+                <a asp-action="Dashboard" class="btn-premium btn-secondary" style="width: auto; padding: 0.7rem 1.5rem; font-size: 0.9rem;">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="dashboard-tabs">
+        <button class="tab-link active" data-tab="overview"><i class="fas fa-chart-line"></i> Summary View</button>
+        <button class="tab-link" data-tab="editor"><i class="fas fa-file-pen"></i> Property Documents</button>
+    </div>
+
+    <!-- Overview Content -->
+    <div id="overviewTab" class="tab-content profile-tab-animate">
+        <div style="display: grid; grid-template-columns: 1fr 380px; gap: 2.5rem;">
+            <div>
+                <!-- Infrastructure Details (Categorized & Collapsible) -->
+                <div style="font-weight: 800; color: var(--navy-deep); margin-bottom: 1.5rem; font-size: 1.25rem; display: flex; align-items: center; gap: 1rem;">
+                    <i class="fas fa-list-check" style="color: var(--primary-color);"></i>
+                    Property Registry Profile
+                </div>
+                
+                <div class="summary-view-infrastructure" style="display: grid; gap: 1rem; margin-bottom: 2.5rem;">
+                    @for (int i = 0; i < categories.Count; i++)
+                    {
+                        var cat = categories[i];
+                        <div class="collapsible-card category-card active @(i % 2 != 0 ? "alt-bg" : "")">
+                            <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                                <h3><i class="fas @cat.Icon" style="color: var(--primary-color);"></i> @cat.Name</h3>
+                                <i class="fas fa-chevron-down chevron"></i>
+                            </div>
+                            <div class="collapsible-content">
+                                <div class="form-grid">
+                                    @foreach (var propName in cat.Props)
+                                    {
+                                        var prop = Model.GetType().GetProperty(propName);
+                                        var value = prop?.GetValue(Model);
+                                        var label = System.Text.RegularExpressions.Regex.Replace(propName, "([A-Z])", " $1").Trim();
+                                        
+                                        <div class="detail-row">
+                                            <span class="detail-label">@label</span>
+                                            <span class="detail-value">
+                                                @if (value == null || (value is string s && string.IsNullOrEmpty(s)))
+                                                {
+                                                    <span class="text-muted">Not Specified</span>
+                                                }
+                                                else if (value is bool b)
+                                                {
+                                                    if (b) { <i class="fas fa-check-circle text-success"></i> @:Yes 
+                                                    } else { <i class="fas fa-times-circle text-muted"></i> @:No 
+                                                    }
+                                                }
+                                                else if (value is DateTime dt)
+                                                {
+                                                    @dt.ToString("MMM dd, yyyy")
+                                                }
+                                                else
+                                                {
+                                                    @value
+                                                }
+                                            </span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Property Narrative replaced/augmented by Branch Registry -->
+                <div class="glass-card" style="padding: 1.5rem 2rem; margin-bottom: 2rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.75rem;">
+                        <h3 style="font-weight: 800; color: var(--navy-deep); margin: 0;"><i class="fas fa-code-branch" style="color: var(--primary-color);"></i> Branch Portfolio</h3>
+                        <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Manage individual branches</div>
+                    </div>
+                    
+                    <div style="display: grid; gap: 1rem;">
+                        <!-- Branch 1 -->
+                        <button type="button" class="btn-branch-long" onclick="loadBranchRegistry('Primary Hub')">
+                            <div class="branch-icon-circle">01</div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 800; color: var(--navy-deep); font-size: 1.1rem;">@Model.Name - Primary Hub</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">CODE: @Model.Code-001 | @Model.City</div>
+                            </div>
+                            <span class="badge" style="background: var(--primary-color); color: white; padding: 0.5rem 1rem; border-radius: 0.75rem; font-weight: 700;">See and Update</span>
+                        </button>
+
+                        <!-- Branch 2 -->
+                        <button type="button" class="btn-branch-long" onclick="loadBranchRegistry('Secondary Site')">
+                            <div class="branch-icon-circle">02</div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 800; color: var(--navy-deep); font-size: 1.1rem;">@Model.BrandName - Secondary Site</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">CODE: @Model.Code-002 | Business District</div>
+                            </div>
+                            <span class="badge" style="background: var(--primary-color); color: white; padding: 0.5rem 1rem; border-radius: 0.75rem; font-weight: 700;">See and Update</span>
+                        </button>
+
+                        <!-- Create -->
+                        <button type="button" class="btn-create-branch" onclick="alert('Creating branch...')">
+                            <i class="fas fa-plus-circle"></i> Create New Property Branch
+                        </button>
+                    </div>
+                </div>
+
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="glass-card" style="padding: 1.5rem;">
+                        <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Portfolio Rating</div>
+                        <div style="font-size: 1.5rem; font-weight: 800; color: var(--navy-deep);">@Model.Category Stars</div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                 <div class="glass-card" style="background: var(--bg-muted); padding: 1.5rem;">
+                    <h4 style="font-weight: 800; color: var(--navy-deep); margin-bottom: 1.5rem;">Registry Contacts</h4>
+                    <div style="font-weight: 700; margin-bottom: 0.5rem;"><i class="fas fa-phone"></i> @Model.Phone1</div>
+                    <div style="font-weight: 700;"><i class="fas fa-envelope"></i> @Model.Email</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Editor Content -->
+    <div id="editorTab" class="tab-content" style="display: none;">
+        <div id="branchEditorHeader" style="display: none; background: #e0f2fe; color: #0369a1; padding: 1rem 1.5rem; border-radius: 1rem; margin-bottom: 1.5rem; border: 1px solid #bae6fd; font-weight: 700; display: flex; align-items: center; justify-content: space-between;">
+            <div><i class="fas fa-code-branch"></i> Active Branch Context: <span id="activeBranchName">Primary Hub</span></div>
+            <button type="button" class="btn" onclick="switchTab('overview')" style="font-size: 0.7rem; color: #0369a1; font-weight: 800;">CHANGE BRANCH</button>
+        </div>
+
+        <form asp-action="CommitRegistry" method="post" id="registryForm">
+            <input type="hidden" name="consignee.Id" value="@Model.Id" />
+
+            <!-- 1. Basic Information -->
+            <div class="collapsible-card active">
+                <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                    <h3><i class="fas fa-id-card" style="color: var(--primary-color);"></i> 1. Basic Information</h3>
+                    <i class="fas fa-chevron-down chevron"></i>
+                </div>
+                <div class="collapsible-content">
+                    <div class="form-grid">
+                        <div class="form-group"><label class="form-label">Trade Name *</label><input type="text" name="consignee.FirstName" id="form-trade-name" value="@Model.Name" class="form-control" data-type="@CNET_WebConstantes.CAT_PROPERTY_PROFILE" required /></div>
+                        <div class="form-group"><label class="form-label">Brand Name</label><input type="text" name="consignee." value="@Model.BrandName" class="form-control" data-type="@CNET_WebConstantes.CAT_PROPERTY_PROFILE" /></div>
+                        <div class="form-group"><label class="form-label">Business Type</label><input type="text" name="consignee.BusinessType" value="@Model.BusinessType" class="form-control" data-type="@CNET_WebConstantes.CAT_PROPERTY_PROFILE" /></div>
+                        <div class="form-group"><label class="form-label">Establishment Date</label><input type="date" name="consignee.EstablishmentDate" value="@(Model.DateOfEstablishment?.ToString("yyyy-MM-dd"))" class="form-control" data-type="@CNET_WebConstantes.CAT_PROPERTY_PROFILE" /></div>
+                        <div class="form-group"><label class="form-label">Is Active</label><select name="consignee.IsActive" class="form-control" data-type="@CNET_WebConstantes.CAT_PROPERTY_PROFILE"><option value="true">Yes</option><option value="false">No</option></select></div>
+                        <div class="form-group"><label class="form-label">Code *</label><input type="text" name="consignee.Code" id="form-code" value="@Model.Code" class="form-control" data-type="@CNET_WebConstantes.CAT_PROPERTY_PROFILE" required /></div>
+                        <div class="form-group"><label class="form-label">TIN</label><input type="text" name="consignee.Tin" value="@Model.TIN" class="form-control" data-type="@CNET_WebConstantes.CAT_PROPERTY_PROFILE" /></div>
+                        <div class="form-group"><label class="form-label">Category *</label><input type="text" name="consignee.Category" value="@Model.Category" class="form-control" data-type="@CNET_WebConstantes.CAT_PROPERTY_PROFILE" required /></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Contact & Geographic -->
+            <div class="collapsible-card active">
+                <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                    <h3><i class="fas fa-map-location-dot" style="color: var(--primary-color);"></i> 2. Contact & Geographic Registry</h3>
+                    <i class="fas fa-chevron-down chevron"></i>
+                </div>
+                <div class="collapsible-content">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem;">
+                        <div class="form-grid">
+                            <div class="form-group"><label class="form-label">Phone 1</label><input type="text" name="consigneeUnits[0].Phone1" value="@Model.Phone1" class="form-control" data-type="@CNET_WebConstantes.CAT_PROPERTY_PROFILE" /></div>
+                            <div class="form-group"><label class="form-label">Email</label><input type="text" name="consigneeUnits[0].Email" value="@Model.Email" class="form-control" data-type="@CNET_WebConstantes.CAT_PROPERTY_PROFILE" /></div>
+                            <div class="form-group"><label class="form-label">Region</label><input type="text" name="consigneeUnits[0].Region" value="@Model.Region" class="form-control" data-type="@CNET_WebConstantes.CAT_PROPERTY_PROFILE" /></div>
+                            <div class="form-group"><label class="form-label">City/Town</label><input type="text" name="consigneeUnits[0].City" value="@Model.City" class="form-control" data-type="@CNET_WebConstantes.CAT_PROPERTY_PROFILE" /></div>
+                            <div class="form-group"><label class="form-label">Subcity</label><input type="text" name="consigneeUnits[0].SubCity" value="@Model.SubCity" class="form-control" data-type="@CNET_WebConstantes.CAT_PROPERTY_PROFILE" /></div>
+                            <div class="form-group"><label class="form-label">Kebele</label><input type="text" name="consigneeUnits[0].Kebele" value="@Model.Kebele" class="form-control" data-type="@CNET_WebConstantes.CAT_PROPERTY_PROFILE" /></div>
+                        </div>
+                        <div style="display: flex; flex-direction: column;">
+                            <label class="form-label">Precise GIS</label>
+                            <div style="display: flex; gap: 1rem; margin-bottom: 0.5rem;">
+                                <input type="text" id="lat-input" name="consigneeUnits[0].Latitude" value="@Model.Latitude" class="form-control" placeholder="Lat" />
+                                <input type="text" id="lng-input" name="consigneeUnits[0].Longitude" value="@Model.Longitude" class="form-control" placeholder="Lng" />
+                            </div>
+                            <div class="map-container" id="editor-map"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 3rem; display: flex; gap: 1rem; justify-content: flex-end; padding-bottom: 3rem;">
+                <button type="button" onclick="switchTab('overview')" class="btn-premium btn-secondary" style="width: auto;">Discard</button>
+                <button type="submit" class="btn-premium" style="width: auto;">Commit Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script>
+        function switchTab(tab) {
+            $('.tab-link').removeClass('active'); $(`.tab-link[data-tab="${tab}"]`).addClass('active');
+            $('.tab-content').hide(); $(`#${tab}Tab`).show();
+            if (tab === 'editor') setTimeout(() => map.invalidateSize(), 150);
+        }
+        function toggleCollapsible(header) {
+            const card = $(header).closest('.collapsible-card'); const content = card.find('.collapsible-content');
+            if (card.hasClass('active')) { content.slideUp(300); card.removeClass('active'); }
+            else { content.slideDown(300); card.addClass('active'); }
+        }
+        function loadBranchRegistry(name) {
+            $('#branchEditorHeader').show();
+            $('#activeBranchName').text(name);
+            $('#form-trade-name').val('@Model.Name - ' + name);
+            switchTab('editor');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        var map = L.map('editor-map').setView([@(Model.Latitude ?? 9.0192), @(Model.Longitude ?? 38.7525)], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        var marker = L.marker([@(Model.Latitude ?? 9.0192), @(Model.Longitude ?? 38.7525)], { draggable: true }).addTo(map);
+        marker.on('dragend', function() {
+            var pos = marker.getLatLng(); $('#lat-input').val(pos.lat.toFixed(6)); $('#lng-input').val(pos.lng.toFixed(6));
+        });
+        map.on('click', function(e) {
+            marker.setLatLng(e.latlng); $('#lat-input').val(e.latlng.lat.toFixed(6)); $('#lng-input').val(e.latlng.lng.toFixed(6));
+        });
+        $(document).ready(function() { 
+            $('.tab-link').on('click', function() { switchTab($(this).data('tab')); });
+            $('.tab-link[data-tab="overview"]').on('click', function() { $('#branchEditorHeader').hide(); });
+        });
+    </script>
+}

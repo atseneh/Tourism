@@ -1,0 +1,649 @@
+@model IEnumerable<CNET_V7_Domain.Domain.ViewSchema.VwConsigneeViewDTO>
+@using Ministry_of_Tourism_pro.Models
+@{
+    ViewData["Title"] = "Sector Approval Queue";
+    var categories = EvaluationMockData.GetCategories();
+    // Pre-assign random mock Yes/No answers
+    var rng = new Random(42);
+    foreach (var cat in categories)
+        foreach (var q in cat.Questions)
+            q.Status = rng.Next(2) == 0 ? "yes" : "no";
+}
+
+<style>
+    .compact-table td {
+        padding: 0.6rem 1rem !important;
+        font-size: 0.85rem !important;
+        vertical-align: middle !important;
+    }
+    .compact-table th {
+        padding: 0.75rem 1rem !important;
+        font-size: 0.8rem !important;
+        white-space: nowrap;
+        background: #1e293b;
+        color: white !important;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        box-shadow: inset 0 -1px 0 var(--border-color);
+    }
+    .compact-table tr:nth-child(even) { background-color: #f8fafc; }
+    .compact-table tr:hover { background-color: #f1f5f9 !important; }
+    .scrollable-grid {
+        max-height: 55vh;
+        overflow-y: auto;
+        border: 1px solid var(--border-color);
+        border-radius: 0.75rem;
+        background: white;
+    }
+    .filter-bar {
+        background: white;
+        padding: 1.25rem;
+        border-radius: 1rem;
+        border: 1px solid var(--border-color);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+    .filter-bar .form-group {
+        margin: 0;
+        flex: 1 1 180px;   /* grow/shrink, min 180px each */
+        min-width: 150px;
+    }
+    .filter-bar .form-group.wide {
+        flex: 2 1 240px;   /* Search gets 2x weight = wider */
+    }
+    .filter-bar label {
+        display: block;
+        font-size: 0.65rem;
+        font-weight: 800;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        margin-bottom: 0.4rem;
+        letter-spacing: 0.02em;
+    }
+    .filter-input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 0.6rem 0.85rem;
+        border-radius: 0.6rem;
+        border: 1.5px solid #e2e8f0;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.2s;
+        color: var(--navy-deep);
+    }
+    .filter-input:focus {
+        border-color: var(--primary-color);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    /* ── Action dropdown ── */
+    .action-dropdown { position: relative; display: inline-block; }
+    .action-menu {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: calc(100% + 4px);
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: 0.6rem;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        min-width: 175px;
+        z-index: 500;
+        overflow: hidden;
+    }
+    .action-menu.open { display: block; animation: menuFade 0.15s ease; }
+    @@keyframes menuFade {
+        from { opacity:0; transform: translateY(-4px); }
+        to   { opacity:1; transform: translateY(0); }
+    }
+    .action-menu-item {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.65rem 1rem;
+        font-size: 0.82rem;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
+        transition: background 0.12s;
+    }
+    .action-menu-item:hover { background: #f1f5f9; }
+    .action-menu-item.danger { color: #ef4444; }
+    .action-menu-item.approve { color: #10b981; }
+    .action-menu-item.audit  { color: var(--primary-color); }
+
+    /* ── State badge ── */
+    .state-badge {
+        display: inline-flex; align-items: center; gap: 0.35rem;
+        padding: 0.25rem 0.65rem; border-radius: 2rem; font-size: 0.7rem; font-weight: 700;
+    }
+    .state-pending  { background:#fef9c3; color:#92400e; }
+    .state-approved { background:#d1fae5; color:#065f46; }
+    .state-declined { background:#fee2e2; color:#991b1b; }
+
+    /* ── Toast notification ── */
+    #toastNotification {
+        position: fixed; bottom: 2rem; right: 2rem; z-index: 9999;
+        padding: 1rem 1.75rem; border-radius: 0.75rem;
+        font-weight: 700; font-size: 0.9rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        display: none; align-items: center; gap: 0.75rem;
+        animation: toastIn 0.3s ease;
+        min-width: 260px;
+    }
+    @@keyframes toastIn { from { transform: translateY(20px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+
+    /* ── Audit slide-out panel ── */
+    #auditOverlay {
+        display: none;
+        position: fixed; inset: 0;
+        background: rgba(15,23,42,0.55);
+        backdrop-filter: blur(3px);
+        z-index: 3000;
+    }
+    #auditPanel {
+        position: fixed; top: 0; right: 0; bottom: 0;
+        width: 700px; max-width: 95vw;
+        background: white;
+        box-shadow: -10px 0 40px rgba(0,0,0,0.15);
+        display: none;                              /* start hidden */
+        flex-direction: column;
+        z-index: 3001;
+        transform: translateX(100%);               /* start off-screen */
+        transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+        pointer-events: none;                      /* block clicks when hidden */
+    }
+    #auditPanel.open {
+        transform: translateX(0);
+        pointer-events: all;
+    }
+
+    .audit-cat-tab {
+        display: flex; align-items: center; gap: 0.5rem;
+        padding: 0.6rem 1rem; border: none; background: transparent;
+        border-bottom: 2px solid transparent; font-size: 0.8rem; font-weight: 600;
+        color: var(--text-muted); cursor: pointer; white-space: nowrap; transition: all .15s;
+    }
+    .audit-cat-tab.active {
+        color: var(--primary-color);
+        border-bottom-color: var(--primary-color);
+        background: #eff6ff;
+    }
+    .eval-row {
+        display: flex; align-items: flex-start; gap: 1rem;
+        padding: 0.85rem 1.25rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .eval-row:last-child { border-bottom: none; }
+    .eval-yes { color: #10b981; }
+    .eval-no  { color: #ef4444; }
+    .eval-badge-yes { background: #d1fae5; color: #065f46; }
+    .eval-badge-no  { background: #fee2e2; color: #991b1b; }
+</style>
+
+<div class="animate-fade-in" style="height: calc(100vh - 120px); display: flex; flex-direction: column;">
+    <!-- Header -->
+    <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1 style="font-weight: 800; color: var(--navy-deep); margin: 0; font-size: 1.75rem; letter-spacing: -0.5px;">Sector Approval Queue</h1>
+            <p style="color: var(--text-muted); margin: 0.25rem 0 0; font-size: 0.95rem;">Auditing high-priority specialized sector registrations.</p>
+        </div>
+        <div class="glass-card" style="padding: 0.5rem 1.25rem; background: #eff6ff; border-color: #dbeafe;">
+            <span style="font-weight: 700; color: #1e40af; font-size: 0.85rem;">
+                <i class="fas fa-layer-group" style="margin-right: 0.5rem;"></i> Active Records: @Model.Count()
+            </span>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <div class="form-group">
+            <label>Search Establishment</label>
+            <div style="position: relative;">
+                <i class="fas fa-search" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.8rem;"></i>
+                <input type="text" id="searchName" class="filter-input" placeholder="Type name..." style="padding-left: 2rem;">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>ID / TIN Search</label>
+            <input type="text" id="searchTin" class="filter-input" placeholder="TIN Number...">
+        </div>
+        <div class="form-group">
+            <label>Sector Type</label>
+            <select id="filterType" class="filter-input">
+                <option value="">All Types</option>
+                @foreach (var type in Model.Select(c => c.ChildPreferenceDescrption).Where(t => !string.IsNullOrEmpty(t)).Distinct().OrderBy(t => t))
+                {
+                    <option value="@type">@type</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Zone / Location</label>
+            <select id="filterZone" class="filter-input">
+                <option value="">All Zones</option>
+                @foreach (var zone in Model.Select(c => c.SpecificAddress ?? "Addis Ababa").Distinct().OrderBy(z => z))
+                {
+                    <option value="@zone">@zone</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="glass-card" style="text-align: center; padding: 4rem 2rem; flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <div style="width: 80px; height: 80px; background: #f0fdf4; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+                <i class="fas fa-check-double" style="font-size: 2.5rem; color: #16a34a;"></i>
+            </div>
+            <h2 style="color: var(--navy-deep); font-weight: 800;">All Clear</h2>
+            <p style="color: var(--text-muted); font-size: 1rem;">No pending applications in this sector.</p>
+        </div>
+    }
+    else
+    {
+        <div class="scrollable-grid">
+            <table class="compact-table" style="width: 100%; border-collapse: separate; border-spacing: 0;">
+                <thead>
+                    <tr>
+                        <th style="padding-left: 2rem !important;">Establishment Name</th>
+                        <th>Reference Info</th>
+                        <th>Location</th>
+                        <th>Preference Details</th>
+                        <th>State</th>
+                        <th style="text-align: right; padding-right: 2rem !important;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var consignee in Model)
+                    {
+                        <tr class="approval-row"
+                            id="row-@consignee.Id"
+                            data-name="@consignee.FirstName?.ToLower()"
+                            data-tin="@consignee.Tin?.ToLower()"
+                            data-type="@consignee.ChildPreferenceDescrption?.ToLower()"
+                            data-zone="@(consignee.SpecificAddress?.ToLower() ?? "addis ababa")">
+                            <td style="padding-left: 2rem !important;">
+                                <div style="font-weight: 700; color: var(--navy-deep);">@consignee.FirstName</div>
+                                <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600;">@consignee.AddressLine1</div>
+                            </td>
+                            <td>
+                                <div style="font-weight: 600; color: var(--text-dark);">TIN: @consignee.Tin</div>
+                                <div style="font-size: 0.7rem; color: var(--text-muted);">REF: #@consignee.Code</div>
+                            </td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                                    <i class="fas fa-map-marker-alt" style="color: var(--primary-color); font-size: 0.75rem;"></i>
+                                    <span>@(consignee.SpecificAddress ?? "Addis")</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge" style="font-size: 0.7rem; background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 0.2rem 0.6rem;">
+                                    @consignee.ChildPreferenceDescrption
+                                </span>
+                            </td>
+                            <!-- State column -->
+                            <td>
+                                <span id="state-@consignee.Id" class="state-badge state-pending">
+                                    <i class="fas fa-clock"></i> Pending
+                                </span>
+                            </td>
+                            <!-- Actions: single dropdown button -->
+                            <td style="padding-right: 2rem !important; text-align: right;">
+                                <div class="action-dropdown">
+                                    <button type="button"
+                                            class="btn-premium btn-secondary"
+                                            style="padding: 0.35rem 0.85rem; font-size: 0.78rem; border-radius: 6px; display:inline-flex; align-items:center; gap:0.4rem;"
+                                            onclick="toggleActionMenu(event, @consignee.Id)">
+                                        <i class="fas fa-bolt"></i> Actions <i class="fas fa-chevron-down" style="font-size:0.65rem;"></i>
+                                    </button>
+                                    <div id="menu-@consignee.Id" class="action-menu">
+                                        <button class="action-menu-item approve" onclick="doApprove(@consignee.Id, '@consignee.FirstName'); closeAllMenus();">
+                                            <i class="fas fa-check-circle"></i> Approve
+                                        </button>
+                                        <button class="action-menu-item danger" onclick="doDecline(@consignee.Id, '@consignee.FirstName'); closeAllMenus();">
+                                            <i class="fas fa-ban"></i> Decline
+                                        </button>
+                                        <button class="action-menu-item audit" onclick="openAuditPanel(@consignee.Id, '@consignee.FirstName'); closeAllMenus();">
+                                            <i class="fas fa-clipboard-list"></i> Sector Registry Audit
+                                        </button>
+                                        <a asp-action="Review" asp-route-id="@consignee.Code"
+                                           class="action-menu-item"
+                                           style="color: var(--text-dark); text-decoration:none;">
+                                            <i class="fas fa-eye"></i> Full Review
+                                        </a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Status Footer -->
+        <div style="background: white; border-top: 1px solid var(--border-color); padding: 0.75rem 2rem; display: flex; justify-content: space-between; align-items: center; border-bottom-left-radius: 1rem; border-bottom-right-radius: 1rem;">
+            <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">
+                Showing <span id="visibleCount">@Model.Count()</span> entries
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <span style="font-size: 0.75rem; color: #64748b;"><i class="fas fa-info-circle"></i> Use filters to narrow down the audit queue</span>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- ═══ Toast Notification ═══ -->
+<div id="toastNotification"></div>
+
+<!-- ═══ Audit Side Panel ═══ -->
+<div id="auditOverlay" onclick="closeAuditPanel()"></div>
+<div id="auditPanel">
+    <!-- Panel Header -->
+    <div style="background: linear-gradient(135deg, #1e293b, #0f172a); padding: 1.5rem 2rem; flex-shrink: 0;">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div>
+                <div style="font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:0.08em; color:rgba(255,255,255,0.5); margin-bottom:0.25rem;">Sector Registry Audit</div>
+                <h4 id="auditPanelTitle" style="margin:0; color:white; font-weight:700; font-size:1.1rem;">Loading...</h4>
+            </div>
+            <button type="button" onclick="closeAuditPanel()"
+                    style="background:rgba(255,255,255,0.1);border:none;border-radius:8px;width:34px;height:34px;cursor:pointer;color:white;font-size:1rem;display:flex;align-items:center;justify-content:center;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <!-- Quick approval strip inside panel -->
+        <div style="display:flex; gap:0.75rem; margin-top:1.25rem;">
+            <button type="button" id="auditApproveBtn"
+                    style="flex:1; background:#10b981; border:none; border-radius:0.5rem; color:white; font-weight:700; font-size:0.85rem; padding:0.6rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:0.5rem;"
+                    onclick="doApproveFromPanel()">
+                <i class="fas fa-check-circle"></i> Approve
+            </button>
+            <button type="button" id="auditDeclineBtn"
+                    style="flex:1; background:#ef4444; border:none; border-radius:0.5rem; color:white; font-weight:700; font-size:0.85rem; padding:0.6rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:0.5rem;"
+                    onclick="doDeclineFromPanel()">
+                <i class="fas fa-ban"></i> Decline
+            </button>
+        </div>
+    </div>
+
+    <!-- Category tabs (scrollable horizontal) -->
+    <div style="border-bottom: 1px solid var(--border-color); overflow-x: auto; display: flex; flex-shrink: 0; background: white;">
+        @foreach (var (cat, ci) in categories.Select((c, i) => (c, i)))
+        {
+            <button type="button"
+                    class="audit-cat-tab @(ci == 0 ? "active" : "")"
+                    data-cat-idx="@ci"
+                    onclick="switchAuditCat(@ci)">
+                <i class="fas @cat.Icon"></i> @cat.Name.Split('(')[0].Trim()
+            </button>
+        }
+        <button type="button" class="audit-cat-tab" id="liveDataTab" data-cat-idx="live" onclick="switchAuditCat('live')" style="display:none; color: var(--primary-color); border-bottom-color: var(--primary-color);">
+            <i class="fas fa-database"></i> LIVE REGISTRY
+        </button>
+    </div>
+
+    <!-- Evaluation panels -->
+    <div style="flex: 1; overflow-y: auto;" id="auditPanelsContainer">
+        <div id="auditCatPanel_live" class="audit-cat-panel" style="display: none;">
+            <div style="padding: 1rem 1.25rem; background: #eff6ff; border-bottom: 1px solid #dbeafe; display:flex; align-items:center; gap:0.75rem;">
+                <div style="width:32px;height:32px;background:var(--primary-color);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:0.85rem;flex-shrink:0;">
+                    <i class="fas fa-server"></i>
+                </div>
+                <div>
+                    <div style="font-weight:700; color:var(--navy-deep); font-size:0.9rem;">Live System Identifications</div>
+                    <div style="font-size:0.72rem; color:var(--text-muted);" id="liveDataCount">Fetching real-time records...</div>
+                </div>
+            </div>
+            <div id="liveIdentificationsList"></div>
+        </div>
+        @foreach (var (cat, ci) in categories.Select((c, i) => (c, i)))
+        {
+            <div id="auditCatPanel_@ci" class="audit-cat-panel" style="display: @(ci == 0 ? "block" : "none");">
+                <!-- Category header -->
+                <div style="padding: 1rem 1.25rem; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display:flex; align-items:center; gap:0.75rem;">
+                    <div style="width:32px;height:32px;background:var(--primary-color);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:0.85rem;flex-shrink:0;">
+                        <i class="fas @cat.Icon"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight:700; color:var(--navy-deep); font-size:0.9rem;">@cat.Name</div>
+                        <div style="font-size:0.72rem; color:var(--text-muted);">@cat.Questions.Count question(s) —
+                            <span style="color:#10b981; font-weight:700;">@cat.Questions.Count(q => q.Status == "yes") Yes</span> /
+                            <span style="color:#ef4444; font-weight:700;">@cat.Questions.Count(q => q.Status == "no") No</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Questions list -->
+                @foreach (var q in cat.Questions)
+                {
+                    <div class="eval-row">
+                        <div style="flex-shrink:0; width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:0.9rem;
+                                    @(q.Status == "yes" ? "background:#d1fae5;" : "background:#fee2e2;")">
+                            <i class="fas @(q.Status == "yes" ? "fa-check eval-yes" : "fa-xmark eval-no")"></i>
+                        </div>
+                        <div style="flex:1;">
+                            <div style="font-size:0.8rem; font-weight:600; color:var(--text-muted); margin-bottom:0.2rem;">Q@q.Code</div>
+                            <div style="font-size:0.85rem; line-height:1.5; color:var(--navy-deep);">@q.QuestionText</div>
+                        </div>
+                        <span class="state-badge @(q.Status == "yes" ? "eval-badge-yes" : "eval-badge-no")"
+                              style="flex-shrink:0; font-size:0.72rem;">
+                            @(q.Status == "yes" ? "Yes" : "No")
+                        </span>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        /* ── Active nav highlight for Pending Approvals ── */
+        document.querySelectorAll('.nav-link, .sidebar-link, a[href]').forEach(link => {
+            if (link.getAttribute('href')?.includes('PendingApprovals')) {
+                link.classList.add('active');
+            }
+        });
+
+        /* ══════════════════════════════
+           Action dropdown
+        ══════════════════════════════ */
+        function toggleActionMenu(e, id) {
+            e.stopPropagation();
+            closeAllMenus();
+            const menu = document.getElementById('menu-' + id);
+            menu.classList.toggle('open');
+        }
+        function closeAllMenus() {
+            document.querySelectorAll('.action-menu.open').forEach(m => m.classList.remove('open'));
+        }
+        document.addEventListener('click', closeAllMenus);
+
+        /* ══════════════════════════════
+           Toast utility
+        ══════════════════════════════ */
+        function showToast(msg, type) {
+            const t = document.getElementById('toastNotification');
+            const isSuccess = type === 'approve';
+            t.style.background  = isSuccess ? '#d1fae5' : '#fee2e2';
+            t.style.color       = isSuccess ? '#065f46' : '#991b1b';
+            t.style.border      = isSuccess ? '1px solid #6ee7b7' : '1px solid #fca5a5';
+            t.innerHTML = `<i class="fas ${isSuccess ? 'fa-check-circle' : 'fa-ban'}" style="font-size:1.2rem;"></i> ${msg}`;
+            t.style.display = 'flex';
+            clearTimeout(t._timer);
+            t._timer = setTimeout(() => { t.style.display = 'none'; }, 4500);
+        }
+
+        /* ══════════════════════════════
+           Approve / Decline actions (no redirect)
+        ══════════════════════════════ */
+        function doApprove(id, name) {
+            const badge = document.getElementById('state-' + id);
+            if (badge) {
+                badge.className = 'state-badge state-approved';
+                badge.innerHTML = '<i class="fas fa-check-circle"></i> Approved';
+            }
+            showToast(`"${name}" has been <strong>Approved</strong> successfully.`, 'approve');
+        }
+
+        function doDecline(id, name) {
+            const badge = document.getElementById('state-' + id);
+            if (badge) {
+                badge.className = 'state-badge state-declined';
+                badge.innerHTML = '<i class="fas fa-ban"></i> Declined';
+            }
+            showToast(`"${name}" has been <strong>Declined</strong>.`, 'decline');
+        }
+
+        /* ══════════════════════════════
+           Audit side panel
+        ══════════════════════════════ */
+        let _auditCurrentId   = null;
+        let _auditCurrentName = '';
+
+        async function openAuditPanel(id, name) {
+            _auditCurrentId   = id;
+            _auditCurrentName = name;
+            document.getElementById('auditPanelTitle').textContent = name;
+
+            // Show overlay
+            const overlay = document.getElementById('auditOverlay');
+            overlay.style.display = 'block';
+
+            // Show panel then trigger slide-in on next frame
+            const panel = document.getElementById('auditPanel');
+            panel.style.display = 'flex';
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => panel.classList.add('open'));
+            });
+
+            // Reset tabs and panels
+            $('#liveDataTab').hide();
+            $('#auditCatPanel_live').hide();
+            $('#liveIdentificationsList').empty();
+            $('#liveDataCount').text('Fetching real-time records...');
+
+            switchAuditCat(0);
+
+            // Fetch live data
+            try {
+                console.log("Fetching identifications for:", id);
+                const response = await fetch(`GetEstablishmentIdentifications?id=${id}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log("Identifications received:", data);
+                    if (data && data.length > 0) {
+                        $('#liveDataTab').show();
+                        $('#liveDataCount').text(`${data.length} live identification records found.`);
+                        
+                        const list = $('#liveIdentificationsList');
+                        data.forEach(item => {
+                            list.append(`
+                                <div class="eval-row">
+                                    <div style="flex-shrink:0; width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:0.9rem; background:#eff6ff; color:var(--primary-color);">
+                                        <i class="fas fa-info-circle"></i>
+                                    </div>
+                                    <div style="flex:1;">
+                                        <div style="font-size:0.8rem; font-weight:600; color:var(--text-muted); margin-bottom:0.2rem;">${item.description || 'Identification'}</div>
+                                        <div style="font-size:0.85rem; line-height:1.5; color:var(--navy-deep);">${item.idNumber || 'N/A'}</div>
+                                    </div>
+                                    <span class="state-badge state-approved" style="flex-shrink:0; font-size:0.72rem;">LIVE</span>
+                                </div>
+                            `);
+                        });
+                        switchAuditCat('live');
+                    } else {
+                        console.warn("No identifications found for ID:", id);
+                        $('#liveDataCount').text("No live identification records found in system.");
+                    }
+                } else {
+                    console.error("Audit API failed:", response.status);
+                    showToast("Failed to fetch live audit data.", "decline");
+                }
+            } catch (err) {
+                console.error("Error fetching identifications:", err);
+                showToast("Connection error while fetching audit data.", "decline");
+            }
+        }
+
+        function closeAuditPanel() {
+            const panel   = document.getElementById('auditPanel');
+            const overlay = document.getElementById('auditOverlay');
+
+            // Slide panel out
+            panel.classList.remove('open');
+
+            // After the CSS transition (300ms) fully hide both elements
+            setTimeout(() => {
+                panel.style.display   = 'none';
+                overlay.style.display = 'none';
+            }, 320);
+        }
+
+        function doApproveFromPanel() {
+            if (_auditCurrentId) {
+                doApprove(_auditCurrentId, _auditCurrentName);
+                closeAuditPanel();
+            }
+        }
+        function doDeclineFromPanel() {
+            if (_auditCurrentId) {
+                doDecline(_auditCurrentId, _auditCurrentName);
+                closeAuditPanel();
+            }
+        }
+
+        function switchAuditCat(idx) {
+            document.querySelectorAll('.audit-cat-panel').forEach(p => p.style.display = 'none');
+            const panel = (idx === 'live') ? document.getElementById('auditCatPanel_live') : document.getElementById('auditCatPanel_' + idx);
+            if (panel) panel.style.display = 'block';
+
+            document.querySelectorAll('.audit-cat-tab').forEach(btn => {
+                const btnIdx = btn.dataset.catIdx;
+                const active = (btnIdx == idx);
+                btn.classList.toggle('active', active);
+            });
+
+            // Scroll selected tab into view
+            const activeTab = document.querySelector(`.audit-cat-tab[data-cat-idx="${idx}"]`);
+            if (activeTab) activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+
+        /* ══════════════════════════════
+           Filters
+        ══════════════════════════════ */
+        $(document).ready(function() {
+            // ESC closes the audit panel
+            $(document).on('keydown', function(e) {
+                if (e.key === 'Escape') closeAuditPanel();
+            });
+
+            function performFilters() {
+                const name = $('#searchName').val().toLowerCase();
+                const tin  = $('#searchTin').val().toLowerCase();
+                const type = $('#filterType').val().toLowerCase();
+                const zone = $('#filterZone').val().toLowerCase();
+                let visible = 0;
+                $('.approval-row').each(function() {
+                    const match =
+                        ($(this).data('name') || '').includes(name) &&
+                        ($(this).data('tin')  || '').includes(tin)  &&
+                        (!type || $(this).data('type') === type)    &&
+                        (!zone || $(this).data('zone') === zone);
+                    $(this).toggle(match);
+                    if (match) visible++;
+                });
+                $('#visibleCount').text(visible);
+            }
+            $('.filter-input').on('input change', performFilters);
+        });
+    </script>
+}

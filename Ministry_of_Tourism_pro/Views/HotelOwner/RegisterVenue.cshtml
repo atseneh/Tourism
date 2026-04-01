@@ -1,0 +1,141 @@
+@* @model VenueRegistrationViewModel
+@{
+    ViewData["Title"] = "Venue Registration";
+}
+
+<div class="animate-fade-in">
+    <!-- Header Section -->
+    <div class="mb-4 d-flex align-items-center justify-content-between">
+        <div>
+            <h1 style="color: var(--navy-deep); font-weight: 800; margin: 0; font-size: 2rem; letter-spacing: -1px;">
+                <i class="fas fa-landmark mr-2" style="color: var(--primary-color);"></i>Venue Registration
+            </h1>
+            <p class="text-muted font-weight-500 mb-0">Register meeting rooms, ballrooms, and event spaces.</p>
+        </div>
+        <a asp-action="Dashboard" class="btn-premium btn-secondary" style="width: auto; padding: 0.6rem 1.5rem;">
+            <i class="fas fa-arrow-left mr-2"></i>Back to Profile
+        </a>
+    </div>
+
+    <div class="glass-card mb-5">
+        <form asp-action="RegisterVenue" method="post">
+            <input type="hidden" asp-for="HotelId" />
+
+            <!-- Basic Venue Details -->
+            <div class="mb-5">
+                <h4 style="color: var(--navy-deep); font-weight: 800; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="background: var(--primary-color); color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem;">1</span>
+                    Basic Venue Details
+                </h4>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label asp-for="VenueName" class="form-label">Venue Name</label>
+                        <input asp-for="VenueName" class="form-control" placeholder="e.g. Grand Emerald Hall" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="VenueType" class="form-label">Venue Type</label>
+                        <select asp-for="VenueType" class="form-control">
+                            <option value="">Select Type</option>
+                            <option value="Conference Hall">Conference Hall</option>
+                            <option value="Meeting Room">Meeting Room</option>
+                            <option value="Ballroom">Ballroom</option>
+                            <option value="Outdoor Area">Outdoor Area</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label asp-for="Description" class="form-label">Description</label>
+                        <textarea asp-for="Description" class="form-control" rows="3" placeholder="Describe the ambiance and specialized uses..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Capacity & Layout -->
+            <div class="mb-5 p-4" style="background: var(--bg-muted); border-radius: 1.25rem;">
+                <h4 style="color: var(--navy-deep); font-weight: 800; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="background: var(--primary-color); color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem;">2</span>
+                    Capacity & Arrangements
+                </h4>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label asp-for="SeatingCapacity" class="form-label">Max Seating Capacity</label>
+                        <input asp-for="SeatingCapacity" class="form-control" style="background: white;" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="StandingCapacity" class="form-label">Standing Capacity</label>
+                        <input asp-for="StandingCapacity" class="form-control" style="background: white;" />
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label mb-3">Table Arrangement Types</label>
+                        <div class="d-flex flex-wrap gap-4">
+                            @foreach (var type in new[] { "Theater", "Classroom", "U-Shape", "Banquet", "Boardroom" })
+                            {
+                                <div class="custom-control custom-checkbox mr-3">
+                                    <input type="checkbox" class="custom-control-input" id="table_@type" name="SelectedTableArrangements" value="@type">
+                                    <label class="custom-control-label font-weight-600" for="table_@type" style="color: var(--text-dark);">@type</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Facilities & Dimensions -->
+            <div class="mb-5">
+                <h4 style="color: var(--navy-deep); font-weight: 800; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="background: var(--primary-color); color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem;">3</span>
+                    Facilities & Dimensions
+                </h4>
+                <div class="form-grid">
+                    <div class="form-group full-width mb-4">
+                        <label class="form-label mb-3">Audio-Visual & Utility</label>
+                        <div class="row">
+                            @foreach (var facility in new[] { "Projector", "Microphone", "WiFi", "Stage", "Lighting", "Parking Availability", "Accessibility" })
+                            {
+                                <div class="col-md-4 mb-3">
+                                    <div class="custom-control custom-checkbox">
+                                        @if (facility == "Parking Availability" || facility == "Accessibility")
+                                        {
+                                            <input type="checkbox" class="custom-control-input" id="fac_@facility.Replace(" ", "")" name="@(facility == "Accessibility" ? "IsAccessible" : "HasParking")" value="true">
+                                        }
+                                        else
+                                        {
+                                            <input type="checkbox" class="custom-control-input" id="fac_@facility" name="SelectedFacilities" value="@facility">
+                                        }
+                                        <label class="custom-control-label font-weight-600" for="fac_@facility.Replace(" ", "")" style="color: var(--text-dark);">@facility</label>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Area" class="form-label">Area (Square meters)</label>
+                        <input asp-for="Area" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="CeilingHeight" class="form-label">Ceiling Height (m)</label>
+                        <input asp-for="CeilingHeight" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 pt-4 border-top d-flex justify-content-end gap-3 align-items-center">
+                <a asp-action="Dashboard" class="btn-premium btn-secondary" style="width: auto; padding: 0.75rem 2.5rem;">Discard</a>
+                <button type="submit" class="btn-premium" style="width: auto; padding: 0.75rem 3.5rem;">
+                    <i class="fas fa-check-circle mr-2"></i>Complete Venue Registration
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 2rem; }
+    .full-width { grid-column: span 2; }
+    .gap-4 { gap: 1.5rem; }
+    
+    @@media (max-width: 768px) {
+        .form-grid { grid-template-columns: 1fr; }
+        .full-width { grid-column: auto; }
+    }
+</style>
+ *@

@@ -1,0 +1,209 @@
+@model Ministry_of_Tourism_pro.Models.UserManagementViewModel
+@{
+    ViewData["Title"] = "Manage Members";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .sa-header {
+        background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 100%);
+        border-radius: 1.25rem;
+        padding: 1.75rem 2.5rem;
+        color: white;
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .sa-header h1 { font-size: 1.4rem; font-weight: 800; margin: 0 0 .2rem; letter-spacing: -0.5px; }
+    .sa-header p  { margin: 0; opacity: .7; font-size: .85rem; }
+
+    .sa-card {
+        background: white;
+        border-radius: 1rem;
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    }
+    .sa-card-header {
+        padding: .875rem 1.5rem;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fafbfc;
+    }
+    .sa-card-header h6 { margin: 0; font-weight: 700; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: #475569; }
+
+    .sa-table th {
+        font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+        color: #94a3b8; padding: .75rem 1rem; border-bottom: 1px solid #f1f5f9 !important; background: #f8fafc;
+    }
+    .sa-table td { padding: .85rem 1rem; border-color: #f1f5f9 !important; vertical-align: middle; }
+    .sa-table tbody tr:hover { background: #f8fafc; }
+
+    .u-avatar {
+        width: 38px; height: 38px; border-radius: .6rem; background: #eef2ff;
+        color: #4f46e5; font-weight: 800; font-size: .9rem;
+        display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+
+    .role-chip {
+        display: inline-flex; align-items: center; gap: .35rem;
+        font-size: .72rem; font-weight: 700; padding: .3rem .8rem; border-radius: 2rem;
+        background: #fef3c7; color: #92400e; border: 1px solid #fde68a;
+    }
+    .role-chip.no-role { background: #f1f5f9; color: #94a3b8; border-color: #e2e8f0; }
+
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: .35rem; }
+    .dot-active   { background: #22c55e; }
+    .dot-inactive { background: #e2e8f0; }
+
+    .badge-user { background: #eff6ff; color: #1d4ed8; border: 1px solid #dbeafe; font-size: .72rem; font-weight: 700; padding: .3rem .8rem; border-radius: 2rem; }
+
+    .btn-icon {
+        width: 32px; height: 32px; border-radius: .5rem; border: 1px solid #e2e8f0;
+        background: white; display: inline-flex; align-items: center; justify-content: center;
+        font-size: .8rem; cursor: pointer; transition: all .15s; color: #64748b;
+    }
+    .btn-icon:hover { background: #f8fafc; color: #4f46e5; border-color: #c7d2fe; }
+
+    .btn-add {
+        display: inline-flex; align-items: center; gap: .5rem; padding: .5rem 1.25rem;
+        border-radius: .7rem; background: #4f46e5; color: white; font-size: .8rem;
+        font-weight: 700; border: none; text-decoration: none; transition: all .15s;
+    }
+    .btn-add:hover { background: #4338ca; color: white; }
+
+    .btn-back {
+        display: inline-flex; align-items: center; gap: .5rem; padding: .5rem 1rem;
+        border-radius: .7rem; background: rgba(255,255,255,.15); color: white;
+        font-size: .8rem; font-weight: 700; border: 1px solid rgba(255,255,255,.25); text-decoration: none; transition: all .15s;
+    }
+    .btn-back:hover { background: rgba(255,255,255,.25); color: white; }
+
+    .empty-state { text-align: center; padding: 3.5rem 1rem; color: #94a3b8; }
+    .empty-state i { font-size: 2.5rem; margin-bottom: .75rem; display: block; opacity: .5; }
+    .empty-state p { font-size: .875rem; margin-bottom: 1rem; }
+</style>
+
+<div class="main-content" style="padding: 1.5rem 2rem;">
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert border-0 d-flex align-items-center gap-2 mb-3" style="background:#f0fdf4; color:#166534; font-size:.875rem; border-radius:.75rem;">
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Page Header -->
+    <div class="sa-header mb-4">
+        <div>
+            <h1><i class="fas fa-users-viewfinder me-3"></i>@Model.ConsigneeName</h1>
+            <p>Personnel and authorized user accounts linked to this organization</p>
+        </div>
+        <div class="d-flex gap-2 align-items-center">
+            <a asp-action="CreateUser" asp-route-consigneeId="@Model.ConsigneeId" class="btn-add">
+                <i class="fas fa-user-plus"></i> Add Member
+            </a>
+            <a asp-action="Index" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+
+    <!-- Members Table -->
+    <div class="sa-card">
+        <div class="sa-card-header">
+            <h6><i class="fas fa-user-shield me-2"></i>Personnel (gslType = 26)</h6>
+            <span style="font-size:.75rem; color:#94a3b8; font-weight:600;">@Model.Users?.Count ?? 0 member(s)</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table sa-table mb-0">
+                <thead>
+                    <tr>
+                        <th style="width:35%">Full Name</th>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Users != null && Model.Users.Any())
+                    {
+                        foreach (var user in Model.Users)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="u-avatar">@(string.IsNullOrEmpty(user.FullName) ? "P" : user.FullName[0].ToString())</div>
+                                        <div>
+                                            <div class="fw-bold text-dark" style="font-size:.875rem;">@user.FullName</div>
+                                            <div class="text-muted" style="font-size:.72rem;">Person #@user.PersonId</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(user.UserName))
+                                    {
+                                        <span class="badge-user"><i class="fas fa-at me-1" style="font-size:.6rem;"></i>@user.UserName</span>
+                                    }
+                                    else
+                                    {
+                                        <span style="font-size:.78rem; color:#94a3b8; font-style:italic;">No account</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (user.Role != "No Role")
+                                    {
+                                        <span class="role-chip"><i class="fas fa-shield-halved" style="font-size:.6rem;"></i>@user.Role</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="role-chip no-role"><i class="fas fa-minus" style="font-size:.6rem;"></i>Unassigned</span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    @if (user.IsActive)
+                                    {
+                                        <span style="font-size:.75rem; font-weight:700; color:#16a34a;">
+                                            <span class="status-dot dot-active"></span>Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span style="font-size:.75rem; font-weight:700; color:#94a3b8;">
+                                            <span class="status-dot dot-inactive"></span>Inactive
+                                        </span>
+                                    }
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <button class="btn-icon" title="Edit Personnel"><i class="fas fa-pencil"></i></button>
+                                        <button class="btn-icon" title="Disable" style="color:#ef4444;" onclick="this.style.color='#94a3b8'"><i class="fas fa-ban"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5">
+                                <div class="empty-state">
+                                    <i class="fas fa-users-slash"></i>
+                                    <p>No personnel found for this organization.</p>
+                                    <a asp-action="CreateUser" asp-route-consigneeId="@Model.ConsigneeId" class="btn-add">
+                                        <i class="fas fa-user-plus"></i> Add First Member
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

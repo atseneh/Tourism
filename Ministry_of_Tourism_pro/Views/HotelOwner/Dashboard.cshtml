@@ -1,0 +1,2670 @@
+@model IEnumerable<Ministry_of_Tourism_pro.Application.DTOs.HotelDto>
+@using Ministry_of_Tourism_pro.WebConstants
+@{
+    var hotel = Model.FirstOrDefault() ?? new Ministry_of_Tourism_pro.Application.DTOs.HotelDto();
+    ViewData["Title"] = $"{hotel.Name} • Registry Profile";
+}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+    .profile-tab-animate {
+        animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    h3 {
+        font-size: 1.1rem;
+        font-weight: 800;
+        margin: 0;
+    }
+    
+    .collapsible-card {
+        background: white;
+        border-radius: 1rem;
+        border: 1px solid var(--border-color);
+        margin-bottom: 1rem;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .collapsible-card.active {
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary-color);
+    }
+    
+    .collapsible-header {
+        padding: 1.25rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        background: white;
+        user-select: none;
+    }
+    
+    .collapsible-header:hover { background: var(--bg-muted); }
+    
+    .collapsible-header .chevron {
+        transition: transform 0.3s ease;
+        color: var(--text-muted);
+    }
+    
+    .collapsible-card.active .collapsible-header .chevron {
+        transform: rotate(180deg);
+        color: var(--primary-color);
+    }
+    
+    .collapsible-content { border-top: 1px solid var(--border-color); padding: 1.25rem 1.5rem; display: none; }
+    .collapsible-card.active .collapsible-content { display: block; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem 1.5rem; }
+    .full-width { grid-column: span 2; }
+    .form-label { font-weight: 700; color: var(--navy-deep); margin-bottom: 0.25rem; display: block; font-size: 0.8rem; }
+    .form-control { border-radius: 0.6rem; padding: 0.45rem 0.85rem; border: 1.5px solid var(--border-color); width: 100%; transition: border-color 0.2s; font-size: 0.9rem; }
+    .form-control:focus { border-color: var(--primary-color); outline: none; }
+
+    .glass-card {
+        background: white !important;
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .map-container { height: 350px; border-radius: 1rem; border: 1.5px solid var(--border-color); overflow: hidden; margin-top: 10px; }
+    
+    @@keyframes slideUp {
+        from { transform: translateY(15px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(6px);
+        z-index: 10000;
+        overflow-y: auto;
+        padding: 2rem 1rem;
+        display: none; /* Controlled by JS */
+        justify-content: center;
+        align-items: flex-start; /* Better for tall modals */
+    }
+
+    .modal-content-animate {
+        animation: modalFadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        position: relative;
+        margin: auto; /* Centers horizontally and vertically in flex items if combined with specific settings */
+        z-index: 10001;
+        width: 100%;
+        max-width: 750px;
+    }
+
+    @@keyframes modalFadeUp {
+        from { transform: translateY(30px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Branch specific styles */
+    .btn-branch-long {
+        width: 100%; background: white; border: 1.5px solid var(--border-color); border-radius: 1.25rem; padding: 1.25rem 1.75rem;
+        display: flex; align-items: center; gap: 1.5rem; cursor: pointer; transition: all 0.2s ease; margin-bottom: 1rem;
+        text-align: left; position: relative; overflow: hidden;
+    }
+    .btn-branch-long:hover {
+        border-color: var(--primary-color); background: var(--bg-muted); transform: translateY(-3px); box-shadow: var(--shadow-md);
+    }
+    .btn-branch-long .branch-icon {
+        width: 54px; height: 54px; background: var(--bg-muted); border-radius: 50%; display: flex; align-items: center; 
+        justify-content: center; font-size: 1.25rem; color: var(--primary-color); font-weight: 800; border: 1.5px solid var(--border-color);
+    }
+    .btn-branch-long:hover .branch-icon { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+
+    .btn-create-branch {
+        width: 100%; background: transparent; border: 2px dashed var(--border-color); border-radius: 1.25rem; padding: 1.5rem;
+        color: var(--text-muted); font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.75rem;
+    }
+    .btn-create-branch:hover { background: var(--bg-muted); border-color: var(--primary-color); color: var(--primary-color); }
+
+    /* Attachment Old Format Support */
+    .attach-cat-btn {
+        width: 100%; text-align: left; background: transparent; border: none; border-left: 3px solid transparent; 
+        padding: 0.65rem 1.25rem; font-size: 0.875rem; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: all .15s;
+    }
+    .attach-cat-btn.active {
+        background: white; border-left-color: var(--primary-color); font-weight: 700; color: var(--navy-deep);
+    }
+    .attach-dropzone {
+        border: 2px dashed var(--border-color); border-radius: 0.75rem; padding: 1.75rem; text-align: center; background: var(--bg-muted); cursor: pointer; transition: border-color .2s;
+    }
+    .attach-dropzone:hover { border-color: var(--primary-color); }
+
+    /* Asset Grid Styles */
+    .asset-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1.25rem;
+        margin-top: 0.5rem;
+    }
+    .asset-card {
+        background: white !important;
+        border: 1px solid var(--border-color);
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.2s ease;
+        position: relative;
+        border-left: 3px solid var(--primary-color);
+    }
+    .asset-card:hover { 
+        border-color: var(--primary-color); 
+        box-shadow: var(--shadow-sm);
+        transform: translateY(-2px);
+    }
+    .asset-icon-circle {
+        width: 36px;
+        height: 36px;
+        background: var(--bg-muted);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-color);
+        font-size: 0.9rem;
+    }
+    .asset-badge {
+        font-size: 0.65rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        background: var(--bg-muted);
+        color: var(--text-muted);
+    }
+    .asset-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 4px; height: 100%;
+        background: var(--primary-color);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    .asset-card:hover::before { opacity: 1; }
+    
+    .asset-info { display: flex; flex-direction: column; gap: 0.25rem; }
+    .asset-name { font-weight: 800; color: var(--navy-deep); font-size: 0.95rem; }
+    .asset-value { font-size: 1.25rem; font-weight: 900; color: var(--primary-color); display: flex; align-items: baseline; gap: 0.35rem; }
+    .asset-value span { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
+    
+    .btn-remove-asset { 
+        width: 32px; height: 32px; 
+        display: flex; align-items: center; justify-content: center;
+        color: #ef4444; cursor: pointer; border-radius: 50%; 
+        transition: all 0.2s; border: 1px solid transparent;
+    }
+    .btn-remove-asset:hover { background: #fee2e2; border-color: #fecaca; }
+
+    .btn-save-section {
+        background: var(--bg-muted);
+        color: var(--navy-deep);
+        border: 1px solid var(--border-color);
+        padding: 0.4rem 0.8rem;
+        border-radius: 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        transition: all 0.2s;
+    }
+    .btn-save-section:hover {
+        background: #10b981;
+        color: white;
+        border-color: #10b981;
+    }
+    .form-group-inline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+        padding: 0.65rem 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .form-group-inline .form-label {
+        margin-bottom: 0;
+        flex: 0 0 280px;
+        font-size: 0.85rem;
+        color: var(--navy-deep);
+        padding-right: 1.5rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .form-group-inline .form-control,
+    .form-group-inline .toggle-group {
+        flex: 1;
+        min-width: 0; /* Allow shrinking if needed */
+    }
+    .form-group-inline .form-control {
+        text-align: left; /* Switched to left for better multi-word visibility */
+    }
+    .form-group-inline .premium-checkbox {
+        flex-shrink: 0;
+        min-width: 140px;
+    }
+    .form-group-inline .toggle-group {
+        display: flex;
+        justify-content: flex-start;
+    }
+    .form-group-inline:last-child {
+        border-bottom: none;
+    }
+
+    .premium-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        cursor: pointer;
+        user-select: none;
+        padding: 0.4rem 0.75rem;
+        border-radius: 0.75rem;
+        border: 1.5px solid var(--border-color);
+        transition: all 0.2s ease;
+        background: white;
+        width: fit-content;
+        min-width: 110px;
+        justify-content: space-between;
+    }
+    .premium-checkbox:hover {
+        border-color: var(--primary-color);
+        background: white;
+        box-shadow: var(--shadow-sm);
+    }
+    .premium-checkbox input { display: none; }
+    .checkbox-box {
+        width: 22px;
+        height: 22px;
+        border: 2px solid #cbd5e1;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        background: white;
+    }
+    .premium-checkbox input:checked ~ .checkbox-box {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    .premium-checkbox .checkbox-box i {
+        color: white;
+        font-size: 0.8rem;
+        opacity: 0;
+        transform: scale(0.5);
+        transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .premium-checkbox input:checked ~ .checkbox-box i {
+        opacity: 1;
+        transform: scale(1);
+    }
+    .premium-checkbox .checkbox-text {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        transition: color 0.2s;
+    }
+    .premium-checkbox input:checked ~ .checkbox-text {
+        color: var(--navy-deep);
+    }
+
+    /* Keep toggle group for 3-way choices if needed, but match style */
+    .toggle-group {
+        display: flex;
+        background: #f8fafc;
+        padding: 0.25rem;
+        border-radius: 0.75rem;
+        border: 1.5px solid var(--border-color);
+        gap: 0.25rem;
+    }
+    .toggle-item {
+        flex: 1;
+        padding: 0.4rem 0.75rem;
+        text-align: center;
+        border-radius: 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: var(--text-muted);
+    }
+    .toggle-item.active {
+        background: white;
+        color: var(--primary-color);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-color);
+    }
+
+    /* Sidebar Navigation Styles */
+    .registry-layout {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 2rem;
+        align-items: start;
+    }
+    /* Sidebar Sub-Navigation Styles */
+    .registry-subnav {
+        margin: 0.5rem 0.5rem 0.5rem 2.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        border-left: 1.5px solid var(--border-color);
+        padding-left: 0.75rem;
+    }
+    .registry-nav-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
+        color: var(--text-muted);
+        font-weight: 600;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .registry-nav-item:hover {
+        background: var(--bg-muted);
+        color: var(--primary-color);
+    }
+    .registry-nav-item.active {
+        background: #eef2ff;
+        color: var(--primary-color);
+        font-weight: 700;
+    }
+    .registry-nav-item i {
+        width: 14px;
+        text-align: center;
+        font-size: 0.85rem;
+    }
+
+    /* Branch Detail Panel Styles */
+    .detail-overlay {
+        display: block;
+        position: fixed;
+        top: 0; right: 0; width: 40vw; height: 100%;
+        background: white;
+        box-shadow: -15px 0 45px rgba(0,0,0,0.12);
+        z-index: 11000;
+        padding: 0;
+        overflow-y: auto;
+        transform: translateX(100%);
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        visibility: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    .detail-overlay.active { transform: translateX(0); visibility: visible; }
+    .detail-panel-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 2;
+    }
+    .detail-panel-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem 1.5rem 2rem;
+    }
+    .detail-search-bar {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--bg-muted);
+        border: 1px solid var(--border-color);
+        border-radius: 0.6rem;
+        padding: 0.4rem 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+    .detail-search-bar input {
+        border: none;
+        background: transparent;
+        outline: none;
+        font-size: 0.85rem;
+        color: var(--text-dark);
+        flex: 1;
+        font-family: inherit;
+    }
+    .detail-filter-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-bottom: 1rem;
+    }
+    .detail-chip {
+        padding: 0.25rem 0.7rem;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        border: 1.5px solid var(--border-color);
+        background: white;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: all 0.15s;
+        white-space: nowrap;
+    }
+    .detail-chip:hover, .detail-chip.active {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+    .detail-cat-card {
+        border: 1px solid var(--border-color);
+        border-radius: 0.75rem;
+        margin-bottom: 0.75rem;
+        overflow: hidden;
+    }
+    .detail-cat-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.6rem 1rem;
+        background: var(--bg-muted);
+        cursor: pointer;
+        user-select: none;
+        gap: 0.5rem;
+    }
+    .detail-cat-header:hover { background: #e8f5f5; }
+    .detail-cat-title {
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: var(--navy-deep);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .detail-cat-chevron {
+        color: var(--text-muted);
+        font-size: 0.7rem;
+        transition: transform 0.25s;
+    }
+    .detail-cat-card.open .detail-cat-chevron { transform: rotate(180deg); color: var(--primary-color); }
+    .detail-cat-body {
+        display: none;
+        padding: 0.5rem 1rem 0.75rem;
+    }
+    .detail-cat-card.open .detail-cat-body { display: block; }
+    
+    .detail-backdrop {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(15, 23, 42, 0.3);
+        backdrop-filter: blur(4px);
+        z-index: 10999;
+    }
+    
+    .detail-header {
+        margin-bottom: 2rem;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 1.5rem;
+    }
+    .detail-section {
+        margin-bottom: 2.5rem;
+    }
+    .detail-section-title {
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        border-left: 3px solid var(--primary-color);
+        padding-left: 0.75rem;
+    }
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f8fafc;
+    }
+    .detail-label { color: #64748b; font-size: 0.9rem; font-weight: 600; }
+    .detail-value { color: var(--navy-deep); font-weight: 800; font-size: 0.9rem; text-align: right; }
+    
+    .update-btn-top {
+        background: var(--primary-color);
+        color: white;
+        padding: 0.4rem 1rem;
+        border-radius: 0.6rem;
+        font-weight: 700;
+        font-size: 0.78rem;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+    .update-btn-top:hover { background: var(--navy-deep); transform: translateY(-1px); }
+
+    @@media (max-width: 1024px) {
+        .registry-layout { grid-template-columns: 1fr; }
+        .registry-sidebar { display: none; }
+        .detail-overlay { width: 100%; }
+    }
+</style>
+
+@section SidebarSubNav {
+    <div id="registrySidebarContainer" style="display: none;">
+        <div class="registry-subnav">
+            <div style="padding-bottom: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);">
+                <div id="sidebarBranchName" style="font-weight: 800; color: var(--navy-deep); font-size: 0.75rem; text-transform: uppercase;">...</div>
+            </div>
+            <div class="registry-nav-item active" onclick="scrollToSection(0)">
+                <i class="fas fa-id-card"></i> Basic Info
+            </div>
+            <div class="registry-nav-item" onclick="scrollToSection(1)">
+                <i class="fas fa-bed"></i> Accommodation
+            </div>
+            <div class="registry-nav-item" onclick="scrollToSection(2)">
+                <i class="fas fa-utensils"></i> Food & Beverage
+            </div>
+            <div class="registry-nav-item" onclick="scrollToSection(3)">
+                <i class="fas fa-handshake"></i> Events
+            </div>
+            <div class="registry-nav-item" onclick="scrollToSection(4)">
+                <i class="fas fa-building"></i> Facilities
+            </div>
+            <div class="registry-nav-item" onclick="scrollToSection(5)">
+                <i class="fas fa-wheelchair"></i> Accessibility
+            </div>
+            <div class="registry-nav-item" onclick="scrollToSection(6)">
+                <i class="fas fa-shield-halved"></i> Security & Safety
+            </div>
+            <div class="registry-nav-item" onclick="scrollToSection(7)">
+                <i class="fas fa-car"></i> Transport & Parking
+            </div>
+            <div class="registry-nav-item" onclick="scrollToSection(8)">
+                <i class="fas fa-wifi"></i> ICT & Guest Services
+            </div>
+            <div class="registry-nav-item" onclick="scrollToSection(9)">
+                <i class="fas fa-bolt"></i> Utilities & Resilience
+            </div>
+            <div class="registry-nav-item" onclick="scrollToSection(10)">
+                <i class="fas fa-leaf"></i> Sustainability
+            </div>
+            <div class="registry-nav-item" onclick="scrollToSection(11)">
+                <i class="fas fa-users"></i> Staffing & Languages
+            </div>
+            <div class="registry-nav-item" onclick="scrollToSection(12)">
+                <i class="fas fa-paperclip"></i> Attachments
+            </div>
+            <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color);">
+                <button type="button" class="btn btn-primary w-100" style="padding: 0.4rem; border-radius: 0.5rem; font-size: 0.72rem; font-weight: 800;" onclick="saveRegistry(this, 'all')">
+                    <i class="fas fa-save"></i> Commit All
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="animate-fade-in">
+
+    <!-- Compact Header Section -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; position: relative; z-index: 1;">
+        <div style="display: flex; align-items: center; gap: 1.25rem;">
+            <div style="width: 50px; height: 50px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); padding: 8px;">
+                <img src="~/logo/logo.svg" alt="Logo" style="width: 100%; height: 100%; object-fit: contain;" />
+            </div>
+            <div>
+                <h1 style="color: var(--navy-deep); font-weight: 800; margin: 0; font-size: 1.75rem; letter-spacing: -0.5px;">@hotel.Name</h1>
+                <p id="dynamicSubTitle" style="color: var(--text-muted); margin: 0.25rem 0 0; font-size: 0.95rem; font-weight: 600;">Manage your property branches and registry information</p>
+            </div>
+        </div>
+        
+        <!-- Compact Navigation Tabs -->
+        <div class="dashboard-tabs" style="margin-bottom: -1rem; border: none; padding: 0; gap: 2rem;">
+            <button class="tab-link active" data-tab="overview" style="padding: 1rem 0; font-size: 0.9rem; font-weight: 700;">
+                <i class="fas fa-id-card-clip" style="margin-right: 0.5rem;"></i>Overview
+            </button>
+        </div>
+    </div>
+
+    <!-- Tab Contents -->
+    <div id="overviewTab" class="tab-content profile-tab-animate">
+        <div style="display: grid; grid-template-columns: 1fr 350px; gap: 2.5rem;">
+            <div>
+                <!-- Branch Registry Section (Replaces Narrative as requested) -->
+                <div class="glass-card" style="padding: 2.5rem; margin-bottom: 2rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h3 style="color: var(--navy-deep); font-weight: 800; margin: 0;"><i class="fas fa-code-branch" style="color: var(--primary-color);"></i> Branch Portfolio</h3>
+                        <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">ACTIVE BRANCHES: 2</div>
+                    </div>
+                    
+                    <div style="display: grid; gap: 1rem;">
+                        @foreach (var (b, index) in Model.Select((value, i) => (value, i)))
+                        {
+                            var jsonIds = Newtonsoft.Json.JsonConvert.SerializeObject(b.RawIdentifications.Select(id => new { id.Description, id.IdNumber }));
+                            <!-- Branch @(index + 1) -->
+                            <div class="btn-branch-long" onclick='showBranchSummary("@b.TradeName", "@b.ConsigneeUnitDescription", "@b.Code", "@b.TIN", "@b.ConsigneeUnitId", "@b.City", "@b.StarCategory", "@b.TotalRooms", "@b.TotalBeds", @Html.Raw(jsonIds))'>
+                                <div class="branch-icon">@((index + 1).ToString("D2"))</div>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 800; color: var(--navy-deep); font-size: 1.05rem; margin-bottom: 0.25rem;">@b.TradeName - @b.ConsigneeUnitDescription</div>
+                                    <div style="display: flex; gap: 1rem; font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">
+                                        <span>RID: #@b.Id.ToString("D5")</span>
+                                        @if (!string.IsNullOrEmpty(b.TIN)) { <span>TIN: @b.TIN</span> }
+                                        <span><i class="fas fa-location-dot"></i> @b.City</span>
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <span class="badge" onclick='event.stopPropagation(); loadBranchRegistry("@b.ConsigneeUnitDescription", "@b.Code", "@b.TIN", "@b.ConsigneeUnitId")' style="background: var(--primary-color); color: white; border-radius: 0.75rem; padding: 0.6rem 1.25rem;">See and Update</span>
+                                    <i class="fas fa-chevron-right" style="color: var(--border-color);"></i>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Create Branch -->
+                        <button type="button" class="btn-create-branch" onclick="alert('Initializing New Branch Registry...')">
+                            <i class="fas fa-plus-circle" style="font-size: 1.25rem;"></i> Create New Property Branch
+                        </button>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="card" style="padding: 1.5rem; border: 1px solid var(--border-color);">
+                        <div style="color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Total Portfolio Rooms</div>
+                        <div style="font-size: 1.5rem; font-weight: 800; color: var(--navy-deep);">@(hotel.NumberOfRooms * 2) Units</div>
+                    </div>
+                    <div class="card" style="padding: 1.5rem; border: 1px solid var(--border-color);">
+                        <div style="color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Global Category</div>
+                        <div style="font-size: 1.5rem; font-weight: 800; color: var(--navy-deep);">@hotel.Category</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="display: grid; gap: 2.5rem; align-content: start;">
+                 <div class="glass-card" style="padding:1.5rem;">
+                    <h4 style="font-weight: 800; color: var(--navy-deep); margin-bottom: 1.5rem;">Registry Contacts</h4>
+                    <div style="display: grid; gap: 1rem;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <i class="fas fa-envelope" style="color: var(--primary-color);"></i>
+                            <div style="font-weight: 700;">@hotel.Email</div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <i class="fas fa-phone" style="color: var(--primary-color);"></i>
+                            <div style="font-weight: 700;">@hotel.Phone1</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registry Editor Tab -->
+    <div id="editorTab" class="tab-content profile-tab-animate" style="display: none;">
+        <div id="branchEditorHeader" style="display: none; background: #fff3cd; color: #856404; padding: 1rem 1.5rem; border-radius: 1rem; margin-bottom: 1.5rem; border: 1px solid #ffeeba; font-weight: 700; display: flex; align-items: center; gap: 1rem;">
+            <i class="fas fa-code-branch"></i>
+            <span>Editing Branch: <span id="activeBranchName">Main Hub</span></span>
+            <button type="button" class="btn" style="margin-left: auto; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: #856404;" onclick="switchTab('overview'); $('#registrySidebarContainer').hide();">Switch Branch</button>
+        </div>
+
+        <form asp-action="CommitRegistry" method="post" id="registryForm">
+            <div class="registry-layout" style="grid-template-columns: 1fr;">
+                <!-- Registry Sections -->
+                <div class="registry-sections-container" style="display: grid; gap: 1rem;">
+            <input type="hidden" name="Id" id="editorConsigneeId" value="@hotel.Id" />
+            <input type="hidden" name="ConsigneeUnitId" id="editorConsigneeUnitId" value="" />
+            <input type="hidden" name="TradeName" id="editorTradeName" value="" />
+            
+            <!-- 1. Basic Information -->
+            <div class="collapsible-card active">
+                <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                    <h3><i class="fas fa-id-card" style="color: var(--primary-color);"></i> 1. Basic Information</h3>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <button type="button" class="btn-save-section" onclick="event.stopPropagation(); saveRegistry(this, 'basic')" title="Update Section">
+                            <i class="fas fa-cloud-arrow-up"></i>
+                        </button>
+                        <i class="fas fa-chevron-down chevron"></i>
+                    </div>
+                </div>
+                <div class="collapsible-content" style="display: block;">
+                    <div class="form-grid">
+                        <div class="form-group-inline">
+                            <label class="form-label">Trade Name *</label>
+                            <input type="text" name="TradeName" id="form-trade-name" value="@hotel.Name" class="form-control" required />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Registration Name</label>
+                            <input type="text" name="RegistrationName" id="form-registration-name" value="@hotel.RegistrationName" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Specific Address</label>
+                            <input type="text" name="SpecificAddress" id="form-address" value="@hotel.SpecificAddress" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Sub City</label>
+                            <input type="text" name="Subcity" id="form-subcity-basic" value="@hotel.Subcity" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Airport Distance (km)</label>
+                            <input type="text" name="DistanceFromAirport" id="form-airport-dist" value="@hotel.DistanceFromAirport" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Star Category</label>
+                            <select name="StarCategory" id="form-star-cat" class="form-control">
+                                <option value="">Select Category</option>
+                                <option value="5" selected="@(hotel.StarCategory == "5")">5 Star</option>
+                                <option value="4" selected="@(hotel.StarCategory == "4")">4 Star</option>
+                                <option value="3" selected="@(hotel.StarCategory == "3")">3 Star</option>
+                                <option value="2" selected="@(hotel.StarCategory == "2")">2 Star</option>
+                                <option value="1" selected="@(hotel.StarCategory == "1")">1 Star</option>
+                                <option value="Tourist Recommended" selected="@(hotel.StarCategory == "Tourist Recommended")">Tourist Recommended</option>
+                                <option value="Motel" selected="@(hotel.StarCategory == "Motel")">Motel</option>
+                                <option value="Guest House" selected="@(hotel.StarCategory == "Guest House")">Guest House</option>
+                            </select>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Total Rooms</label>
+                            <input type="number" name="TotalRooms" id="form-total-rooms" value="@hotel.TotalRooms" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Total Beds</label>
+                            <input type="number" name="TotalBeds" id="form-total-beds" value="@hotel.TotalBeds" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Contact (Email/Phone)</label>
+                            <input type="text" name="ContactInformation" id="form-contact-info" value="@hotel.ContactInformation" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Reservations Contact</label>
+                            <input type="text" name="ReservationsContact" id="form-res-contact" value="@hotel.ReservationsContact" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Sustainability Focal</label>
+                            <input type="text" name="SustainabilityFocalPoint" id="form-sust-focal" value="@hotel.SustainabilityFocalPoint" class="form-control" />
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label">Location on Map</label>
+                            <div id="editor-map" class="map-container"></div>
+                            <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                                <div style="flex: 1;">
+                                    <label class="form-label" style="font-size: 0.7rem; opacity: 0.7;">Latitude</label>
+                                    <input type="text" name="Latitude" id="lat-input" value="@hotel.Latitude" class="form-control" readonly />
+                                </div>
+                                <div style="flex: 1;">
+                                    <label class="form-label" style="font-size: 0.7rem; opacity: 0.7;">Longitude</label>
+                                    <input type="text" name="Longitude" id="lng-input" value="@hotel.Longitude" class="form-control" readonly />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Accommodation Infrastructure -->
+            <div class="collapsible-card">
+                <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                    <h3><i class="fas fa-bed" style="color: var(--primary-color);"></i> 2. Accommodation Infrastructure</h3>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <button type="button" class="btn-save-section" onclick="event.stopPropagation(); saveRegistry(this, 'accommodation')" title="Update Section">
+                            <i class="fas fa-cloud-arrow-up"></i>
+                        </button>
+                        <i class="fas fa-chevron-down chevron"></i>
+                    </div>
+                </div>
+                <div class="collapsible-content">
+                    <div class="form-grid">
+                        <div class="form-group-inline">
+                            <label class="form-label">King size Rooms</label>
+                            <input type="number" name="KingSizeRooms" id="form-king-rooms" value="@hotel.KingSizeRooms" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Twin bed Rooms</label>
+                            <input type="number" name="TwinBedRooms" id="form-twin-rooms" value="@hotel.TwinBedRooms" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Junior Suites</label>
+                            <input type="number" name="JuniorSuites" id="form-junior-suites" value="@hotel.JuniorSuites" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Suites</label>
+                            <input type="number" name="Suites" id="form-suites" value="@hotel.Suites" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Presidential Suites</label>
+                            <input type="number" name="PresidentialSuites" id="form-pres-suites" value="@hotel.PresidentialSuites" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Accessible Rooms</label>
+                            <input type="number" name="AccessibleRooms" id="form-acc-rooms" value="@hotel.AccessibleRooms" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Food & Beverage -->
+            <div class="collapsible-card">
+                <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                    <h3><i class="fas fa-utensils" style="color: var(--primary-color);"></i> 3. Food & Beverage</h3>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <button type="button" class="btn-save-section" onclick="event.stopPropagation(); saveRegistry(this, 'food_beverage')" title="Update Section">
+                            <i class="fas fa-cloud-arrow-up"></i>
+                        </button>
+                        <i class="fas fa-chevron-down chevron"></i>
+                    </div>
+                </div>
+                <div class="collapsible-content">
+                    <div class="form-grid">
+                        <div class="form-group-inline">
+                            <label class="form-label">All-day Dining</label>
+                            <input type="hidden" name="AllDayDining" id="form-all-day-dining" value="@(hotel.AllDayDining == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-all-day-dining" @(hotel.AllDayDining == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">All-day Dining Seats</label>
+                            <input type="number" name="AllDayDiningSeats" id="form-dining-seats" value="@hotel.AllDayDiningSeats" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Specialty Restaurants</label>
+                            <input type="text" name="SpecialtyRestaurants" id="form-spec-rest" value="@hotel.SpecialtyRestaurants" class="form-control" placeholder="Italian, Chinese..." />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Coffee Shop</label>
+                            <input type="hidden" name="CoffeeShop" id="form-coffee-shop" value="@(hotel.CoffeeShop == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-coffee-shop" @(hotel.CoffeeShop == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Bars (number)</label>
+                            <input type="number" name="BarsCount" id="form-bars-count" value="@hotel.BarsCount" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Night Club</label>
+                            <input type="hidden" name="NightClub" id="form-night-club" value="@(hotel.NightClub == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-night-club" @(hotel.NightClub == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Souvenir Shops</label>
+                            <input type="number" name="SouvenirShops" id="form-shops-count" value="@hotel.SouvenirShops" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Delegation Catering</label>
+                            <input type="hidden" name="DelegationCatering" id="form-del-cat" value="@(hotel.DelegationCatering == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-del-cat" @(hotel.DelegationCatering == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Catering Max Pax</label>
+                            <input type="number" name="DelegationCateringMaxPax" id="form-del-cat-max" value="@hotel.DelegationCateringMaxPax" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Refill Water Stations</label>
+                            <input type="hidden" name="RefillWaterStations" id="form-refill-water" value="@(hotel.RefillWaterStations == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-refill-water" @(hotel.RefillWaterStations == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Veg/Vegan Options</label>
+                            <input type="hidden" name="VegVeganOptions" id="form-veg-options" value="@(hotel.VegVeganOptions == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-veg-options" @(hotel.VegVeganOptions == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">No Single-use Plastics</label>
+                            <input type="hidden" name="NoSingleUsePlastics" id="form-no-plastic" value="@(hotel.NoSingleUsePlastics == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-no-plastic" @(hotel.NoSingleUsePlastics == true ? "checked" : "") />
+                                <span class="checkbox-text">Ensured</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Meetings & Events Specs -->
+            <div class="collapsible-card">
+                <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                    <h3><i class="fas fa-handshake" style="color: var(--primary-color);"></i> 4. Meetings & Events Specs</h3>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <button type="button" class="btn-save-section" onclick="event.stopPropagation(); saveRegistry(this, 'meetings_events')" title="Update Section">
+                            <i class="fas fa-cloud-arrow-up"></i>
+                        </button>
+                        <i class="fas fa-chevron-down chevron"></i>
+                    </div>
+                </div>
+                <div class="collapsible-content">
+                    <div class="form-grid">
+                        <div class="form-group-inline">
+                            <label class="form-label">Meeting Rooms</label>
+                            <input type="number" name="MeetingRoomsCount" id="form-meeting-rooms" value="@hotel.MeetingRoomsCount" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Max Theatre Cap.</label>
+                            <input type="number" name="LargestRoomCapacityTheatre" id="form-cap-theatre" value="@hotel.LargestRoomCapacityTheatre" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Max Classroom Cap.</label>
+                            <input type="number" name="LargestRoomCapacityClassroom" id="form-cap-classroom" value="@hotel.LargestRoomCapacityClassroom" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Max Banquet Cap.</label>
+                            <input type="number" name="LargestRoomCapacityBanquet" id="form-cap-banquet" value="@hotel.LargestRoomCapacityBanquet" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Total Meeting Space (sqm)</label>
+                            <input type="number" name="TotalMeetingSpaceSqm" id="form-total-meeting-sqm" value="@hotel.TotalMeetingSpaceSqm" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Public Facilities -->
+            <div class="collapsible-card">
+                <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                    <h3><i class="fas fa-building" style="color: var(--primary-color);"></i> 5. Public Facilities</h3>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <button type="button" class="btn-save-section" onclick="event.stopPropagation(); saveRegistry(this, 'public_facilities')" title="Update Section">
+                            <i class="fas fa-cloud-arrow-up"></i>
+                        </button>
+                        <i class="fas fa-chevron-down chevron"></i>
+                    </div>
+                </div>
+                <div class="collapsible-content">
+                    <div class="form-grid">
+                        <div class="form-group-inline">
+                            <label class="form-label">Internet Bandwidth Down</label>
+                            <input type="number" name="InternetBandwidthDown" id="form-net-down" value="@hotel.InternetBandwidthDown" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Internet Bandwidth Up</label>
+                            <input type="number" name="InternetBandwidthUp" id="form-net-up" value="@hotel.InternetBandwidthUp" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Lobby Area (sqm)</label>
+                            <input type="number" name="LobbyAreaSqm" id="form-lobby-sqm" value="@hotel.LobbyAreaSqm" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Green Area/Garden (sqm)</label>
+                            <input type="number" name="GreenAreaSqm" id="form-green-sqm" value="@hotel.GreenAreaSqm" class="form-control" />
+                        </div>                        <div class="form-group-inline">
+                            <label class="form-label">Pool Available</label>
+                            <input type="hidden" name="PoolAvailable" id="form-pool-avail" value="@(hotel.PoolAvailable == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-pool-avail" data-toggle-callback="togglePoolType" @(hotel.PoolAvailable == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div id="poolTypeGroup" class="form-group-inline" style="display: @(hotel.PoolAvailable == true ? "flex" : "none");">
+                            <label class="form-label">Pool Type</label>
+                            <select name="PoolType" id="form-pool-type" class="form-control">
+                                <option value="Indoor" selected="@(hotel.PoolType == "Indoor")">Indoor</option>
+                                <option value="Outdoor" selected="@(hotel.PoolType == "Outdoor")">Outdoor</option>
+                                <option value="Both" selected="@(hotel.PoolType == "Both")">Both</option>
+                            </select>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Spa Available</label>
+                            <input type="hidden" name="SpaAvailable" id="form-spa-avail" value="@(hotel.SpaAvailable == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-spa-avail" data-toggle-callback="toggleSpaGender" @(hotel.SpaAvailable == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div id="spaGenderGroup" class="form-group-inline" style="display: @(hotel.SpaAvailable == true ? "flex" : "none");">
+                            <label class="form-label">Spa Category</label>
+                            <select name="SpaGender" id="form-spa-gender" class="form-control">
+                                <option value="Male Only" selected="@(hotel.SpaGender == "Male Only")">Male Only</option>
+                                <option value="Female Only" selected="@(hotel.SpaGender == "Female Only")">Female Only</option>
+                                <option value="Unisex" selected="@(hotel.SpaGender == "Unisex")">Unisex</option>
+                            </select>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Massage Service</label>
+                            <input type="hidden" name="MassageService" id="form-massage" value="@(hotel.MassageService == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-massage" @(hotel.MassageService == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Children's Playground</label>
+                            <input type="hidden" name="ChildrensPlayground" id="form-playground" value="@(hotel.ChildrensPlayground == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-playground" @(hotel.ChildrensPlayground == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Children's Day Care</label>
+                            <input type="hidden" name="ChildrenDayCare" id="form-daycare" value="@(hotel.ChildrenDayCare == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-daycare" @(hotel.ChildrenDayCare == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Staff Canteen</label>
+                            <input type="hidden" name="StaffCanteen" id="form-canteen" value="@(hotel.StaffCanteen == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-canteen" @(hotel.StaffCanteen == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. Accessibility -->
+            <div class="collapsible-card">
+                <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                    <h3><i class="fas fa-wheelchair" style="color: var(--primary-color);"></i> 6. Accessibility</h3>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <button type="button" class="btn-save-section" onclick="event.stopPropagation(); saveRegistry(this, 'accessibility')" title="Update Section">
+                            <i class="fas fa-cloud-arrow-up"></i>
+                        </button>
+                        <i class="fas fa-chevron-down chevron"></i>
+                    </div>
+                </div>
+                <div class="collapsible-content">
+                    <div class="form-grid">                        <div class="form-group-inline">
+                            <label class="form-label">Wheelchair Ramps</label>
+                            <input type="hidden" name="WheelchairRamps" id="form-ramps" value="@(hotel.WheelchairRamps == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-ramps" @(hotel.WheelchairRamps == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Elevators Count</label>
+                            <input type="number" name="ElevatorsCount" id="form-elevators" value="@hotel.ElevatorsCount" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Wheelchair Sized Elevators</label>
+                            <input type="hidden" name="ElevatorsWheelchairSized" id="form-elev-acc" value="@(hotel.ElevatorsWheelchairSized == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-elev-acc" @(hotel.ElevatorsWheelchairSized == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Public Accessible Bathroom</label>
+                            <input type="hidden" name="PublicAccessibleBathroom" id="form-bathroom-acc" value="@(hotel.PublicAccessibleBathroom == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-bathroom-acc" @(hotel.PublicAccessibleBathroom == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. Security & Safety -->
+            <div class="collapsible-card">
+                <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                    <h3><i class="fas fa-shield-halved" style="color: var(--primary-color);"></i> 7. Security & Safety</h3>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <button type="button" class="btn-save-section" onclick="event.stopPropagation(); saveRegistry(this, 'security_safety')" title="Update Section">
+                            <i class="fas fa-cloud-arrow-up"></i>
+                        </button>
+                        <i class="fas fa-chevron-down chevron"></i>
+                    </div>
+                </div>
+                <div class="collapsible-content">
+                    <div class="form-grid">
+                        <div class="form-group-inline">
+                            <label class="form-label">CCTV in Public Areas</label>
+                            <input type="hidden" name="CCTVPublicAreas" id="form-cctv" value="@(hotel.CCTVPublicAreas == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-cctv" @(hotel.CCTVPublicAreas == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Fire Ext. Last Inspection</label>
+                            <input type="date" name="FireExtinguishersLastInspection" id="form-fire-insp" value="@(hotel.FireExtinguishersLastInspection?.ToString("yyyy-MM-dd"))" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Hose Reels</label>
+                            <input type="hidden" name="HoseReels" id="form-hose" value="@(hotel.HoseReels == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-hose" @(hotel.HoseReels == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Smoke Detectors (Rooms)</label>
+                            <input type="hidden" name="SmokeDetectorsInRooms" id="form-smoke-rooms" value="@(hotel.SmokeDetectorsInRooms == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-smoke-rooms" @(hotel.SmokeDetectorsInRooms == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Smoke Detectors (Public)</label>
+                            <input type="hidden" name="SmokeDetectorsInPublicAreas" id="form-smoke-public" value="@(hotel.SmokeDetectorsInPublicAreas == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-smoke-public" @(hotel.SmokeDetectorsInPublicAreas == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Sprinkler Coverage</label>
+                            <input type="text" name="SprinklerCoverage" id="form-sprinkler" value="@hotel.SprinklerCoverage" class="form-control" placeholder="Full, Partial, None" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Fire Alarm Control Panel</label>
+                            <input type="hidden" name="FireAlarmControlPanel" id="form-alarm-panel" value="@(hotel.FireAlarmControlPanel == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-alarm-panel" @(hotel.FireAlarmControlPanel == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Emergency Exits Count</label>
+                            <input type="number" name="EmergencyExitsCount" id="form-exits" value="@hotel.EmergencyExitsCount" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Bag Scanner</label>
+                            <input type="hidden" name="BagScanner" id="form-bag-scanner" value="@(hotel.BagScanner == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-bag-scanner" @(hotel.BagScanner == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Walk-through Scanner</label>
+                            <input type="hidden" name="WalkThroughScanner" id="form-walk-scanner" value="@(hotel.WalkThroughScanner == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-walk-scanner" @(hotel.WalkThroughScanner == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Hand Scanner</label>
+                            <input type="hidden" name="HandScanner" id="form-hand-scanner" value="@(hotel.HandScanner == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-hand-scanner" @(hotel.HandScanner == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 8. Transport & Parking -->
+            <div class="collapsible-card">
+                <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                    <h3><i class="fas fa-car" style="color: var(--primary-color);"></i> 8. Transport & Parking</h3>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <button type="button" class="btn-save-section" onclick="event.stopPropagation(); saveRegistry(this, 'transport_parking')" title="Update Section">
+                            <i class="fas fa-cloud-arrow-up"></i>
+                        </button>
+                        <i class="fas fa-chevron-down chevron"></i>
+                    </div>
+                </div>
+                <div class="collapsible-content">
+                    <div class="form-grid">
+                        <div class="form-group-inline">
+                            <label class="form-label">Parking Spaces (number)</label>
+                            <input type="number" name="ParkingSpacesCount" id="form-parking" value="@hotel.ParkingSpacesCount" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Bus Parking (number)</label>
+                            <input type="number" name="BusParkingCount" id="form-bus-parking" value="@hotel.BusParkingCount" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Shuttle to COP Venue</label>
+                            <input type="hidden" name="ShuttleToCop" id="form-shuttle-cop" value="@(hotel.ShuttleToCop == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-shuttle-cop" @(hotel.ShuttleToCop == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Shuttle to Airport</label>
+                            <input type="hidden" name="ShuttleToAirport" id="form-shuttle-airport" value="@(hotel.ShuttleToAirport == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-shuttle-airport" @(hotel.ShuttleToAirport == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Public Transport within 500m</label>
+                            <input type="hidden" name="PublicTransportWithin500m" id="form-pub-transport" value="@(hotel.PublicTransportWithin500m == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-pub-transport" @(hotel.PublicTransportWithin500m == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">EV Charging Points</label>
+                            <input type="number" name="EvChargingPoints" id="form-ev-points" value="@hotel.EvChargingPoints" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">EV Charger Types</label>
+                            <input type="text" name="EvChargerTypes" id="form-ev-types" value="@hotel.EvChargerTypes" class="form-control" placeholder="Type 1, Type 2, etc." />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 9. ICT & Guest Services -->
+            <div class="collapsible-card">
+                <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                    <h3><i class="fas fa-wifi" style="color: var(--primary-color);"></i> 9. ICT & Guest Services</h3>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <button type="button" class="btn-save-section" onclick="event.stopPropagation(); saveRegistry(this, 'ict_services')" title="Update Section">
+                            <i class="fas fa-cloud-arrow-up"></i>
+                        </button>
+                        <i class="fas fa-chevron-down chevron"></i>
+                    </div>
+                </div>
+                <div class="collapsible-content">
+                    <div class="form-grid">
+                        <div class="form-group-inline">
+                            <label class="form-label">Wi-Fi Property-wide</label>
+                            <input type="hidden" name="WifiPropertyWide" id="form-wifi-prop" value="@(hotel.WifiPropertyWide == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-wifi-prop" @(hotel.WifiPropertyWide == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Wi-Fi Avg Speed (Mbps)</label>
+                            <input type="number" name="WifiAvgSpeed" id="form-wifi-speed" value="@hotel.WifiAvgSpeed" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">In-house Laundry</label>
+                            <input type="hidden" name="InHouseLaundry" id="form-laundry" value="@(hotel.InHouseLaundry == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-laundry" @(hotel.InHouseLaundry == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">24-hour Reception</label>
+                            <input type="hidden" name="Reception24hr" id="form-reception" value="@(hotel.Reception24hr == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-reception" @(hotel.Reception24hr == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">VIP Check-In</label>
+                            <input type="hidden" name="VipCheckIn" id="form-vip-check" value="@(hotel.VipCheckIn == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-vip-check" @(hotel.VipCheckIn == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Passport Scanner</label>
+                            <input type="hidden" name="PassportScanner" id="form-pass-scanner" value="@(hotel.PassportScanner == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-pass-scanner" @(hotel.PassportScanner == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Currency Scanner/Detector</label>
+                            <input type="hidden" name="CurrencyScanner" id="form-curr-scanner" value="@(hotel.CurrencyScanner == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-curr-scanner" @(hotel.CurrencyScanner == true ? "checked" : "") />
+                                <span class="checkbox-text">Available</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 10. Utilities & Resilience -->
+            <div class="collapsible-card">
+                <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                    <h3><i class="fas fa-bolt" style="color: var(--primary-color);"></i> 10. Utilities & Resilience</h3>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <button type="button" class="btn-save-section" onclick="event.stopPropagation(); saveRegistry(this, 'utilities_resilience')" title="Update Section">
+                            <i class="fas fa-cloud-arrow-up"></i>
+                        </button>
+                        <i class="fas fa-chevron-down chevron"></i>
+                    </div>
+                </div>
+                <div class="collapsible-content">
+                    <div class="form-grid">
+                        <div class="form-group-inline">
+                            <label class="form-label">Standby Gen. Capacity (kVA)</label>
+                            <input type="number" name="StandbyGeneratorCapacityKva" id="form-gen-cap" value="@hotel.StandbyGeneratorCapacityKva" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Standby Gen. Coverage</label>
+                            <select name="StandbyGeneratorCoverage" id="form-gen-cov" class="form-control">
+                                <option value="Full" selected="@(hotel.StandbyGeneratorCoverage == "Full")">Full</option>
+                                <option value="Partial" selected="@(hotel.StandbyGeneratorCoverage == "Partial")">Partial</option>
+                                <option value="None" selected="@(hotel.StandbyGeneratorCoverage == "None")">None</option>
+                            </select>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Water Treatment</label>
+                            <select name="WaterTreatment" id="form-water" class="form-control">
+                                <option value="None" selected="@(hotel.WaterTreatment == "None")">None</option>
+                                <option value="Basic" selected="@(hotel.WaterTreatment == "Basic")">Basic</option>
+                                <option value="Advanced" selected="@(hotel.WaterTreatment == "Advanced")">Advanced</option>
+                            </select>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Waste Segregation</label>
+                            <input type="hidden" name="WasteSegregation" id="form-waste-seg" value="@(hotel.WasteSegregation == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-waste-seg" @(hotel.WasteSegregation == true ? "checked" : "") />
+                                <span class="checkbox-text">Enabled</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Recycling Program</label>
+                            <input type="hidden" name="Recycling" id="form-recycling" value="@(hotel.Recycling == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-recycling" @(hotel.Recycling == true ? "checked" : "") />
+                                <span class="checkbox-text">Enabled</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Hazardous Waste Handling</label>
+                            <input type="hidden" name="HazardousWasteHandling" id="form-haz-waste" value="@(hotel.HazardousWasteHandling == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-haz-waste" @(hotel.HazardousWasteHandling == true ? "checked" : "") />
+                                <span class="checkbox-text">Enabled</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 11. Sustainability & Certifications -->
+            <div class="collapsible-card">
+                <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                    <h3><i class="fas fa-leaf" style="color: var(--primary-color);"></i> 11. Sustainability & Certifications</h3>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <button type="button" class="btn-save-section" onclick="event.stopPropagation(); saveRegistry(this, 'sustainability')" title="Update Section">
+                            <i class="fas fa-cloud-arrow-up"></i>
+                        </button>
+                        <i class="fas fa-chevron-down chevron"></i>
+                    </div>
+                </div>
+                <div class="collapsible-content">
+                    <div class="form-grid">
+                        <div class="form-group-inline">
+                            <label class="form-label">HACCP/GSTC Cert.</label>
+                            <select name="SustainabilityCertification" id="form-sust-cert" class="form-control">
+                                <option value="Yes" selected="@(hotel.SustainabilityCertification == "Yes")">Yes</option>
+                                <option value="No" selected="@(hotel.SustainabilityCertification == "No")">No</option>
+                                <option value="In progress" selected="@(hotel.SustainabilityCertification == "In progress")">In Progress</option>
+                            </select>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Other Eco-labels</label>
+                            <input type="text" name="OtherEcoLabels" id="form-eco-labels" value="@hotel.OtherEcoLabels" class="form-control" placeholder="e.g. Green Key..." />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Food Waste Program</label>
+                            <input type="hidden" name="FoodWasteProgram" id="form-waste-prog" value="@(hotel.FoodWasteProgram == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-waste-prog" @(hotel.FoodWasteProgram == true ? "checked" : "") />
+                                <span class="checkbox-text">Enabled</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Refill Water Stations</label>
+                            <input type="hidden" name="SustainabilityRefillWaterStations" id="form-sust-refill" value="@(hotel.SustainabilityRefillWaterStations == true ? "true" : "false")" />
+                            <label class="premium-checkbox">
+                                <input type="checkbox" class="sync-checkbox" data-target="form-sust-refill" @(hotel.SustainabilityRefillWaterStations == true ? "checked" : "") />
+                                <span class="checkbox-text">Enabled</span>
+                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 12. Staffing & Languages -->
+            <div class="collapsible-card">
+                <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                    <h3><i class="fas fa-users" style="color: var(--primary-color);"></i> 12. Staffing & Languages</h3>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <button type="button" class="btn-save-section" onclick="event.stopPropagation(); saveRegistry(this, 'staffing')" title="Update Section">
+                            <i class="fas fa-cloud-arrow-up"></i>
+                        </button>
+                        <i class="fas fa-chevron-down chevron"></i>
+                    </div>
+                </div>
+                <div class="collapsible-content">
+                    <div class="form-grid">
+                        <div class="form-group-inline">
+                            <label class="form-label">Total Staff</label>
+                            <input type="number" name="TotalStaff" id="form-total-staff" value="@hotel.TotalStaff" class="form-control" />
+                        </div>
+                        <div class="form-group-inline">
+                            <label class="form-label">Front Desk Languages</label>
+                            <input type="text" name="InternationalLanguagesFrontDesk" id="form-languages" value="@hotel.InternationalLanguagesFrontDesk" class="form-control" placeholder="English, Arabic, etc." />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Attachment Registry -->
+            <div class="collapsible-card" style="margin-top: 2rem;">
+                <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                    <h3><i class="fas fa-paperclip" style="color: var(--primary-color);"></i> 4. Attachment Registry</h3>
+                    <i class="fas fa-chevron-down chevron"></i>
+                </div>
+                <div class="collapsible-content">
+                    <div style="display: flex; min-height: 380px; border: 1.5px solid var(--border-color); border-radius: 1rem; overflow: hidden;">
+                        <div style="width: 220px; background: var(--bg-muted); border-right: 1px solid var(--border-color); padding: 1rem 0;">
+                            @foreach (var (cat, idx) in CNET_WebConstantes.AttachmentCategories.Select((c, i) => (c, i)))
+                            {
+                                <button type="button" class="attach-cat-btn @(idx == 0 ? "active" : "")" data-cat-index="@idx" onclick="switchAttachCategory(@idx)">
+                                    <i class="fas fa-folder" style="margin-right: 0.5rem; opacity: 0.6;"></i>@cat
+                                </button>
+                            }
+                        </div>
+                        <div style="flex: 1; padding: 2rem;">
+                            @foreach (var (cat, idx) in CNET_WebConstantes.AttachmentCategories.Select((c, i) => (c, i)))
+                            {
+                                <div id="attachPanel_@idx" class="attach-panel" style="display: @(idx == 0 ? "block" : "none"); text-align: center;">
+                                    <div class="attach-dropzone">
+                                        <i class="fas fa-cloud-arrow-up" style="font-size: 2.5rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+                                        <h5 style="font-weight: 700;">Upload @cat</h5>
+                                        <p>Click or drag files here.</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 3rem; display: flex; gap: 1rem; justify-content: flex-end; padding-bottom: 3rem;">
+                <button type="button" onclick="switchTab('overview')" class="btn-premium btn-secondary" style="width: auto; padding: 0.8rem 2.5rem;">Discard</button>
+                <button type="button" onclick="saveRegistry(this, 'all')" class="btn-premium" style="width: auto; padding: 0.8rem 3rem;">Commit All Changes</button>
+            </div>
+                </div> <!-- End registry-sections-container -->
+            </div> <!-- End registry-layout -->
+        </form>
+    </div>
+
+    <!-- Asset Registration Modal -->
+    <div id="assetModal" class="modal-overlay">
+        <div class="glass-card modal-content-animate" style="width: 100%; max-width: 700px; padding: 2.5rem; border: none; box-shadow: var(--shadow-2xl);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <div>
+                    <h3 id="modalTitle" style="margin: 0; color: var(--navy-deep); font-weight: 800; font-size: 1.25rem;">Add Asset</h3>
+                    <p id="modalSubtitle" style="margin: 0.25rem 0 0; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Infrastructure Category</p>
+                </div>
+                <button type="button" onclick="closeAssetModal()" style="background: var(--bg-muted); border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; transition: all 0.2s;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <input type="hidden" id="modalSectionId" />
+            
+            <div style="max-height: 60vh; overflow-y: auto; padding-right: 10px;">
+                <!-- Universal Fields (Used for simple assets) -->
+                <div id="simpleAssetFields" class="form-grid" style="grid-template-columns: 1fr; margin-bottom: 1.5rem;">
+                    <div class="form-group">
+                        <label class="form-label" id="assetTypeLabel">Asset Name/Type</label>
+                        <input type="text" id="assetTypeName" class="form-control" placeholder="e.g. WiFi Router, HVAC Unit..." />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Total Quantity</label>
+                        <input type="number" id="assetCount" class="form-control" value="1" min="1" />
+                    </div>
+                </div>
+
+                <!-- 1. Accommodation Specific Fields -->
+                <div id="accommodationFields" style="display: none; border-top: 1px solid var(--border-color); padding-top: 1.5rem; margin-top: 1rem;">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Room Type</label>
+                            <select id="accRoomType" class="form-control">
+                                <option>Single Room</option>
+                                <option>Double Room</option>
+                                <option>Twin Room</option>
+                                <option>Deluxe Room</option>
+                                <option>Suite</option>
+                                <option>Family Room</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Number of Rooms</label>
+                            <input type="number" id="accNumRooms" value="1" min="1" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Bed Type</label>
+                            <select id="accBedType" class="form-control">
+                                <option>Single Bed</option>
+                                <option>Double Bed</option>
+                                <option>King Bed</option>
+                                <option>Queen Bed</option>
+                                <option>Twin Beds</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Max Occupancy</label>
+                            <input type="number" id="accOccupancy" value="2" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Room Size (sqm)</label>
+                            <input type="text" id="accSize" placeholder="25" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Price per Night (ETB)</label>
+                            <input type="number" id="accPrice" placeholder="1500" class="form-control" />
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label">Amenities (Comma separated)</label>
+                            <input type="text" id="accAmenities" placeholder="WiFi, AC, TV, Mini-bar" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Venue Specific Fields -->
+                <div id="venueFields" style="display: none; border-top: 1px solid var(--border-color); padding-top: 1.5rem; margin-top: 1rem;">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Venue Type</label>
+                            <select id="venType" class="form-control">
+                                <option>Conference Hall</option>
+                                <option>Meeting Room</option>
+                                <option>Ballroom</option>
+                                <option>Outdoor Area</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Max Seating</label>
+                            <input type="number" id="venSeating" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Standing Capacity</label>
+                            <input type="number" id="venStanding" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Area (sqm)</label>
+                            <input type="number" id="venArea" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Ceiling Height (m)</label>
+                            <input type="number" id="venCeiling" class="form-control" />
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label">Table Arrangements</label>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                @foreach (var t in new[] { "Theater", "Classroom", "U-Shape", "Banquet", "Boardroom" }) {
+                                    <label style="font-size: 0.75rem;"><input type="checkbox" name="venTables" value="@t"> @t</label>
+                                }
+                            </div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label">Facilities (AV, etc.)</label>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                @foreach (var f in new[] { "Projector", "Microphone", "WiFi", "Stage", "Lighting", "Parking", "Accessibility" }) {
+                                    <label style="font-size: 0.75rem;"><input type="checkbox" name="venFacilities" value="@f"> @f</label>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Dining Specific Fields -->
+                <div id="diningFields" style="display: none; border-top: 1px solid var(--border-color); padding-top: 1.5rem; margin-top: 1rem;">
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label class="form-label">Dining Type</label>
+                            <select id="dinSpec" class="form-control" onchange="$('.catering-details').toggle($(this).val() !== 'Regular Restaurant')">
+                                <option>Regular Restaurant</option>
+                                <option>Catering Service</option>
+                                <option>Both Catering and Restaurant</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Cuisine Type</label>
+                            <input type="text" id="dinCuisine" placeholder="Ethiopian, Italian..." class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Seating Capacity</label>
+                            <input type="number" id="dinCapacity" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Operating Hours</label>
+                            <input type="text" id="dinHours" placeholder="e.g. 7 AM - 10 PM" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Dining Setting</label>
+                            <select id="dinSetting" class="form-control"><option>Indoor</option><option>Outdoor</option><option>Both</option></select>
+                        </div>
+                        <div class="catering-details form-group full-width" style="display: none; background: var(--bg-muted); padding: 1rem; border-radius: 0.5rem; border-left: 4px solid var(--primary-color);">
+                            <label class="form-label" style="color: var(--primary-color);">Catering Information</label>
+                            <div class="form-grid">
+                                <div class="form-group"><label class="form-label">Max Catering Cap.</label><input type="number" id="dinCatCap" class="form-control" /></div>
+                                <div class="form-group"><label class="form-label">Service Types</label><input type="text" id="dinCatService" placeholder="Buffet, Set Menu..." class="form-control" /></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button type="button" onclick="closeAssetModal()" class="btn-premium btn-secondary" style="flex: 1;">Cancel</button>
+                <button type="button" onclick="addAsset()" class="btn-premium" style="flex: 2;">Add to Registry</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script>
+      function switchTab(tabName) {
+        $('.tab-link').removeClass('active');
+        $(`.tab-link[data-tab="${tabName}"]`).addClass('active');
+        $('.tab-content').hide();
+        $(`#${tabName}Tab`).show();
+        
+        if (tabName === 'overview') {
+            $('#dynamicSubTitle').text('Manage your property branches and registry information');
+            $('#branchEditorHeader').hide();
+            $('#registrySidebarContainer').hide();
+        }
+        
+        if (tabName === 'editor') {
+            initMap();
+            setTimeout(() => { if (map) map.invalidateSize(); }, 200);
+        }
+    }
+
+    // Checkbox Sync Logic
+    $(document).on('change', '.sync-checkbox', function() {
+        const isChecked = $(this).is(':checked');
+        const targetId = $(this).data('target');
+        const callback = $(this).data('toggle-callback');
+
+        // Update hidden input
+        $('#' + targetId).val(isChecked ? "true" : "false");
+
+        // Special callbacks
+        if (callback && typeof window[callback] === 'function') {
+            window[callback](isChecked);
+        }
+    });
+
+    // Toggle Group Logic
+    $(document).on('click', '.toggle-item', function() {
+        const value = $(this).data('value');
+        const $group = $(this).closest('.toggle-group');
+        const targetId = $group.data('target');
+        const callback = $group.data('toggle-callback');
+
+        // Update visual state
+        $group.find('.toggle-item').removeClass('active');
+        $(this).addClass('active');
+
+        // Update hidden input
+        $('#' + targetId).val(value);
+
+        // Special callbacks
+        if (callback && typeof window[callback] === 'function') {
+            window[callback](value);
+        }
+    });
+
+    function togglePoolType(val) {
+        const isTrue = (val === true || val === "true");
+        $('#poolTypeGroup').toggle(isTrue);
+    }
+
+    function toggleSpaGender(val) {
+        const isTrue = (val === true || val === "true");
+        $('#spaGenderGroup').toggle(isTrue);
+    }
+
+    function syncToggleGroups() {
+        // Sync checkboxes
+        $('.sync-checkbox').each(function() {
+            const $chk = $(this);
+            const targetId = $chk.data('target');
+            const value = $('#' + targetId).val();
+            const isChecked = (value === 'true' || value === true);
+            
+            $chk.prop('checked', isChecked);
+            
+            // Trigger callbacks
+            const callback = $chk.data('toggle-callback');
+            if (callback && typeof window[callback] === 'function') {
+                window[callback](isChecked);
+            }
+        });
+
+        // Sync old-style toggle groups
+        $('.toggle-group').each(function() {
+            const $group = $(this);
+            const targetId = $group.data('target');
+            const value = $('#' + targetId).val();
+            
+            $group.find('.toggle-item').removeClass('active');
+            $group.find(`.toggle-item[data-value="${value}"]`).addClass('active');
+            
+            const callback = $group.data('toggle-callback');
+            if (callback && typeof window[callback] === 'function') {
+                window[callback](value);
+            }
+        });
+    }
+
+        async function loadBranchRegistry(branchDescription, branchCode, tin, unitId) {
+            $('#editorConsigneeUnitId').val(unitId);
+            $('#activeBranchName').text(branchDescription);
+            $('#dynamicSubTitle').text('Editing Branch: ' + branchDescription);
+            $('#editorConsigneeId').val('@hotel.Id'); // Default ID
+            $('#editorTradeName').val('@hotel.TradeName'); // Default TradeName
+            
+            $('#branchEditorHeader').show();
+            switchTab('editor');
+
+            $('.collapsible-content').hide();
+            $('.collapsible-card').removeClass('active');
+            $('.collapsible-card:first-child').addClass('active').find('.collapsible-content').show();
+
+            try {
+                const response = await fetch(`/HotelOwner/GetBranchRegistry?consigneeUnitId=${unitId}`);
+                if (response.ok) {
+                    const hotel = await response.json();
+                    
+                    // Populate Hidden IDs
+                    $('#editorConsigneeId').val(hotel.id);
+                    $('#editorConsigneeUnitId').val(hotel.consigneeUnitId);
+                    $('#editorTradeName').val(hotel.name);
+
+                    // Populate Basic Info
+                    $('#form-trade-name').val(hotel.name);
+                    $('#form-registration-name').val(hotel.registrationName);
+                    $('#form-address').val(hotel.specificAddress);
+                    $('#form-subcity-basic').val(hotel.subcity);
+                    $('#form-airport-dist').val(hotel.distanceFromAirport);
+                    $('#form-star-cat').val(hotel.starCategory);
+                    $('#form-total-rooms').val(hotel.totalRooms);
+                    $('#form-total-beds').val(hotel.totalBeds);
+                    $('#form-contact-info').val(hotel.contactInformation);
+                    $('#form-res-contact').val(hotel.reservationsContact);
+                    $('#form-sust-focal').val(hotel.sustainabilityFocalPoint);
+
+                    // Populate Accommodation
+                    $('#form-king-rooms').val(hotel.kingSizeRooms);
+                    $('#form-twin-rooms').val(hotel.twinBedRooms);
+                    $('#form-junior-suites').val(hotel.juniorSuites);
+                    $('#form-suites').val(hotel.suites);
+                    $('#form-pres-suites').val(hotel.presidentialSuites);
+                    $('#form-acc-rooms').val(hotel.accessibleRooms);
+
+                    // Populate F&B
+                    $('#form-all-day-dining').val(String(hotel.allDayDining));
+                    $('#form-dining-seats').val(hotel.allDayDiningSeats);
+                    $('#form-spec-rest').val(hotel.specialtyRestaurants);
+                    $('#form-coffee-shop').val(String(hotel.coffeeShop));
+                    $('#form-bars-count').val(hotel.barsCount);
+                    $('#form-night-club').val(String(hotel.nightClub));
+                    $('#form-shops-count').val(hotel.souvenirShops);
+                    $('#form-del-cat').val(String(hotel.delegationCatering));
+                    $('#form-del-cat-max').val(hotel.delegationCateringMaxPax);
+                    $('#form-refill-water').val(String(hotel.refillWaterStations));
+                    $('#form-veg-options').val(String(hotel.vegVeganOptions));
+                    $('#form-no-plastic').val(String(hotel.noSingleUsePlastics));
+
+                    // Populate Meetings
+                    $('#form-meeting-rooms').val(hotel.meetingRoomsCount);
+                    $('#form-cap-theatre').val(hotel.largestRoomCapacityTheatre);
+                    $('#form-cap-classroom').val(hotel.largestRoomCapacityClassroom);
+                    $('#form-cap-banquet').val(hotel.largestRoomCapacityBanquet);
+                    $('#form-total-meeting-sqm').val(hotel.totalMeetingSpaceSqm);
+
+                    // Populate Public Facilities
+                    $('#form-net-down').val(hotel.internetBandwidthDown);
+                    $('#form-net-up').val(hotel.internetBandwidthUp);
+                    $('#form-lobby-sqm').val(hotel.lobbyAreaSqm);
+                    $('#form-green-sqm').val(hotel.greenAreaSqm);
+                    $('#form-pool-avail').val(String(hotel.poolAvailable)).trigger('change');
+                    $('#form-pool-type').val(hotel.poolType);
+                    $('#form-spa-avail').val(String(hotel.spaAvailable)).trigger('change');
+                    $('#form-spa-gender').val(hotel.spaGender);
+                    $('#form-massage').val(String(hotel.massageService));
+                    $('#form-playground').val(String(hotel.childrensPlayground));
+                    $('#form-daycare').val(String(hotel.childrenDayCare));
+                    $('#form-canteen').val(String(hotel.staffCanteen));
+
+                    // Populate Accessibility
+                    $('#form-ramps').val(String(hotel.wheelchairRamps));
+                    $('#form-elevators').val(hotel.elevatorsCount);
+                    $('#form-elev-acc').val(String(hotel.elevatorsWheelchairSized));
+                    $('#form-bathroom-acc').val(String(hotel.publicAccessibleBathroom));
+
+                    // Populate Safety
+                    $('#form-cctv').val(String(hotel.cctvPublicAreas));
+                    $('#form-fire-insp').val(hotel.fireExtinguishersLastInspection ? hotel.fireExtinguishersLastInspection.split('T')[0] : '');
+                    $('#form-hose').val(String(hotel.hoseReels));
+                    $('#form-smoke-rooms').val(String(hotel.smokeDetectorsInRooms));
+                    $('#form-smoke-public').val(String(hotel.smokeDetectorsInPublicAreas));
+                    $('#form-sprinkler').val(hotel.sprinklerCoverage);
+                    $('#form-alarm-panel').val(String(hotel.fireAlarmControlPanel));
+                    $('#form-exits').val(hotel.emergencyExitsCount);
+                    $('#form-bag-scanner').val(String(hotel.bagScanner));
+                    $('#form-walk-scanner').val(String(hotel.walkThroughScanner));
+                    $('#form-hand-scanner').val(String(hotel.handScanner));
+
+                    // Populate Transport
+                    $('#form-parking').val(hotel.parkingSpacesCount);
+                    $('#form-bus-parking').val(hotel.busParkingCount);
+                    $('#form-shuttle-cop').val(String(hotel.shuttleToCop));
+                    $('#form-shuttle-airport').val(String(hotel.shuttleToAirport));
+                    $('#form-pub-transport').val(String(hotel.publicTransportWithin500m));
+                    $('#form-ev-points').val(hotel.evChargingPoints);
+                    $('#form-ev-types').val(hotel.evChargerTypes);
+
+                    // Populate ICT
+                    $('#form-wifi-prop').val(String(hotel.wifiPropertyWide));
+                    $('#form-wifi-speed').val(hotel.wifiAvgSpeed);
+                    $('#form-laundry').val(String(hotel.inHouseLaundry));
+                    $('#form-reception').val(String(hotel.reception24hr));
+                    $('#form-vip-check').val(String(hotel.vipCheckIn));
+                    $('#form-pass-scanner').val(String(hotel.passportScanner));
+                    $('#form-curr-scanner').val(String(hotel.currencyScanner));
+
+                    // Populate Utilities
+                    $('#form-gen-cap').val(hotel.standbyGeneratorCapacityKva);
+                    $('#form-gen-cov').val(hotel.standbyGeneratorCoverage);
+                    $('#form-water').val(hotel.waterTreatment);
+                    $('#form-waste-seg').val(String(hotel.wasteSegregation));
+                    $('#form-recycling').val(String(hotel.recycling));
+                    $('#form-haz-waste').val(String(hotel.hazardousWasteHandling));
+
+                    // Populate Sustainability
+                    $('#form-sust-cert').val(hotel.sustainabilityCertification);
+                    $('#form-eco-labels').val(hotel.otherEcoLabels);
+                    $('#form-waste-prog').val(String(hotel.foodWasteProgram));
+                    $('#form-sust-refill').val(String(hotel.sustainabilityRefillWaterStations));
+
+                    $('#form-total-staff').val(hotel.totalStaff);
+                    $('#form-languages').val(hotel.internationalLanguagesFrontDesk);
+
+                    syncToggleGroups();
+                    updateMap(hotel.latitude || 9.03, hotel.longitude || 38.74);
+                }
+            } catch (error) {
+                console.error('Load error:', error);
+                Swal.fire('Error', 'Failed to load branch data.', 'error');
+            }
+        }
+
+
+        function toggleCollapsible(header) {
+            const card = $(header).closest('.collapsible-card');
+            const content = card.find('.collapsible-content');
+            if (card.hasClass('active')) { content.slideUp(300); card.removeClass('active'); }
+            else { content.slideDown(300); card.addClass('active'); }
+        }
+
+        // Asset Registry Logic
+        let assets = {
+            accommodation: [],
+            dining: [],
+            venue: [],
+            amenities: []
+        };
+
+        function openAssetModal(sectionId, sectionName) {
+            $('#modalSectionId').val(sectionId);
+            $('#modalTitle').text(`Add ${sectionName} Details`);
+            $('#modalSubtitle').text(`Registration for ${sectionName}`);
+            
+            // Hide all specialized fields first
+            $('#accommodationFields, #venueFields, #diningFields').hide();
+            $('#simpleAssetFields').show();
+
+            if (sectionId === 'accommodation') {
+                $('#accommodationFields').show();
+                $('#simpleAssetFields').hide();
+            } else if (sectionId === 'venue') {
+                $('#venueFields').show();
+                $('#simpleAssetFields').hide();
+            } else if (sectionId === 'dining') {
+                $('#diningFields').show();
+                $('#simpleAssetFields').hide();
+            } else {
+                $('#assetTypeLabel').text('Asset Type / Category');
+                $('#assetTypeName').attr('placeholder', 'e.g. WiFi Router, HVAC Unit...');
+            }
+
+            $('body').css('overflow', 'hidden'); 
+            $('#assetModal').css('display', 'flex').hide().fadeIn(300);
+        }
+
+        function closeAssetModal() {
+            $('body').css('overflow', ''); 
+            $('#assetModal').fadeOut(300);
+        }
+
+        function addAsset() {
+            const sectionId = $('#modalSectionId').val();
+            let assetData = { id: Date.now() };
+
+            if (sectionId === 'accommodation') {
+                assetData = {
+                    ...assetData,
+                    roomType: $('#accRoomType').val(),
+                    bedType: $('#accBedType').val(),
+                    maxOccupancy: parseInt($('#accOccupancy').val()) || 2,
+                    numberOfRooms: parseInt($('#accNumRooms').val()) || 1,
+                    roomSize: $('#accSize').val(),
+                    pricePerNight: parseFloat($('#accPrice').val()) || 0,
+                    amenities: $('#accAmenities').val()
+                };
+                assetData.name = assetData.roomType;
+                assetData.displayValue = `${assetData.roomSize} sqm • ${assetData.pricePerNight} ETB (${assetData.numberOfRooms} Units)`;
+            } else if (sectionId === 'venue') {
+                const tables = $('input[name="venTables"]:checked').map(function() { return this.value; }).get().join(', ');
+                const facilities = $('input[name="venFacilities"]:checked').map(function() { return this.value; }).get().join(', ');
+                assetData = {
+                    ...assetData,
+                    name: $('#venType').val(),
+                    type: $('#venType').val(),
+                    maxSeatingCapacity: parseInt($('#venSeating').val()) || 0,
+                    standingCapacity: parseInt($('#venStanding').val()) || 0,
+                    areaSize: parseFloat($('#venArea').val()) || 0,
+                    ceilingHeight: parseFloat($('#venCeiling').val()) || 0,
+                    tableArrangements: tables,
+                    facilities: facilities
+                };
+                assetData.displayValue = `${assetData.maxSeatingCapacity} Seats • ${assetData.areaSize} sqm`;
+            } else if (sectionId === 'dining') {
+                assetData = {
+                    ...assetData,
+                    name: $('#dinCuisine').val() || 'Restaurant',
+                    specialization: $('#dinSpec').val(),
+                    cuisineType: $('#dinCuisine').val(),
+                    seatingCapacity: parseInt($('#dinCapacity').val()) || 0,
+                    operatingHours: $('#dinHours').val(),
+                    diningSetting: $('#dinSetting').val(),
+                    maxCateringCapacity: parseInt($('#dinCatCap').val()) || 0,
+                    serviceTypes: $('#dinCatService').val()
+                };
+                assetData.displayValue = `${assetData.specialization} • ${assetData.seatingCapacity} Seats`;
+            } else {
+                assetData.name = $('#assetTypeName').val().trim();
+                assetData.count = parseInt($('#assetCount').val());
+                assetData.displayValue = `${assetData.count} Units`;
+                
+                if (!assetData.name) { alert('Please specify the asset type.'); return; }
+                if (isNaN(assetData.count) || assetData.count < 1) { alert('Please enter a valid count.'); return; }
+            }
+
+            assets[sectionId].push(assetData);
+            renderAssets(sectionId);
+            closeAssetModal();
+        }
+
+        function removeAsset(sectionId, assetId) {
+            assets[sectionId] = assets[sectionId].filter(a => a.id !== assetId);
+            renderAssets(sectionId);
+        }
+
+        function renderAssets(sectionId) {
+            const container = $(`#assetContainer_${sectionId}`);
+            const sectionAssets = assets[sectionId];
+
+            if (sectionAssets.length === 0) {
+                const icon = sectionId === 'accommodation' ? 'bed' : 
+                           sectionId === 'dining' ? 'utensils' :
+                           sectionId === 'venue' ? 'handshake' : 'swimming-pool';
+                
+                container.html(`<div class="empty-state" style="grid-column: 1/-1; padding: 2rem; text-align: center; color: var(--text-muted); border: 2px dashed var(--border-color); border-radius: 1rem;">
+                        <i class="fas fa-${icon}" style="font-size: 2rem; opacity: 0.2; margin-bottom: 0.75rem; display: block;"></i>
+                        No records found.
+                    </div>`);
+                return;
+            }
+
+            container.empty();
+            sectionAssets.forEach(asset => {
+                let iconClass = 'fas fa-cube';
+                if (sectionId === 'accommodation') iconClass = 'fas fa-bed';
+                else if (sectionId === 'venue') iconClass = 'fas fa-door-open';
+                else if (sectionId === 'dining') iconClass = 'fas fa-utensils';
+
+                container.append(`
+                    <div class="asset-card">
+                        <div class="asset-icon-circle">
+                            <i class="${iconClass}"></i>
+                        </div>
+                        <div class="asset-info">
+                            <div style="font-weight: 800; color: var(--navy-deep); font-size: 0.85rem; line-height: 1.2;">${asset.name || 'Unspecified'}</div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.2rem;">
+                                <span class="asset-badge">${asset.bedType || asset.type || 'Standard'}</span>
+                                <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">${asset.displayValue}</span>
+                            </div>
+                        </div>
+                        <div class="btn-remove-asset" onclick="removeAsset('${sectionId}', ${asset.id})" style="width: 30px; height: 30px; background: #fff1f2; color: #e11d48; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                            <i class="fas fa-trash-can" style="font-size: 0.8rem;"></i>
+                        </div>
+                    </div>
+                `);
+            });
+            updateAllHiddenInputs();
+        }
+
+        function updateAllHiddenInputs() {
+            let container = $('#allAssetsHiddenContainer');
+            if (container.length === 0) {
+                $('#registryForm').append('<div id="allAssetsHiddenContainer"></div>');
+                container = $('#allAssetsHiddenContainer');
+            }
+            container.empty();
+            
+            // Here we would map the complex JS objects to the format expected by the backend
+            // For now, we'll keep the simple mapping to show it's working
+            let index = 0;
+            Object.keys(assets).forEach(sectionId => {
+                assets[sectionId].forEach(asset => {
+                    container.append(`
+                        <input type="hidden" name="Infrastructure[${index}].Section" value="${sectionId}" />
+                        <input type="hidden" name="Infrastructure[${index}].Data" value='${JSON.stringify(asset)}' />
+                    `);
+                    index++;
+                });
+            });
+        }
+
+        // Centralized Registry Persistence Logic
+        async function saveRegistry(btn, mode) {
+        const unitId = $('#editorConsigneeUnitId').val();
+        if (!unitId) {
+            Swal.fire('Error', 'Please select a property branch first.', 'error');
+            return;
+        }
+
+        const btnText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+        try {
+            const formData = new FormData();
+            formData.append('branchId', unitId);
+            formData.append('mode', mode);
+
+            // Always send core identifiers and location
+            formData.append('Id', $('#editorConsigneeId').val());
+            formData.append('ConsigneeUnitId', $('#editorConsigneeUnitId').val());
+            formData.append('TradeName', $('#form-trade-name').val());
+            formData.append('Latitude', $('#lat-input').val());
+            formData.append('Longitude', $('#lng-input').val());
+
+            // 1. Collect Basic Info if mode is 'basic' or 'all'
+            if (mode === 'basic' || mode === 'all') {
+                formData.append('RegistrationName', $('#form-registration-name').val());
+                formData.append('SpecificAddress', $('#form-address').val());
+                formData.append('Subcity', $('#form-subcity-basic').val());
+                formData.append('DistanceFromAirport', $('#form-airport-dist').val());
+                formData.append('StarCategory', $('#form-star-cat').val());
+                formData.append('TotalRooms', $('#form-total-rooms').val());
+                formData.append('TotalBeds', $('#form-total-beds').val());
+                formData.append('ContactInformation', $('#form-contact-info').val());
+                formData.append('ReservationsContact', $('#form-res-contact').val());
+                formData.append('SustainabilityFocalPoint', $('#form-sust-focal').val());
+            }
+
+            // 2. Collection Accommodation if mode is 'accommodation' or 'all'
+            if (mode === 'accommodation' || mode === 'all') {
+                formData.append('KingSizeRooms', $('#form-king-rooms').val());
+                formData.append('TwinBedRooms', $('#form-twin-rooms').val());
+                formData.append('JuniorSuites', $('#form-junior-suites').val());
+                formData.append('Suites', $('#form-suites').val());
+                formData.append('PresidentialSuites', $('#form-pres-suites').val());
+                formData.append('AccessibleRooms', $('#form-acc-rooms').val());
+            }
+
+            // 3. Food & Beverage
+            if (mode === 'food_beverage' || mode === 'all') {
+                formData.append('AllDayDining', $('#form-all-day-dining').val());
+                formData.append('AllDayDiningSeats', $('#form-dining-seats').val());
+                formData.append('SpecialtyRestaurants', $('#form-spec-rest').val());
+                formData.append('CoffeeShop', $('#form-coffee-shop').val());
+                formData.append('BarsCount', $('#form-bars-count').val());
+                formData.append('NightClub', $('#form-night-club').val());
+                formData.append('SouvenirShops', $('#form-shops-count').val());
+                formData.append('DelegationCatering', $('#form-del-cat').val());
+                formData.append('DelegationCateringMaxPax', $('#form-del-cat-max').val());
+                formData.append('RefillWaterStations', $('#form-refill-water').val());
+                formData.append('VegVeganOptions', $('#form-veg-options').val());
+                formData.append('NoSingleUsePlastics', $('#form-no-plastic').val());
+            }
+
+            // 4. Meetings & Events
+            if (mode === 'meetings_events' || mode === 'all') {
+                formData.append('MeetingRoomsCount', $('#form-meeting-rooms').val());
+                formData.append('LargestRoomCapacityTheatre', $('#form-cap-theatre').val());
+                formData.append('LargestRoomCapacityClassroom', $('#form-cap-classroom').val());
+                formData.append('LargestRoomCapacityBanquet', $('#form-cap-banquet').val());
+                formData.append('TotalMeetingSpaceSqm', $('#form-total-meeting-sqm').val());
+            }
+
+            // 5. Public Facilities
+            if (mode === 'public_facilities' || mode === 'all') {
+                formData.append('InternetBandwidthDown', $('#form-net-down').val());
+                formData.append('InternetBandwidthUp', $('#form-net-up').val());
+                formData.append('LobbyAreaSqm', $('#form-lobby-sqm').val());
+                formData.append('GreenAreaSqm', $('#form-green-sqm').val());
+                formData.append('PoolAvailable', $('#form-pool-avail').val());
+                formData.append('PoolType', $('#form-pool-type').val());
+                formData.append('SpaAvailable', $('#form-spa-avail').val());
+                formData.append('SpaGender', $('#form-spa-gender').val());
+                formData.append('MassageService', $('#form-massage').val());
+                formData.append('ChildrensPlayground', $('#form-playground').val());
+                formData.append('ChildrenDayCare', $('#form-daycare').val());
+                formData.append('StaffCanteen', $('#form-canteen').val());
+            }
+
+            // 6. Accessibility
+            if (mode === 'accessibility' || mode === 'all') {
+                formData.append('WheelchairRamps', $('#form-ramps').val());
+                formData.append('ElevatorsCount', $('#form-elevators').val());
+                formData.append('ElevatorsWheelchairSized', $('#form-elev-acc').val());
+                formData.append('PublicAccessibleBathroom', $('#form-bathroom-acc').val());
+            }
+
+            // 7. Security & Safety
+            if (mode === 'security_safety' || mode === 'all') {
+                formData.append('CCTVPublicAreas', $('#form-cctv').val());
+                formData.append('FireExtinguishersLastInspection', $('#form-fire-insp').val());
+                formData.append('HoseReels', $('#form-hose').val());
+                formData.append('SmokeDetectorsInRooms', $('#form-smoke-rooms').val());
+                formData.append('SmokeDetectorsInPublicAreas', $('#form-smoke-public').val());
+                formData.append('SprinklerCoverage', $('#form-sprinkler').val());
+                formData.append('FireAlarmControlPanel', $('#form-alarm-panel').val());
+                formData.append('EmergencyExitsCount', $('#form-exits').val());
+                formData.append('BagScanner', $('#form-bag-scanner').val());
+                formData.append('WalkThroughScanner', $('#form-walk-scanner').val());
+                formData.append('HandScanner', $('#form-hand-scanner').val());
+            }
+
+            // 8. Transport & Parking
+            if (mode === 'transport_parking' || mode === 'all') {
+                formData.append('ParkingSpacesCount', $('#form-parking').val());
+                formData.append('BusParkingCount', $('#form-bus-parking').val());
+                formData.append('ShuttleToCop', $('#form-shuttle-cop').val());
+                formData.append('ShuttleToAirport', $('#form-shuttle-airport').val());
+                formData.append('PublicTransportWithin500m', $('#form-pub-transport').val());
+                formData.append('EvChargingPoints', $('#form-ev-points').val());
+                formData.append('EvChargerTypes', $('#form-ev-types').val());
+            }
+
+            // 9. ICT & Services
+            if (mode === 'ict_services' || mode === 'all') {
+                formData.append('WifiPropertyWide', $('#form-wifi-prop').val());
+                formData.append('WifiAvgSpeed', $('#form-wifi-speed').val());
+                formData.append('InHouseLaundry', $('#form-laundry').val());
+                formData.append('Reception24hr', $('#form-reception').val());
+                formData.append('VipCheckIn', $('#form-vip-check').val());
+                formData.append('PassportScanner', $('#form-pass-scanner').val());
+                formData.append('CurrencyScanner', $('#form-curr-scanner').val());
+            }
+
+            // 10. Utilities
+            if (mode === 'utilities_resilience' || mode === 'all') {
+                formData.append('StandbyGeneratorCapacityKva', $('#form-gen-cap').val());
+                formData.append('StandbyGeneratorCoverage', $('#form-gen-cov').val());
+                formData.append('WaterTreatment', $('#form-water').val());
+                formData.append('WasteSegregation', $('#form-waste-seg').val());
+                formData.append('Recycling', $('#form-recycling').val());
+                formData.append('HazardousWasteHandling', $('#form-haz-waste').val());
+            }
+
+            // 11. Sustainability
+            if (mode === 'sustainability' || mode === 'all') {
+                formData.append('SustainabilityCertification', $('#form-sust-cert').val());
+                formData.append('OtherEcoLabels', $('#form-eco-labels').val());
+                formData.append('FoodWasteProgram', $('#form-waste-prog').val());
+                formData.append('SustainabilityRefillWaterStations', $('#form-sust-refill').val());
+            }
+
+            // 12. Staffing
+            if (mode === 'staffing' || mode === 'all') {
+                formData.append('TotalStaff', $('#form-total-staff').val());
+                formData.append('InternationalLanguagesFrontDesk', $('#form-languages').val());
+            }
+
+            const response = await fetch('/HotelOwner/CommitRegistry', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                if (result.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Registry updated successfully.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    Swal.fire('Error', result.message || 'Failed to update registry.', 'error');
+                }
+            } else {
+                Swal.fire('Error', 'Server communication error.', 'error');
+            }
+        } catch (error) {
+            console.error('Save error:', error);
+            Swal.fire('Error', 'An unexpected error occurred.', 'error');
+        } finally {
+            btn.innerHTML = btnText;
+            btn.disabled = false;
+        }
+    }
+
+        function switchAttachCategory(idx) {
+            $('.attach-panel').hide();
+            $('#attachPanel_' + idx).show();
+            $('.attach-cat-btn').removeClass('active');
+            $(`.attach-cat-btn[data-cat-index="${idx}"]`).addClass('active');
+        }
+        var map, marker;
+
+        function initMap() {
+            if (map) return; // Already initialized
+            const mapContainer = document.getElementById('editor-map');
+            if (!mapContainer) return;
+
+            map = L.map('editor-map').setView([@(hotel.Latitude ?? 9.0192), @(hotel.Longitude ?? 38.7525)], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+            marker = L.marker([@(hotel.Latitude ?? 9.0192), @(hotel.Longitude ?? 38.7525)], { draggable: true }).addTo(map);
+
+            marker.on('dragend', function() {
+                var pos = marker.getLatLng();
+                $('#lat-input').val(pos.lat.toFixed(6));
+                $('#lng-input').val(pos.lng.toFixed(6));
+            });
+
+            map.on('click', function(e) {
+                marker.setLatLng(e.latlng);
+                $('#lat-input').val(e.latlng.lat.toFixed(6));
+                $('#lng-input').val(e.latlng.lng.toFixed(6));
+            });
+        }
+
+        function updateMap(lat, lng) {
+            if (!map) initMap();
+            const latlng = L.latLng(lat, lng);
+            map.setView(latlng, 15);
+            marker.setLatLng(latlng);
+            $('#lat-input').val(lat.toFixed(6));
+            $('#lng-input').val(lng.toFixed(6));
+            setTimeout(() => map.invalidateSize(), 200);
+        }
+    </script>
+    
+    <!-- Branch Detail Sidebar Overlay -->
+    <div class="detail-backdrop" id="detailBackdrop" onclick="hideBranchSummary()"></div>
+    <div class="detail-overlay" id="branchSummaryPanel">
+        <!-- Sticky Header -->
+        <div class="detail-panel-header">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div id="summaryIcon" style="width: 40px; height: 40px; font-size: 1rem; background: var(--bg-muted); border-radius: 0.75rem; border: 1.5px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: var(--primary-color); font-weight: 800;">01</div>
+                    <div>
+                        <div id="summaryTradeName" style="font-weight: 900; color: var(--navy-deep); font-size: 1.05rem; line-height: 1.2;">Main Hub</div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.2rem;">
+                            <span id="summaryUnitDesc" class="badge" style="background: var(--bg-muted); color: var(--navy-deep); font-weight: 800; text-transform: uppercase; font-size: 0.65rem;">Central Unit</span>
+                            <span id="summaryTin" style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700;">TIN: ...</span>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" style="background: var(--bg-muted); border: 1px solid var(--border-color); color: var(--text-muted); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;" onclick="hideBranchSummary()">&times;</button>
+            </div>
+            <!-- Compact Action Area -->
+            <div id="summaryActionArea"></div>
+            <!-- Search Bar -->
+            <div class="detail-search-bar">
+                <i class="fas fa-search" style="color: var(--text-muted); font-size: 0.8rem;"></i>
+                <input type="text" id="summarySearchInput" placeholder="Search registry fields..." oninput="filterSummaryFields()" />
+            </div>
+            <!-- Category Filter Chips -->
+            <div class="detail-filter-chips" id="summaryFilterChips">
+                <span class="detail-chip active" data-cat="all" onclick="filterByCategory(this)">All</span>
+                <span class="detail-chip" data-cat="basic" onclick="filterByCategory(this)"><i class="fas fa-id-card"></i> Basic</span>
+                <span class="detail-chip" data-cat="accommodation" onclick="filterByCategory(this)"><i class="fas fa-bed"></i> Rooms</span>
+                <span class="detail-chip" data-cat="food_beverage" onclick="filterByCategory(this)"><i class="fas fa-utensils"></i> F&B</span>
+                <span class="detail-chip" data-cat="meetings_events" onclick="filterByCategory(this)"><i class="fas fa-handshake"></i> Events</span>
+                <span class="detail-chip" data-cat="public_facilities" onclick="filterByCategory(this)"><i class="fas fa-building"></i> Facilities</span>
+                <span class="detail-chip" data-cat="accessibility" onclick="filterByCategory(this)"><i class="fas fa-wheelchair"></i> Access</span>
+                <span class="detail-chip" data-cat="security_safety" onclick="filterByCategory(this)"><i class="fas fa-shield-halved"></i> Security</span>
+                <span class="detail-chip" data-cat="transport_parking" onclick="filterByCategory(this)"><i class="fas fa-car"></i> Transport</span>
+                <span class="detail-chip" data-cat="ict_services" onclick="filterByCategory(this)"><i class="fas fa-wifi"></i> ICT</span>
+                <span class="detail-chip" data-cat="utilities_resilience" onclick="filterByCategory(this)"><i class="fas fa-bolt"></i> Utilities</span>
+                <span class="detail-chip" data-cat="sustainability" onclick="filterByCategory(this)"><i class="fas fa-leaf"></i> Green</span>
+                <span class="detail-chip" data-cat="staffing" onclick="filterByCategory(this)"><i class="fas fa-users"></i> Staff</span>
+            </div>
+        </div>
+        <!-- Scrollable Body -->
+        <div class="detail-panel-body">
+            <!-- Core Info -->
+            <div class="detail-cat-card open" data-category="basic">
+                <div class="detail-cat-header" onclick="toggleDetailCat(this)">
+                    <span class="detail-cat-title"><i class="fas fa-info-circle"></i> Registry Summary</span>
+                    <i class="fas fa-chevron-down detail-cat-chevron"></i>
+                </div>
+                <div class="detail-cat-body">
+                    <div class="detail-row"><span class="detail-label">Location</span><span id="summaryLocation" class="detail-value">Addis Ababa</span></div>
+                    <div class="detail-row"><span class="detail-label">Property Code</span><span id="summaryCode" class="detail-value">ET-001</span></div>
+                    <div class="detail-row"><span class="detail-label">Category</span><span id="summaryCategory" class="detail-value">5 Star</span></div>
+                </div>
+            </div>
+            <div class="detail-cat-card open" data-category="accommodation">
+                <div class="detail-cat-header" onclick="toggleDetailCat(this)">
+                    <span class="detail-cat-title"><i class="fas fa-bed"></i> Capacity Highlights</span>
+                    <i class="fas fa-chevron-down detail-cat-chevron"></i>
+                </div>
+                <div class="detail-cat-body">
+                    <div class="detail-row"><span class="detail-label">Total Rooms</span><span id="summaryRooms" class="detail-value">0 Units</span></div>
+                    <div class="detail-row"><span class="detail-label">Total Beds</span><span id="summaryBeds" class="detail-value">0 Units</span></div>
+                </div>
+            </div>
+            <!-- Dynamic Sections rendered by JS -->
+            <div id="summaryDynamicSections"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- Navigation & Scroll Logic ---
+        function scrollToSection(index) {
+            const sections = $('.collapsible-card');
+            if (index >= sections.length) return;
+            
+            const target = $(sections[index]);
+            
+            // Expand if collapsed
+            if (!target.hasClass('active')) {
+                toggleCollapsible(target.find('.collapsible-header')[0]);
+            }
+            
+            // Scroll with offset for header/tabs
+            const offset = target.offset().top - 150;
+            $('html, body').animate({ scrollTop: offset }, 600);
+            
+            // Update sidebar active state
+            updateSidebarNav(index);
+        }
+
+        function updateSidebarNav(index) {
+            $('.registry-nav-item').removeClass('active');
+            $('.registry-nav-item').eq(index).addClass('active');
+        }
+
+        // Scroll Spy Implementation
+        $(window).scroll(function() {
+            if ($('#editorTab').is(':visible')) {
+                const scrollPos = $(document).scrollTop() + 200;
+                $('.collapsible-card').each(function(i) {
+                    const top = $(this).offset().top;
+                    const bottom = top + $(this).outerHeight();
+                    if (scrollPos >= top && scrollPos <= bottom) {
+                        updateSidebarNav(i);
+                    }
+                });
+            }
+        });
+
+        // --- Branch Summary Logic ---
+        // Category label mapping
+        const catMeta = {
+            basic:             { label: 'Basic Info',           icon: 'fas fa-id-card' },
+            accommodation:     { label: 'Accommodation',        icon: 'fas fa-bed' },
+            food_beverage:     { label: 'Food & Beverage',      icon: 'fas fa-utensils' },
+            meetings_events:   { label: 'Meetings & Events',    icon: 'fas fa-handshake' },
+            public_facilities: { label: 'Public Facilities',    icon: 'fas fa-building' },
+            accessibility:     { label: 'Accessibility',        icon: 'fas fa-wheelchair' },
+            security_safety:   { label: 'Security & Safety',    icon: 'fas fa-shield-halved' },
+            transport_parking: { label: 'Transport & Parking',  icon: 'fas fa-car' },
+            ict_services:      { label: 'ICT & Guest Services', icon: 'fas fa-wifi' },
+            utilities_resilience: { label: 'Utilities & Resilience', icon: 'fas fa-bolt' },
+            sustainability:    { label: 'Sustainability',       icon: 'fas fa-leaf' },
+            staffing:          { label: 'Staffing & Languages', icon: 'fas fa-users' }
+        };
+
+        // Map IdentificationDTO Description -> category key using CNET_WebConstantes category IDs
+        const fieldCatMap = {
+            RegistrationName:'basic', DistanceFromAirport:'basic', StarCategory:'basic', TotalRooms:'basic', TotalBeds:'basic', ContactInformation:'basic', ReservationsContact:'basic', SustainabilityFocalPoint:'basic',
+            KingSizeRooms:'accommodation', TwinBedRooms:'accommodation', JuniorSuites:'accommodation', Suites:'accommodation', PresidentialSuites:'accommodation', AccessibleRooms:'accommodation',
+            AllDayDining:'food_beverage', AllDayDiningSeats:'food_beverage', SpecialtyRestaurants:'food_beverage', CoffeeShop:'food_beverage', BarsCount:'food_beverage', NightClub:'food_beverage', SouvenirShops:'food_beverage', DelegationCatering:'food_beverage', DelegationCateringMaxPax:'food_beverage', RefillWaterStations:'food_beverage', VegVeganOptions:'food_beverage', NoSingleUsePlastics:'food_beverage',
+            MeetingRoomsCount:'meetings_events', LargestRoomCapacityTheatre:'meetings_events', LargestRoomCapacityClassroom:'meetings_events', LargestRoomCapacityBanquet:'meetings_events', TotalMeetingSpaceSqm:'meetings_events',
+            InternetBandwidthDown:'public_facilities', InternetBandwidthUp:'public_facilities', LobbyAreaSqm:'public_facilities', GreenAreaSqm:'public_facilities', PoolAvailable:'public_facilities', PoolType:'public_facilities', SpaAvailable:'public_facilities', SpaGender:'public_facilities', MassageService:'public_facilities', ChildrensPlayground:'public_facilities', ChildrenDayCare:'public_facilities', StaffCanteen:'public_facilities',
+            WheelchairRamps:'accessibility', ElevatorsCount:'accessibility', ElevatorsWheelchairSized:'accessibility', PublicAccessibleBathroom:'accessibility',
+            CCTVPublicAreas:'security_safety', FireExtinguishersLastInspection:'security_safety', HoseReels:'security_safety', SmokeDetectorsInRooms:'security_safety', SmokeDetectorsInPublicAreas:'security_safety', SprinklerCoverage:'security_safety', FireAlarmControlPanel:'security_safety', EmergencyExitsCount:'security_safety', BagScanner:'security_safety', WalkThroughScanner:'security_safety', HandScanner:'security_safety',
+            ParkingSpacesCount:'transport_parking', BusParkingCount:'transport_parking', ShuttleToCop:'transport_parking', ShuttleToAirport:'transport_parking', PublicTransportWithin500m:'transport_parking', EvChargingPoints:'transport_parking', EvChargerTypes:'transport_parking',
+            WifiPropertyWide:'ict_services', WifiAvgSpeed:'ict_services', InHouseLaundry:'ict_services', Reception24hr:'ict_services', VipCheckIn:'ict_services', PassportScanner:'ict_services', CurrencyScanner:'ict_services',
+            StandbyGeneratorCapacityKva:'utilities_resilience', StandbyGeneratorCoverage:'utilities_resilience', WaterTreatment:'utilities_resilience', WasteSegregation:'utilities_resilience', Recycling:'utilities_resilience', HazardousWasteHandling:'utilities_resilience',
+            SustainabilityCertification:'sustainability', OtherEcoLabels:'sustainability', FoodWasteProgram:'sustainability', SustainabilityRefillWaterStations:'sustainability',
+            TotalStaff:'staffing', InternationalLanguagesFrontDesk:'staffing'
+        };
+
+        let _currentIdentifications = [];
+        let _currentSummaryUnitId = '';
+        let _currentSummaryUnitCode = '';
+        let _currentSummaryUnitTin = '';
+        let _currentSummaryUnitDesc = '';
+
+        function showBranchSummary(tradeName, unitDesc, code, tin, unitId, city, category, rooms, beds, identifications) {
+            _currentIdentifications = identifications || [];
+            _currentSummaryUnitId = unitId;
+            _currentSummaryUnitCode = code;
+            _currentSummaryUnitTin = tin;
+            _currentSummaryUnitDesc = unitDesc;
+
+            $('#summaryTradeName').text(tradeName);
+            $('#summaryUnitDesc').text(unitDesc);
+            $('#summaryCode').text(code || 'N/A');
+            $('#summaryTin').text('TIN: ' + (tin || 'N/A'));
+            $('#summaryLocation').text(city || 'Addis Ababa');
+            $('#summaryCategory').text(category || 'General Sector');
+            $('#summaryRooms').text((rooms || '0') + ' Units');
+            $('#summaryBeds').text((beds || '0') + ' Units');
+            
+            // Compact action button at top
+            $('#summaryActionArea').html(`
+                <button type="button" class="update-btn-top" style="width:100%; margin-bottom: 0.75rem; justify-content: center;" onclick="loadBranchRegistry('${unitDesc.replace(/'/g, "\\'")}', '${code}', '${tin}', '${unitId}')">
+                    <i class="fas fa-edit"></i> See & Update Registry
+                </button>
+            `);
+
+            // Reset filter chips and search
+            $('#summarySearchInput').val('');
+            $('.detail-chip').removeClass('active');
+            $('.detail-chip[data-cat="all"]').addClass('active');
+
+            renderDynamicSections('all', '');
+
+            $('#detailBackdrop').fadeIn(300);
+            $('#branchSummaryPanel').addClass('active');
+            $('body').css('overflow', 'hidden');
+        }
+
+        function renderDynamicSections(activeCat, searchTerm) {
+            const container = $('#summaryDynamicSections');
+            container.empty();
+            
+            // Group identifications by category
+            const grouped = {};
+            (_currentIdentifications || []).forEach(id => {
+                const cat = fieldCatMap[id.Description] || 'basic';
+                if (!grouped[cat]) grouped[cat] = [];
+                grouped[cat].push(id);
+            });
+
+            // Render each category group
+            Object.keys(catMeta).forEach(catKey => {
+                const items = grouped[catKey] || [];
+                if (items.length === 0) return;
+
+                // Category filter
+                if (activeCat !== 'all' && catKey !== activeCat) return;
+
+                // Search filter
+                const filtered = items.filter(id => {
+                    if (!searchTerm) return true;
+                    const q = searchTerm.toLowerCase();
+                    return (id.Description || '').toLowerCase().includes(q) || (id.IdNumber || '').toLowerCase().includes(q);
+                });
+                if (filtered.length === 0) return;
+
+                const meta = catMeta[catKey];
+                let rowsHtml = filtered.map(id => {
+                    let val = id.IdNumber || '';
+                    if (val === 'True') val = '<span style="color:#059669;font-weight:800;"><i class="fas fa-check-circle"></i> Yes</span>';
+                    else if (val === 'False') val = '<span style="color:#94a3b8;font-weight:700;"><i class="fas fa-minus-circle"></i> No</span>';
+                    const labelDisplay = (id.Description || '').replace(/([A-Z])/g, ' $1').trim();
+                    return `<div class="detail-row" data-field="${id.Description}">
+                        <span class="detail-label" style="font-size:0.8rem;">${labelDisplay}</span>
+                        <span class="detail-value" style="font-size:0.8rem;">${val}</span>
+                    </div>`;
+                }).join('');
+
+                container.append(`
+                    <div class="detail-cat-card open" data-category="${catKey}">
+                        <div class="detail-cat-header" onclick="toggleDetailCat(this)">
+                            <span class="detail-cat-title"><i class="${meta.icon}"></i> ${meta.label}</span>
+                            <i class="fas fa-chevron-down detail-cat-chevron"></i>
+                        </div>
+                        <div class="detail-cat-body">${rowsHtml}</div>
+                    </div>
+                `);
+            });
+
+            if (container.children().length === 0) {
+                container.html(`<div style="text-align:center; padding: 1.5rem; color: var(--text-muted); font-size:0.85rem;"><i class="fas fa-inbox" style="font-size:2rem; opacity:0.2; display:block; margin-bottom:0.5rem;"></i>No data found</div>`);
+            }
+        }
+
+        function toggleDetailCat(header) {
+            const card = $(header).closest('.detail-cat-card');
+            card.toggleClass('open');
+            if (card.hasClass('open')) {
+                card.find('.detail-cat-body').slideDown(200);
+            } else {
+                card.find('.detail-cat-body').slideUp(200);
+            }
+        }
+
+        function filterByCategory(chip) {
+            $('.detail-chip').removeClass('active');
+            $(chip).addClass('active');
+            const cat = $(chip).data('cat');
+            const search = $('#summarySearchInput').val();
+            renderDynamicSections(cat, search);
+        }
+
+        function filterSummaryFields() {
+            const search = $('#summarySearchInput').val();
+            const activeCat = $('.detail-chip.active').data('cat') || 'all';
+            renderDynamicSections(activeCat, search);
+        }
+
+        function hideBranchSummary() {
+            $('#detailBackdrop').fadeOut(300);
+            $('#branchSummaryPanel').removeClass('active');
+            $('body').css('overflow', '');
+        }
+
+        // Override original loadBranchRegistry to handle UI transitions and sidebar
+        const originalLoadRegistry = loadBranchRegistry;
+        loadBranchRegistry = async function(branchDescription, branchCode, tin, unitId) {
+            hideBranchSummary();
+            $('#sidebarBranchName').text(branchDescription);
+            $('#registrySidebarContainer').show(); // Show sidebar in global nav
+            await originalLoadRegistry(branchDescription, branchCode, tin, unitId);
+            updateSidebarNav(0);
+        };
+
+        $(document).ready(function() {
+            $('.tab-link').on('click', function() { switchTab($(this).data('tab')); });
+            
+            // If we want to hide the branch header when switching back manually
+            $('.tab-link[data-tab="overview"]').on('click', function() {
+                $('#branchEditorHeader').hide();
+            });
+
+            syncToggleGroups();
+        });
+    </script>
+}

@@ -1,0 +1,181 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>No Privilege - AATMCDP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --danger-color: #ef4444;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+        }
+
+        /* Animated Background Slider */
+        .bg-slider {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 2s ease-in-out, transform 8s linear;
+            transform: scale(1.1);
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: scale(1.0);
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%);
+        }
+
+        /* Content Card */
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            padding: 20px;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 3.5rem;
+            border-radius: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @@keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .icon-box {
+            width: 80px;
+            height: 80px;
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2.5rem;
+            border: 2px solid var(--danger-color);
+        }
+
+        h1 {
+            color: #1e293b;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        p {
+            color: #475569;
+            font-size: 1.1rem;
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
+        }
+
+        .btn {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-block;
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.5);
+            background: #2563eb;
+        }
+
+        /* Slide animations */
+        .slide:nth-child(1) { background-image: url('/images/backgrounds/skyline.png'); }
+        .slide:nth-child(2) { background-image: url('/images/backgrounds/unity_park.png'); }
+        .slide:nth-child(3) { background-image: url('/images/backgrounds/entoto.png'); }
+        .slide:nth-child(4) { background-image: url('/images/backgrounds/africa.jpg'); }
+
+    </style>
+</head>
+<body>
+
+    <div class="bg-slider">
+        <div class="slide active"></div>
+        <div class="slide"></div>
+        <div class="slide"></div>
+        <div class="slide"></div>
+        <div class="overlay"></div>
+    </div>
+
+    <div class="container">
+        <div class="glass-card">
+            <div class="icon-box">
+                <span style="font-weight: bold;">!</span>
+            </div>
+            <h1>Access Restricted</h1>
+            <p>You have no privilege to act on the system message. Please contact your administrator to request access rights to this portal.</p>
+            <a href="/Account/Login" class="btn">Return to Login</a>
+        </div>
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function nextSlide() {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }
+
+        setInterval(nextSlide, 6000);
+    </script>
+</body>
+</html>

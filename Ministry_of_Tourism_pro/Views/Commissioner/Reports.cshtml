@@ -1,0 +1,523 @@
+@model IEnumerable<Ministry_of_Tourism_pro.Application.DTOs.HotelDto>
+@{
+    ViewData["Title"] = "National Tourism Reports • Commissioner View";
+}
+
+<style>
+    @@media print {
+        .no-print, nav, header, .dashboard-sidebar, .btn-premium, .glass-card.no-print, .report-header-section { display: none !important; }
+        .print-only { display: block !important; }
+        .glass-card { border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
+        body { background: white !important; }
+        .main-content { padding: 0 !important; margin: 0 !important; }
+        .grid-scroll-container { height: auto !important; overflow: visible !important; width: 100% !important; }
+        .grid-footer { display: flex !important; background: transparent !important; border: none !important; }
+    }
+    .print-only { display: none; }
+    
+    /* Typography & Spacing Optimization */
+    .report-table th { 
+        background: #f1f5f9; 
+        padding: 0.75rem; 
+        font-size: 0.65rem; 
+        text-transform: uppercase; 
+        letter-spacing: 0.05em; 
+        font-weight: 800; 
+        color: var(--navy-deep);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 2px solid var(--border-color);
+    }
+    .report-table td { padding: 0.75rem; border-bottom: 1px solid var(--border-color); font-size: 0.8rem; vertical-align: top; }
+    .report-row:hover { background: rgba(99, 102, 241, 0.03); }
+    
+    .filter-select {
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        padding: 0.4rem 2rem 0.4rem 0.75rem;
+        font-weight: 700;
+        color: var(--navy-deep);
+        font-size: 0.75rem;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23475569'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.5rem center;
+        background-size: 0.8rem;
+        height: 36px;
+    }
+
+    .btn-action-sm {
+        height: 36px;
+        padding: 0 0.75rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: 1px solid var(--border-color);
+        background: white;
+        color: var(--navy-deep);
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .btn-action-sm:hover { background: var(--bg-muted); border-color: var(--primary-color); }
+
+    /* Fixed Height Scrolling Grid */
+    .grid-scroll-container {
+        height: calc(100vh - 380px);
+        overflow-y: auto;
+        border-bottom: 1px solid var(--border-color);
+        background: white;
+    }
+    
+    .grid-footer {
+        padding: 0.75rem 1.5rem;
+        background: #f8fafc;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text-muted);
+    }
+
+    /* Report Navigation Tabs */
+    .report-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        border-bottom: 2px solid var(--border-color);
+        padding-bottom: 0.25rem;
+    }
+    .report-tab {
+        padding: 0.6rem 1.25rem;
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: var(--text-muted);
+        cursor: pointer;
+        border-radius: 0.5rem 0.5rem 0 0;
+        transition: all 0.2s;
+        border: 2px solid transparent;
+        border-bottom: none;
+        margin-bottom: -2px;
+    }
+    .report-tab:hover { color: var(--primary-color); background: rgba(99, 102, 241, 0.05); }
+    .report-tab.active {
+        color: var(--primary-color);
+        background: white;
+        border-color: var(--border-color);
+        border-bottom: 2px solid white;
+    }
+    .report-view { display: none; }
+    .report-view.active { display: block; }
+</style>
+
+<div class="animate-fade-in" style="overflow: hidden;">
+    <!-- Header: Compact -->
+    <div class="report-header-section" style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 1.5rem;">
+            <img src="/logo/logo.svg" alt="Ministry Logo" class="print-only" style="height: 60px; margin-right: 1.5rem;">
+            <div>
+                <h1 id="reportTitle" style="font-weight: 900; color: var(--navy-deep); margin: 0; letter-spacing: -1px; font-size: 1.5rem;">General Infrastructure Registry</h1>
+                <p style="color: var(--text-muted); margin: 0; font-size: 0.85rem; font-weight: 500;">National Tourism Infrastructure Registry • Commissioner Oversight</p>
+            </div>
+        </div>
+        <div style="font-size: 0.7rem; text-align: right; color: var(--text-muted);">
+            <div>Ref: NT-GRID-2024</div>
+            <div style="font-weight: 800; color: var(--primary-color);">SYSTEM STATUS: ONLINE</div>
+        </div>
+    </div>
+
+    <!-- Report Navigation Tabs -->
+    <div class="report-tabs no-print">
+        <div class="report-tab active" onclick="switchReport('general', this)">General Registry</div>
+        <div class="report-tab" onclick="switchReport('accommodation', this)">Accommodation Detail Report</div>
+        <div class="report-tab" onclick="switchReport('dining', this)">Dining Detail Report</div>
+        <div class="report-tab" onclick="switchReport('venue', this)">Venue Detail Report</div>
+        <div class="report-tab" onclick="switchReport('ratingSummary', this)">Rating Summary Report</div>
+    </div>
+
+    <!-- Filter & Action Bar: Integrated -->
+    <div class="glass-card no-print" style="margin-bottom: 1rem; padding: 0.75rem 1rem; border: none; background: rgba(255,255,255,0.7);">
+        <div style="display: flex; gap: 0.75rem; align-items: center;">
+            <div style="flex: 1; position: relative;">
+                <i class="fas fa-search" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.75rem; opacity: 0.6;"></i>
+                <input type="text" id="reportSearch" onkeyup="filterReport()" placeholder="Search registry..." class="form-control" style="padding-left: 2.5rem; margin: 0; background: white; height: 36px; font-size: 0.75rem; border-color: var(--border-color);">
+            </div>
+            
+            <select id="ratingFilter" onchange="filterReport()" class="filter-select" style="width: 150px;">
+                <option value="all">Rating: All</option>
+                <option value="5 Star">5 Star</option>
+                <option value="4 Star">4 Star</option>
+                <option value="3 Star">3 Star</option>
+                <option value="2 Star">2 Star</option>
+                <option value="1 Star">1 Star</option>
+                <option value="Not Assigned">Unassigned</option>
+            </select>
+
+            <select id="typeFilter" onchange="filterReport()" class="filter-select" style="width: 150px;">
+                <option value="all">Type: All</option>
+                <option value="Resort">Resort</option>
+                <option value="Hotel">Hotel</option>
+                <option value="Lodge">Lodge</option>
+                <option value="Tourist Recommended">Recommended</option>
+            </select>
+
+            <div style="width: 1px; height: 24px; background: var(--border-color); margin: 0 0.5rem;"></div>
+
+            <button onclick="window.print()" class="btn-action-sm" title="Print Document">
+                <i class="fas fa-print"></i>
+            </button>
+            <button onclick="exportToExcel()" class="btn-action-sm" title="Export Filtered Data to Excel">
+                <i class="fas fa-file-excel" style="color: #16a34a;"></i>
+            </button>
+            <button onclick="resetFilters()" class="btn-action-sm" style="color: #ef4444;" title="Reset Filters">
+                <i class="fas fa-rotate-left"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Report Views -->
+    <div id="generalView" class="report-view active">
+        <!-- High-Performance Data Grid -->
+        <div class="glass-card" style="padding: 0; overflow: hidden; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+            <div class="grid-scroll-container">
+                <table class="report-table" style="width: 100%; border-collapse: collapse;" id="propertyTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">Property & Category</th>
+                            <th style="width: 20%;">Location & Contact</th>
+                            <th style="width: 18%;">Accommodations</th>
+                            <th style="width: 18%;">Dining & Catering</th>
+                            <th style="width: 19%;">Event Infrastructure</th>
+                        </tr>
+                    </thead>
+                    <tbody id="generalRealBody" class="real-data-body">
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                                <i class="fas fa-circle-notch fa-spin" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                                Fetching live registry data...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="accommodationView" class="report-view">
+        <div class="glass-card" style="padding: 0; overflow: hidden; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+            <div class="grid-scroll-container">
+                <table class="report-table" style="width: 100%; border-collapse: collapse;" id="accommodationTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">Property Name</th>
+                            <th style="width: 20%;">Room Type</th>
+                            <th style="width: 15%;">Bed Config</th>
+                            <th style="width: 10%;">Count</th>
+                            <th style="width: 15%;">Price (ETB)</th>
+                            <th style="width: 15%;">Max Pax</th>
+                        </tr>
+                    </thead>
+                    <tbody id="accommodationRealBody" class="real-data-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="diningView" class="report-view">
+        <div class="glass-card" style="padding: 0; overflow: hidden; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+            <div class="grid-scroll-container">
+                <table class="report-table" style="width: 100%; border-collapse: collapse;" id="diningTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">Property Name</th>
+                            <th style="width: 20%;">Facility Name</th>
+                            <th style="width: 20%;">Specialization</th>
+                            <th style="width: 15%;">Cuisine</th>
+                            <th style="width: 10%;">Seating</th>
+                            <th style="width: 10%;">Catering</th>
+                        </tr>
+                    </thead>
+                    <tbody id="diningRealBody" class="real-data-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="venueView" class="report-view">
+        <div class="glass-card" style="padding: 0; overflow: hidden; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+            <div class="grid-scroll-container">
+                <table class="report-table" style="width: 100%; border-collapse: collapse;" id="venueTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">Property Name</th>
+                            <th style="width: 20%;">Venue/Hall Name</th>
+                            <th style="width: 15%;">Type</th>
+                            <th style="width: 15%;">Capacity (Seating)</th>
+                            <th style="width: 15%;">Capacity (Standing)</th>
+                            <th style="width: 10%;">Area (m²)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="venueRealBody" class="real-data-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="ratingSummaryView" class="report-view">
+        <div class="glass-card" style="padding: 0; overflow: hidden; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+            <div class="grid-scroll-container">
+                <table class="report-table" style="width: 100%; border-collapse: collapse;" id="ratingSummaryTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 30%;">Rating Category</th>
+                            <th style="width: 20%;">Property Count</th>
+                            <th style="width: 25%;">Total Rooms</th>
+                            <th style="width: 25%;">Avg Rooms/Property</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ratingSummaryRealBody" class="real-data-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+        
+        <!-- Grid Footer -->
+        <div class="grid-footer">
+            <div style="display: flex; gap: 1.5rem;">
+                <span>Total Registered: <span style="color: var(--navy-deep); font-weight: 800;">@Model.Count()</span></span>
+                <span>Active Filter View: <span id="visibleCount" style="color: var(--primary-color); font-weight: 800;">@Model.Count()</span></span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-circle-info" style="color: var(--primary-color); opacity: 0.7;"></i>
+                Use filters to isolate specific infrastructure parameters
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function filterReport() {
+            const searchText = document.getElementById('reportSearch').value.toLowerCase();
+            const ratingVal = document.getElementById('ratingFilter').value;
+            const typeVal = document.getElementById('typeFilter').value;
+            const activeView = document.querySelector('.report-view.active');
+            
+            // Filter rows in the active data body
+            const targetBody = activeView.querySelector('.real-data-body');
+            const rows = targetBody.querySelectorAll('.report-row');
+            
+            let visibleCount = 0;
+            
+            rows.forEach(row => {
+                const name = row.getAttribute('data-name');
+                const location = row.getAttribute('data-location') || "";
+                const rating = row.getAttribute('data-rating') || "";
+                const type = row.getAttribute('data-type') || "";
+                
+                let matchesSearch = name.includes(searchText) || location.includes(searchText);
+                let matchesRating = ratingVal === 'all' || rating.includes(ratingVal);
+                if (ratingVal === 'Not Assigned') matchesRating = (rating === 'Not Assigned' || rating === 'General Sector');
+
+                let matchesType = typeVal === 'all' || 
+                                 (typeVal === 'Tourist Recommended' && rating.includes('Tourist Recommended')) ||
+                                 rating.includes(typeVal);
+
+                if (matchesSearch && matchesRating && matchesType) {
+                    row.style.display = "";
+                    visibleCount++;
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            document.getElementById('visibleCount').innerText = visibleCount;
+        }
+
+        function resetFilters() {
+            document.getElementById('reportSearch').value = '';
+            document.getElementById('ratingFilter').value = 'all';
+            document.getElementById('typeFilter').value = 'all';
+            filterReport();
+        }
+
+        function switchReport(reportType, tab) {
+            // Update tabs
+            document.querySelectorAll('.report-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            // Update views
+            document.querySelectorAll('.report-view').forEach(v => v.classList.remove('active'));
+            document.getElementById(reportType + 'View').classList.add('active');
+
+            // Update title
+            const titles = {
+                'general': 'General Infrastructure Registry',
+                'accommodation': 'Accommodation Detail Report',
+                'dining': 'Dining Detail Report',
+                'venue': 'Venue Detail Report',
+                'ratingSummary': 'Rating Summary Report'
+            };
+            document.getElementById('reportTitle').innerText = titles[reportType];
+
+            // Re-filter the new view
+            filterReport();
+        }
+
+        function exportToExcel() {
+            const activeView = document.querySelector('.report-view.active');
+            const table = activeView.querySelector('table');
+            const rows = table.querySelectorAll('tr');
+            let csvContent = "data:text/csv;charset=utf-8,";
+            
+            // Header
+            const headers = Array.from(rows[0].querySelectorAll('th')).map(th => `"${th.innerText.replace(/"/g, '""')}"`);
+            csvContent += headers.join(",") + "\r\n";
+            
+            // Filtered Data Rows
+            Array.from(rows).slice(1).forEach(row => {
+                if (row.style.display !== 'none') {
+                    const cols = Array.from(row.querySelectorAll('td')).map(td => `"${td.innerText.replace(/"/g, '""')}"`);
+                    csvContent += cols.join(",") + "\r\n";
+                }
+            });
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `${document.getElementById('reportTitle').innerText.replace(/ /g, '_')}_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        async function loadReportsFromAPI() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const idFilter = urlParams.get('id');
+                const endpoint = idFilter ? `GetRealReportData?id=${idFilter}` : `GetRealReportData`;
+
+                console.log("Fetching structured reports from:", endpoint);
+                const response = await fetch(endpoint);
+                if (response.ok) {
+                    const report = await response.json();
+                    console.log("Structured Report received:", report);
+                    populateRealReports(report);
+                } else {
+                    console.error("Reports API failed with status:", response.status);
+                    alert("Reports API Error: " + response.statusText);
+                }
+            } catch (err) {
+                console.error("Error loading real report data:", err);
+            }
+        }
+
+        function populateRealReports(report) {
+            // 1. General Registry
+            const generalBody = $('#generalRealBody').empty();
+            if (report.generalRegistry && report.generalRegistry.length > 0) {
+                report.generalRegistry.forEach(h => {
+                    const type = h.category.toLowerCase().includes("resort") ? "Resort" : (h.category.toLowerCase().includes("lodge") ? "Lodge" : "Hotel");
+                    generalBody.append(`
+                        <tr class="report-row" data-rating="${h.category}" data-name="${h.propertyName.toLowerCase()}" data-location="${h.region.toLowerCase()} ${h.city.toLowerCase()} ${h.tin}" data-type="${type}">
+                            <td>
+                                <div style="font-weight: 800; color: var(--navy-deep); font-size: 0.85rem;">${h.propertyName}</div>
+                                <div style="display: flex; align-items: center; gap: 0.4rem; margin-top: 2px;">
+                                    ${h.category === "General Sector" ? '<span style="color: #94a3b8; font-size: 0.6rem; font-weight: 800;">UNASSIGNED</span>' : h.category.includes("Tourist Recommended") ? '<span style="color: #059669; font-size: 0.6rem; font-weight: 800;"><i class="fas fa-thumbs-up" style="margin-right: 3px;"></i> RECOMMENDED</span>' : `<div style="display: flex; gap: 1px; color: #f59e0b; font-size: 0.55rem;">${[1,2,3,4,5].map(i => `<i class="fas ${h.category.includes(i.toString()) ? "fa-star" : "fa-star fa-regular"}"></i>`).join('')}</div>`}
+                                </div>
+                            </td>
+                            <td>
+                                <div style="font-weight: 700; color: #334155; font-size: 0.75rem;">${h.city}</div>
+                                <div style="font-size: 0.65rem; color: var(--text-muted); margin-top: 2px;">TIN: ${h.tin} • ${h.phone}</div>
+                            </td>
+                            <td><div style="font-weight: 800; color: var(--primary-color); font-size: 0.85rem;">${h.totalRooms} Total Rooms</div></td>
+                            <td><div style="font-weight: 800; color: #f59e0b;">${h.totalUnits} Units</div></td>
+                            <td><div style="font-weight: 800; color: #8b5cf6;">${h.totalSpaces} Spaces</div></td>
+                        </tr>
+                    `);
+                });
+            } else {
+                generalBody.append('<tr><td colspan="5" style="text-align:center; padding:2rem;">No live registry records found.</td></tr>');
+            }
+
+            // 2. Accommodation
+            const accommodationBody = $('#accommodationRealBody').empty();
+            if (report.accommodationInfrastructure && report.accommodationInfrastructure.length > 0) {
+                report.accommodationInfrastructure.forEach(h => {
+                    accommodationBody.append(`
+                        <tr class="report-row" data-name="${h.propertyName.toLowerCase()}" data-type="Accommodation">
+                            <td style="font-weight: 700;">${h.propertyName}</td>
+                            <td>${h.roomType}</td>
+                            <td><i class="fas fa-bed" style="opacity: 0.5; margin-right: 5px;"></i> ${h.bedConfig}</td>
+                            <td style="font-weight: 800; color: var(--primary-color);">${h.count}</td>
+                            <td style="font-weight: 700; color: #059669;">N/A</td>
+                            <td>${h.maxPax} Guests</td>
+                        </tr>
+                    `);
+                });
+            }
+
+            // 3. Dining
+            const diningBody = $('#diningRealBody').empty();
+            if (report.foodAndBeverage && report.foodAndBeverage.length > 0) {
+                report.foodAndBeverage.forEach(h => {
+                    diningBody.append(`
+                        <tr class="report-row" data-name="${h.propertyName.toLowerCase()}" data-type="Dining">
+                            <td style="font-weight: 700;">${h.propertyName}</td>
+                            <td style="color: var(--navy-deep); font-weight: 600;">${h.facilityName}</td>
+                            <td>${h.specialization}</td>
+                            <td>${h.cuisine}</td>
+                            <td style="font-weight: 800; color: #f59e0b;">${h.seating}</td>
+                            <td>${h.cateringAvailable ? "YES" : "NO"}</td>
+                        </tr>
+                    `);
+                });
+            }
+
+            // 4. Venue
+            const venueBody = $('#venueRealBody').empty();
+            if (report.meetingsEvents && report.meetingsEvents.length > 0) {
+                report.meetingsEvents.forEach(h => {
+                    venueBody.append(`
+                        <tr class="report-row" data-name="${h.propertyName.toLowerCase()}" data-type="Venue">
+                            <td style="font-weight: 700;">${h.propertyName}</td>
+                            <td style="color: #8b5cf6; font-weight: 600;">${h.venueName}</td>
+                            <td>${h.type}</td>
+                            <td style="font-weight: 800; color: var(--navy-deep);">${h.seatingCapacity}</td>
+                            <td style="font-weight: 700; color: #6366f1;">${h.standingCapacity}</td>
+                            <td>${h.areaSqm}</td>
+                        </tr>
+                    `);
+                });
+            }
+
+            // 5. Summary
+            const summaryBody = $('#ratingSummaryRealBody').empty();
+            if (report.ratingSummary && report.ratingSummary.length > 0) {
+                report.ratingSummary.forEach(s => {
+                    summaryBody.append(`
+                        <tr class="report-row" data-rating="${s.category}" data-name="${s.category.toLowerCase()}" data-type="Summary">
+                            <td style="font-weight: 800; color: var(--navy-deep);">${s.category}</td>
+                            <td style="font-weight: 700; color: var(--primary-color);">${s.propertyCount}</td>
+                            <td style="font-weight: 700;">${s.totalRooms.toLocaleString()}</td>
+                            <td>${s.avgRoomsPerProperty.toFixed(1)}</td>
+                        </tr>
+                    `);
+                });
+            }
+
+            filterReport();
+        }
+
+        $(document).ready(() => {
+            loadReportsFromAPI();
+        });
+    </script>
+}
