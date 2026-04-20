@@ -145,7 +145,7 @@ namespace Ministry_of_Tourism_pro.Controllers
                     FirstName = model.Name,
                     SecondName = model.Name,
                     Tin = model.TIN,
-                    IsActive = true,
+                    IsActive = false,
                     // Typically email and phone are stored in address or remark
                     Remark = $"Email: {model.Email} | Phone: {model.Phone}",
                     GslType = 28 ,
@@ -234,7 +234,7 @@ namespace Ministry_of_Tourism_pro.Controllers
                             Salt = ""
                         };
 
-                        var userResp = await _sharedHelpers.CreateUser(userDto);
+                        var userResp = await _sharedHelpers.CreateUser(userDto); 
                         if (userResp != null)
                         {
                             // Create Role for the user

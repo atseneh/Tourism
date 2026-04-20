@@ -23,6 +23,17 @@ namespace Ministry_of_Tourism_pro.Controllers
         public async Task<IActionResult> Index()
         {
             var users = await _sharedHelpers.GetFilterData<List<VwUserPersonDTO>>("VwUserPerson");
+            
+            // Fetch roles from CNET_WebConstantes for the dropdown
+            var roles = new List<ConsigneeUnitDTO>
+            {
+                new ConsigneeUnitDTO { Id = CNET_WebConstantes.SYSTEM_ADMINISTRATOR, Name = "SystemAdmin", Description = "System Administrator" },
+                new ConsigneeUnitDTO { Id = CNET_WebConstantes.ADMINISTRATOR, Name = "HotelOwner", Description = "Hotel Administrator" },
+                new ConsigneeUnitDTO { Id = CNET_WebConstantes.SUPERVISOR, Name = "Admin", Description = "Supervisor" },
+                new ConsigneeUnitDTO { Id = CNET_WebConstantes.GENERAL_MANAGER, Name = "Commissioner", Description = "General Manager" }
+            };
+            ViewBag.Roles = roles;
+
             return View(users ?? new List<VwUserPersonDTO>());
         }
 
@@ -31,72 +42,116 @@ namespace Ministry_of_Tourism_pro.Controllers
         {
             try
             {
-                if (model.Id > 0 && model.Person > 0)
+                if (model.Id > 0)
                 {
-                    // Update
-                    //var userDto = new UserUpdateDTO
-                    //{
-                    //    Id = model.Id,
-                    //    UserName = model.UserName,
-                    //    Password = model.Password,
-                    //    IsActive = model.IsActive,
-                    //    Person = model.Person,
-                    //    Remark = model.Remark
-                    //};
-                    //await _sharedHelpers.UpdateUser(userDto);
+                    // Update User
+                    var userUpdate = new Ministry_of_Tourism_pro.Models.UserUpdateDTO
+                    {
+                        userId = model.Id,
+                        newUserName = model.UserName,
+                        newPassword = !string.IsNullOrEmpty(model.Password) ? model.Password : null,
+                        isActive = model.IsActive,
+                        person = model.Person,
+                        isAdmin = true,
+                        changePassword = !string.IsNullOrEmpty(model.Password)
+                    };
+                    await _sharedHelpers.UpdateUser(userUpdate);
+
+                    // Update Person Details (Consignee)
+                    var person = await _sharedHelpers.GetConsigneeById(model.Person);
+                    if (person != null)
+                    {
+                        person.FirstName = model.FirstName;
+                        person.SecondName = model.SecondName;
+                        person.IsActive = model.IsActive;
+                        person.Remark = $"Email: {model.RoleName} | Phone: {model.Phone1}";
+                        await _sharedHelpers.SendReqAsync<ConsigneeDTO, ConsigneeDTO>($"Consignee", HttpMethod.Put, person);
+                    }
+
+                    // Update Role (Delete existing and create new to ensure only one role)
+                    if (!string.IsNullOrEmpty(model.RoleName))
+                    {
+                        var roleList = GetAvailableRoles();
+                        var role = roleList.FirstOrDefault(r => (r.Description ?? r.Name) == model.RoleName);
+                        if (role != null)
+                        {
+                            // 1. Find and delete existing role(s)
+                            var currentMapper = await _sharedHelpers.GetUserRoleM(model.Id);
+                            if (currentMapper != null)
+                            {
+                                await _sharedHelpers.SendReqAsync<object, object>($"UserRoleMapper/{currentMapper.Id}", HttpMethod.Delete);
+                            }
+
+                            // 2. Create new role
+                            var newMapper = new UserRoleMapperDTO
+                            {
+                                Id = 0,
+                                User = model.Id,
+                                Role = role.Id,
+                                ExpiryDate = DateTime.Now.AddYears(1),
+                                Remark = "Branch"
+                            };
+                            await _sharedHelpers.CreateUserRoleMapper(newMapper);
+                        }
+                    }
+
                     TempData["SuccessMessage"] = "User updated successfully!";
                 }
                 else
                 {
-                    var consignee1 = new CNET_V7_Domain.Domain.ConsigneeSchema.ConsigneeDTO
+                    // Create logic
+                    var consignee1 = new ConsigneeDTO
                     {
                         FirstName = model.FirstName,
                         SecondName = model.SecondName,
-                        //Tin = model.TIN,
                         IsActive = true,
                         IsPerson = true,
                         Preference = CNET_WebConstantes.EMPLOYEE_CATEGORY,
                         Branch = CNET_WebConstantes.HARDCODED_BRANCH,
-                        // Typically email and phone are stored in address or remark
                         Remark = $"Email: {model.RoleName} | Phone: {model.Phone1}",
                         GslType = 26,
                         Code = Guid.NewGuid().ToString()
                     };
-                    var result2 = await _sharedHelpers.SendReqAsync<CNET_V7_Domain.Domain.ConsigneeSchema.ConsigneeDTO, CNET_V7_Domain.Domain.ConsigneeSchema.ConsigneeDTO>("Consignee", HttpMethod.Post, consignee1);
+                    
+                    var result2 = await _sharedHelpers.SendReqAsync<ConsigneeDTO, ConsigneeDTO>("Consignee", HttpMethod.Post, consignee1);
                     if (result2 != null)
                     {
-                        // Create User for the admin person
-                        var userDto_ = new CNET_V7_Domain.Domain.SecuritySchema.UserDTO
+                        var userDto_ = new UserDTO
                         {
                             UserName = model.UserName,
                             Remark = model.Phone1,
                             IsActive = true,
-                            Password = "admin@123",
+                            Password = string.IsNullOrEmpty(model.Password) ? "admin@123" : model.Password,
                             LoggedInStatus = 1389,
                             Person = result2.Id,
                             Salt = ""
                         };
+                        
                         var userResp = await _sharedHelpers.CreateUser(userDto_);
                         if (userResp != null)
                         {
-                            // Create Role for the user
-                            var roleMapper = new CNET_V7_Domain.Domain.SecuritySchema.UserRoleMapperDTO
+                            // Get Role ID from RoleName using hardcoded list
+                            var roleList = GetAvailableRoles();
+                            var role = roleList.FirstOrDefault(r => (r.Description ?? r.Name) == model.RoleName);
+                            
+                            // Delete any existing mapper (unlikely for new user but safe)
+                            var currentMapper = await _sharedHelpers.GetUserRoleM(userResp.Id);
+                            if (currentMapper != null)
+                            {
+                                await _sharedHelpers.SendReqAsync<object, object>($"UserRoleMapper/{currentMapper.Id}", HttpMethod.Delete);
+                            }
+
+                            var roleMapper = new UserRoleMapperDTO
                             {
                                 Id = 0,
                                 User = userResp.Id,
-                                Role = 106,
-                                ExpiryDate = DateTime.Now,
+                                Role = role?.Id ?? CNET_WebConstantes.ADMINISTRATOR, 
+                                ExpiryDate = DateTime.Now.AddYears(1),
                                 Remark = "Branch"
                             };
                             await _sharedHelpers.CreateUserRoleMapper(roleMapper);
                         }
-                        else
-                        {
-                            TempData["ErrorMessage"] = $"Wait! Organization and Admin Person registered, but User Creation failed: {_sharedHelpers.LastResponseContent}";
-                        }
                     }
-                    // Create
-                 
                     TempData["SuccessMessage"] = "User created successfully!";
                 }
             }
@@ -105,6 +160,17 @@ namespace Ministry_of_Tourism_pro.Controllers
                 TempData["ErrorMessage"] = "Error saving user: " + ex.Message;
             }
             return RedirectToAction("Index");
+        }
+
+        private List<ConsigneeUnitDTO> GetAvailableRoles()
+        {
+            return new List<ConsigneeUnitDTO>
+            {
+                new ConsigneeUnitDTO { Id = CNET_WebConstantes.SYSTEM_ADMINISTRATOR, Name = "SystemAdmin", Description = "System Administrator" },
+                new ConsigneeUnitDTO { Id = CNET_WebConstantes.ADMINISTRATOR, Name = "HotelOwner", Description = "Hotel Administrator" },
+                new ConsigneeUnitDTO { Id = CNET_WebConstantes.SUPERVISOR, Name = "Admin", Description = "Supervisor" },
+                new ConsigneeUnitDTO { Id = CNET_WebConstantes.GENERAL_MANAGER, Name = "Commissioner", Description = "General Manager" }
+            };
         }
 
         [HttpPost]

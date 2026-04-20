@@ -61,6 +61,7 @@
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem 1.5rem; }
     .full-width { grid-column: span 2; }
     .form-label { font-weight: 700; color: var(--navy-deep); margin-bottom: 0.25rem; display: block; font-size: 0.8rem; }
+    .label-subtitle { font-size: 0.72rem; color: #0066cc; font-weight: 700; display: block; margin-top: 0.1rem; margin-bottom: 0.2rem; opacity: 1; }
     .form-control { border-radius: 0.6rem; padding: 0.45rem 0.85rem; border: 1.5px solid var(--border-color); width: 100%; transition: border-color 0.2s; font-size: 0.9rem; }
     .form-control:focus { border-color: var(--primary-color); outline: none; }
 
@@ -727,77 +728,85 @@
                         <i class="fas fa-chevron-down chevron"></i>
                     </div>
                 </div>
-                <div class="collapsible-content" style="display: block;">
-                    <div class="form-grid">
-                        <div class="form-group-inline">
-                            <label class="form-label">Trade Name *</label>
-                            <input type="text" name="TradeName" id="form-trade-name" value="@hotel.Name" class="form-control" required />
+                <div class="collapsible-content" style="display: block; padding: 0;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; background: #fafafa;">
+                        <!-- Left Side -->
+                        <div style="padding: 1.5rem; border-right: 1px solid var(--border-color); background: #ffffff;">
+                            <div class="form-group-inline">
+                                <label class="form-label">Property Name *</label>
+                                <input type="text" name="TradeName" id="form-trade-name" value="@hotel.Name" class="form-control" required />
+                            </div>
+                            <div class="form-group-inline">
+                                <label class="form-label">Registration Name</label>
+                                <input type="text" name="RegistrationName" id="form-registration-name" value="@hotel.RegistrationName" class="form-control" />
+                            </div>
+                            <div class="form-group-inline">
+                                <label class="form-label">Star Category</label>
+                                <select name="StarCategory" id="form-star-cat" class="form-control">
+                                    <option value="">Select Category</option>
+                                    <option value="5" selected="@(hotel.StarCategory == "5")">5 Star</option>
+                                    <option value="4" selected="@(hotel.StarCategory == "4")">4 Star</option>
+                                    <option value="3" selected="@(hotel.StarCategory == "3")">3 Star</option>
+                                    <option value="2" selected="@(hotel.StarCategory == "2")">2 Star</option>
+                                    <option value="1" selected="@(hotel.StarCategory == "1")">1 Star</option>
+                                    <option value="Tourist Recommended" selected="@(hotel.StarCategory == "Tourist Recommended")">Tourist Recommended</option>
+                                    <option value="Motel" selected="@(hotel.StarCategory == "Motel")">Motel</option>
+                                    <option value="Guest House" selected="@(hotel.StarCategory == "Guest House")">Guest House</option>
+                                    <option value="Pension" selected="@(hotel.StarCategory == "Pension")">Pension</option>
+                                    <option value="Not Rated" selected="@(hotel.StarCategory == "Not Rated")">Not Rated</option>
+                                </select>
+                            </div>
+                            <div class="form-group-inline">
+                                <label class="form-label">Contact Information</label>
+                                <input type="text" name="ContactInformation" id="form-contact-info" value="@hotel.ContactInformation" class="form-control" />
+                            </div>
+                            <div class="form-group-inline">
+                                <label class="form-label">Reservations Contact</label>
+                                <input type="text" name="ReservationsContact" id="form-res-contact" value="@hotel.ReservationsContact" class="form-control" />
+                            </div>
                         </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Registration Name</label>
-                            <input type="text" name="RegistrationName" id="form-registration-name" value="@hotel.RegistrationName" class="form-control" />
+                        
+                        <!-- Right Side -->
+                        <div style="padding: 1.5rem; background: #f8fafc;">
+                            <div class="form-group-inline">
+                                <label class="form-label">Address</label>
+                                <input type="text" name="Address" id="form-address-general" value="@hotel.City" class="form-control" placeholder="Property General Address" />
+                            </div>
+                            <div class="form-group-inline">
+                                <label class="form-label">Sub City</label>
+                                <select name="Subcity" id="form-subcity-basic" class="form-control">
+                                    <option value="">Select Subcity</option>
+                                    <option value="16" selected="@(hotel.Subcity == "16")">Addis Ababa</option>
+                                    <option value="17" selected="@(hotel.Subcity == "17")">Addis Ketema</option>
+                                    <option value="18" selected="@(hotel.Subcity == "18")">Akaky Kaliti</option>
+                                    <option value="19" selected="@(hotel.Subcity == "19")">Arada</option>
+                                    <option value="20" selected="@(hotel.Subcity == "20")">Bole</option>
+                                    <option value="21" selected="@(hotel.Subcity == "21")">Gullele</option>
+                                    <option value="22" selected="@(hotel.Subcity == "22")">Kirkos</option>
+                                    <option value="23" selected="@(hotel.Subcity == "23")">Kolfe Keranio</option>
+                                    <option value="24" selected="@(hotel.Subcity == "24")">Lideta</option>
+                                    <option value="25" selected="@(hotel.Subcity == "25")">Nifas Silk-Lafto</option>
+                                    <option value="26" selected="@(hotel.Subcity == "26")">Yeka</option>
+                                    <option value="27" selected="@(hotel.Subcity == "27")">Lemi kura</option>
+                                </select>
+                            </div>
+                            <div class="form-group-inline">
+                                <label class="form-label">Specific Address</label>
+                                <input type="text" name="SpecificAddress" id="form-address" value="@hotel.SpecificAddress" class="form-control" />
+                            </div>
+                            <div class="form-group-inline">
+                                <label class="form-label">Sustainability Focal</label>
+                                <input type="text" name="SustainabilityFocalPoint" id="form-sust-focal" value="@hotel.SustainabilityFocalPoint" class="form-control" />
+                            </div>
+                            <div class="form-group-inline" style="border-bottom: none;">
+                                <!-- Spacer for alignment -->
+                                <label class="form-label">&nbsp;</label>
+                                <div style="flex: 1;"></div>
+                            </div>
                         </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Specific Address</label>
-                            <input type="text" name="SpecificAddress" id="form-address" value="@hotel.SpecificAddress" class="form-control" />
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Sub City</label>
-                            <select name="Subcity" id="form-subcity-basic" class="form-control">
-                                <option value="">Select Subcity</option>
-                                <option value="16" selected="@(hotel.Subcity == "16")">Addis Ababa</option>
-                                <option value="17" selected="@(hotel.Subcity == "17")">Addis Ketema</option>
-                                <option value="18" selected="@(hotel.Subcity == "18")">Akaky Kaliti</option>
-                                <option value="19" selected="@(hotel.Subcity == "19")">Arada</option>
-                                <option value="20" selected="@(hotel.Subcity == "20")">Bole</option>
-                                <option value="21" selected="@(hotel.Subcity == "21")">Gullele</option>
-                                <option value="22" selected="@(hotel.Subcity == "22")">Kirkos</option>
-                                <option value="23" selected="@(hotel.Subcity == "23")">Kolfe Keranio</option>
-                                <option value="24" selected="@(hotel.Subcity == "24")">Lideta</option>
-                                <option value="25" selected="@(hotel.Subcity == "25")">Nifas Silk-Lafto</option>
-                                <option value="26" selected="@(hotel.Subcity == "26")">Yeka</option>
-                                <option value="27" selected="@(hotel.Subcity == "27")">Lemi kura</option>
-                            </select>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Airport Distance (km)</label>
-                            <input type="text" name="DistanceFromAirport" id="form-airport-dist" value="@hotel.DistanceFromAirport" class="form-control" />
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Star Category</label>
-                            <select name="StarCategory" id="form-star-cat" class="form-control">
-                                <option value="">Select Category</option>
-                                <option value="5" selected="@(hotel.StarCategory == "5")">5 Star</option>
-                                <option value="4" selected="@(hotel.StarCategory == "4")">4 Star</option>
-                                <option value="3" selected="@(hotel.StarCategory == "3")">3 Star</option>
-                                <option value="2" selected="@(hotel.StarCategory == "2")">2 Star</option>
-                                <option value="1" selected="@(hotel.StarCategory == "1")">1 Star</option>
-                                <option value="Tourist Recommended" selected="@(hotel.StarCategory == "Tourist Recommended")">Tourist Recommended</option>
-                                <option value="Motel" selected="@(hotel.StarCategory == "Motel")">Motel</option>
-                                <option value="Guest House" selected="@(hotel.StarCategory == "Guest House")">Guest House</option>
-                            </select>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Total Rooms</label>
-                            <input type="number" name="TotalRooms" id="form-total-rooms" value="@hotel.TotalRooms" class="form-control" />
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Total Beds</label>
-                            <input type="number" name="TotalBeds" id="form-total-beds" value="@hotel.TotalBeds" class="form-control" />
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Contact (Email/Phone)</label>
-                            <input type="text" name="ContactInformation" id="form-contact-info" value="@hotel.ContactInformation" class="form-control" />
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Reservations Contact</label>
-                            <input type="text" name="ReservationsContact" id="form-res-contact" value="@hotel.ReservationsContact" class="form-control" />
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Sustainability Focal</label>
-                            <input type="text" name="SustainabilityFocalPoint" id="form-sust-focal" value="@hotel.SustainabilityFocalPoint" class="form-control" />
-                        </div>
-                        <div class="form-group full-width">
+                    </div>
+                    
+                    <div class="form-group full-width" style="padding: 1.5rem; border-top: 1px solid var(--border-color);">
                             <label class="form-label">Location on Map</label>
                             <div id="editor-map" class="map-container"></div>
                             <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
@@ -809,7 +818,6 @@
                                     <label class="form-label" style="font-size: 0.7rem; opacity: 0.7;">Longitude</label>
                                     <input type="text" name="Longitude" id="lng-input" value="@hotel.Longitude" class="form-control" readonly />
                                 </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -829,35 +837,64 @@
                 <div class="collapsible-content">
                     <div class="form-grid">
                         <div class="form-group-inline">
-                            <label class="form-label">King size Rooms</label>
-                            <input type="number" name="KingSizeRooms" id="form-king-rooms" value="@hotel.KingSizeRooms" class="form-control" />
+                            <div style="display: flex; flex-direction: column; flex: 0 0 280px;">
+                                <label class="form-label" style="flex: none; padding-right: 0;">King size Rooms</label>
+                                <span class="label-subtitle">Bed Size 1.5m - 2m</span>
+                            </div>
+                            <input type="number" name="KingSizeRooms" id="form-king-rooms" value="@hotel.KingSizeRooms" class="form-control room-count-input" />
                         </div>
                         <div class="form-group-inline">
-                            <label class="form-label">Twin bed Rooms</label>
-                            <input type="number" name="TwinBedRooms" id="form-twin-rooms" value="@hotel.TwinBedRooms" class="form-control" />
+                            <div style="display: flex; flex-direction: column; flex: 0 0 280px;">
+                                <label class="form-label" style="flex: none; padding-right: 0;">Twin bed Rooms</label>
+                                <span class="label-subtitle">Bed Size 1m - 1.2m</span>
+                            </div>
+                            <input type="number" name="TwinBedRooms" id="form-twin-rooms" value="@hotel.TwinBedRooms" class="form-control room-count-input" />
                         </div>
                         <div class="form-group-inline">
-                            <label class="form-label">Junior Suites</label>
-                            <input type="number" name="JuniorSuites" id="form-junior-suites" value="@hotel.JuniorSuites" class="form-control" />
+                            <div style="display: flex; flex-direction: column; flex: 0 0 280px;">
+                                <label class="form-label" style="flex: none; padding-right: 0;">Junior Suites</label>
+                                <span class="label-subtitle">1 Saloon Room & 1 Bed Room</span>
+                            </div>
+                            <input type="number" name="JuniorSuites" id="form-junior-suites" value="@hotel.JuniorSuites" class="form-control room-count-input" />
                         </div>
                         <div class="form-group-inline">
-                            <label class="form-label">Suites</label>
-                            <input type="number" name="Suites" id="form-suites" value="@hotel.Suites" class="form-control" />
+                            <div style="display: flex; flex-direction: column; flex: 0 0 280px;">
+                                <label class="form-label" style="flex: none; padding-right: 0;">Suites</label>
+                                <span class="label-subtitle">Minimum 1 Saloon Room, 1 King Size Bed Room & 1 Twin Bed Room</span>
+                            </div>
+                            <input type="number" name="Suites" id="form-suites" value="@hotel.Suites" class="form-control room-count-input" />
                         </div>
                         <div class="form-group-inline">
-                            <label class="form-label">Presidential Suites</label>
-                            <input type="number" name="PresidentialSuites" id="form-pres-suites" value="@hotel.PresidentialSuites" class="form-control" />
+                            <div style="display: flex; flex-direction: column; flex: 0 0 280px;">
+                                <label class="form-label" style="flex: none; padding-right: 0;">Presidential Suites</label>
+                                <span class="label-subtitle">Minimum 1 Luxury Room, 1 King Size Bed Room, 1 Twin Bed Room, Cooking Space, 1 Office Set-Up, Luggage Room, & More</span>
+                            </div>
+                            <input type="number" name="PresidentialSuites" id="form-pres-suites" value="@hotel.PresidentialSuites" class="form-control room-count-input" />
                         </div>
                         <div class="form-group-inline">
-                            <label class="form-label">Accessible Rooms</label>
-                            <input type="number" name="AccessibleRooms" id="form-acc-rooms" value="@hotel.AccessibleRooms" class="form-control" />
+                            <div style="display: flex; flex-direction: column; flex: 0 0 280px;">
+                                <label class="form-label" style="flex: none; padding-right: 0;">Accessible Rooms</label>
+                                <span class="label-subtitle">Modified for guests with physical disabilities</span>
+                            </div>
+                            <input type="number" name="AccessibleRooms" id="form-acc-rooms" value="@hotel.AccessibleRooms" class="form-control room-count-input" />
+                        </div>
+                        
+                        <div class="form-group-inline" style="background: #f0f9ff; margin: 0.5rem -1.5rem; padding: 1rem 1.5rem; border-top: 1px solid #bae6fd; border-bottom: 1px solid #bae6fd;">
+                            <div style="flex: 1; display: flex; align-items: center; gap: 1rem;">
+                                <label class="form-label" style="margin-bottom: 0;">Total Rooms (Calculated)</label>
+                                <input type="number" name="TotalRooms" id="form-total-rooms" value="@hotel.TotalRooms" class="form-control" style="width: 120px; background: #fff; font-weight: 800; border-color: #7dd3fc;" readonly />
+                            </div>
+                            <div style="flex: 1; display: flex; align-items: center; gap: 1rem;">
+                                <label class="form-label" style="margin-bottom: 0;">Total Beds (Calculated)</label>
+                                <input type="number" name="TotalBeds" id="form-total-beds" value="@hotel.TotalBeds" class="form-control" style="width: 120px; background: #fff; font-weight: 800; border-color: #7dd3fc;" readonly />
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- 3. Food & Beverage -->
-            <div class="collapsible-card">
+            <div class="collapsible-card" style="border-left: 4px solid var(--primary-color);">
                 <div class="collapsible-header" onclick="toggleCollapsible(this)">
                     <h3><i class="fas fa-utensils" style="color: var(--primary-color);"></i> 3. Food & Beverage</h3>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -867,91 +904,127 @@
                         <i class="fas fa-chevron-down chevron"></i>
                     </div>
                 </div>
-                <div class="collapsible-content">
+                <div class="collapsible-content" style="background: #fafafa;">
                     <div class="form-grid">
-                        <div class="form-group-inline">
-                            <label class="form-label">All-day Dining</label>
-                            <input type="hidden" name="AllDayDining" id="form-all-day-dining" value="@(hotel.AllDayDining == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-all-day-dining" @(hotel.AllDayDining == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
+                        <!-- All-day Dining Section -->
+                        <div class="full-width" style="background: #f0fdf4; padding: 1.25rem; border-radius: 0.75rem; border: 1px solid #dcfce7; margin-bottom: 1rem;">
+                            <h4 style="font-size: 0.85rem; font-weight: 800; color: #166534; margin-bottom: 1rem; text-transform: uppercase;">All-day Dining</h4>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                                <div class="form-group-inline" style="border-bottom: none; padding: 0;">
+                                    <label class="form-label">Available</label>
+                                    <input type="hidden" name="AllDayDining" id="form-all-day-dining" value="@(hotel.AllDayDining == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-all-day-dining" @(hotel.AllDayDining == true ? "checked" : "") />
+                                        <span class="checkbox-text">Yes</span>
+                                        <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                                    </label>
+                                </div>
+                                <div class="form-group-inline" style="border-bottom: none; padding: 0;">
+                                    <label class="form-label">Total Seats</label>
+                                    <input type="number" name="AllDayDiningSeats" id="form-dining-seats" value="@hotel.AllDayDiningSeats" class="form-control" />
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">All-day Dining Seats</label>
-                            <input type="number" name="AllDayDiningSeats" id="form-dining-seats" value="@hotel.AllDayDiningSeats" class="form-control" />
+
+                        <!-- Specialty Restaurants Section -->
+                        <div class="full-width" style="background: white; padding: 1.25rem; border-radius: 0.75rem; border: 1px solid var(--border-color); margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <h4 style="font-size: 0.85rem; font-weight: 800; color: var(--navy-deep); margin-bottom: 0; text-transform: uppercase;">Specialty Restaurants</h4>
+                                <button type="button" class="update-btn-top" onclick="openRestaurantModal()">
+                                    <i class="fas fa-plus"></i> Add Restaurant
+                                </button>
+                            </div>
+                            <input type="hidden" name="SpecialtyRestaurants" id="form-spec-rest" value="@hotel.SpecialtyRestaurants" />
+                            <div id="restaurant-table-container" style="overflow-x: auto;">
+                                <table class="table table-sm table-hover" style="font-size: 0.85rem; border: 1px solid #f1f5f9; border-radius: 0.5rem; overflow: hidden;">
+                                    <thead style="background: #f8fafc;">
+                                        <tr>
+                                            <th style="padding: 0.75rem;">Name</th>
+                                            <th style="padding: 0.75rem;">Type/Cuisine</th>
+                                            <th style="padding: 0.75rem;">Capacity</th>
+                                            <th style="padding: 0.75rem; text-align: center;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="restaurant-tbody">
+                                        <!-- Dynamically populated -->
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Specialty Restaurants</label>
-                            <input type="text" name="SpecialtyRestaurants" id="form-spec-rest" value="@hotel.SpecialtyRestaurants" class="form-control" placeholder="Italian, Chinese..." />
+
+                        <!-- Coffee Shop, Bars, Night Club Row -->
+                        <div class="full-width" style="background: #fefce8; padding: 1rem; border-radius: 0.75rem; border: 1px solid #fef08a; margin-bottom: 1rem;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                                <div class="form-group-inline" style="border: none; padding: 0;">
+                                    <label class="form-label">Coffee Shop</label>
+                                    <input type="hidden" name="CoffeeShop" id="form-coffee-shop" value="@(hotel.CoffeeShop == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-coffee-shop" @(hotel.CoffeeShop == true ? "checked" : "") />
+                                        <span class="checkbox-text">Yes</span>
+                                        <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                                    </label>
+                                </div>
+                                <div class="form-group-inline" style="border: none; padding: 0;">
+                                    <label class="form-label">Bars</label>
+                                    <input type="number" name="BarsCount" id="form-bars-count" value="@hotel.BarsCount" class="form-control" />
+                                </div>
+                                <div class="form-group-inline" style="border: none; padding: 0;">
+                                    <label class="form-label">Night Club</label>
+                                    <input type="hidden" name="NightClub" id="form-night-club" value="@(hotel.NightClub == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-night-club" @(hotel.NightClub == true ? "checked" : "") />
+                                        <span class="checkbox-text">Yes</span>
+                                        <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Coffee Shop</label>
-                            <input type="hidden" name="CoffeeShop" id="form-coffee-shop" value="@(hotel.CoffeeShop == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-coffee-shop" @(hotel.CoffeeShop == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
+
+                        <!-- Souvenir Shops Section -->
+                        <div class="full-width" style="background: white; padding: 1.25rem; border-radius: 0.75rem; border: 1px solid var(--border-color); margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <h4 style="font-size: 0.85rem; font-weight: 800; color: var(--navy-deep); margin-bottom: 0; text-transform: uppercase;">Souvenir Shops</h4>
+                                <button type="button" class="update-btn-top" onclick="openShopModal()" style="background: #ec4899;">
+                                    <i class="fas fa-plus"></i> Add Shop
+                                </button>
+                            </div>
+                            <input type="hidden" name="SouvenirShops" id="form-shops-count" value="@hotel.SouvenirShops" />
+                            <div id="shop-table-container" style="overflow-x: auto;">
+                                <table class="table table-sm table-hover" style="font-size: 0.85rem; border: 1px solid #f1f5f9; border-radius: 0.5rem; overflow: hidden;">
+                                    <thead style="background: #fdf2f8;">
+                                        <tr>
+                                            <th style="padding: 0.75rem;">Shop Name</th>
+                                            <th style="padding: 0.75rem;">Category</th>
+                                            <th style="padding: 0.75rem;">Location</th>
+                                            <th style="padding: 0.75rem; text-align: center;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="shop-tbody">
+                                        <!-- Dynamically populated -->
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Bars (number)</label>
-                            <input type="number" name="BarsCount" id="form-bars-count" value="@hotel.BarsCount" class="form-control" />
+
+                        <!-- Delegation Catering Row -->
+                        <div class="full-width" style="background: #eff6ff; padding: 1rem; border-radius: 0.75rem; border: 1px solid #dbeafe;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                                <div class="form-group-inline" style="border: none; padding: 0;">
+                                    <label class="form-label">Delegation Catering</label>
+                                    <input type="hidden" name="DelegationCatering" id="form-del-cat" value="@(hotel.DelegationCatering == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-del-cat" @(hotel.DelegationCatering == true ? "checked" : "") />
+                                        <span class="checkbox-text">Available</span>
+                                        <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                                    </label>
+                                </div>
+                                <div class="form-group-inline" style="border: none; padding: 0;">
+                                    <label class="form-label">Catering Max Pax</label>
+                                    <input type="number" name="DelegationCateringMaxPax" id="form-del-cat-max" value="@hotel.DelegationCateringMaxPax" class="form-control" />
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Night Club</label>
-                            <input type="hidden" name="NightClub" id="form-night-club" value="@(hotel.NightClub == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-night-club" @(hotel.NightClub == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Souvenir Shops</label>
-                            <input type="number" name="SouvenirShops" id="form-shops-count" value="@hotel.SouvenirShops" class="form-control" />
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Delegation Catering</label>
-                            <input type="hidden" name="DelegationCatering" id="form-del-cat" value="@(hotel.DelegationCatering == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-del-cat" @(hotel.DelegationCatering == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Catering Max Pax</label>
-                            <input type="number" name="DelegationCateringMaxPax" id="form-del-cat-max" value="@hotel.DelegationCateringMaxPax" class="form-control" />
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Refill Water Stations</label>
-                            <input type="hidden" name="RefillWaterStations" id="form-refill-water" value="@(hotel.RefillWaterStations == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-refill-water" @(hotel.RefillWaterStations == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Veg/Vegan Options</label>
-                            <input type="hidden" name="VegVeganOptions" id="form-veg-options" value="@(hotel.VegVeganOptions == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-veg-options" @(hotel.VegVeganOptions == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">No Single-use Plastics</label>
-                            <input type="hidden" name="NoSingleUsePlastics" id="form-no-plastic" value="@(hotel.NoSingleUsePlastics == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-no-plastic" @(hotel.NoSingleUsePlastics == true ? "checked" : "") />
-                                <span class="checkbox-text">Ensured</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
+
                     </div>
                 </div>
             </div>
@@ -967,23 +1040,39 @@
                         <i class="fas fa-chevron-down chevron"></i>
                     </div>
                 </div>
-                <div class="collapsible-content">
+                <div class="collapsible-content" style="background: #fafafa;">
                     <div class="form-grid">
-                        <div class="form-group-inline">
-                            <label class="form-label">Meeting Rooms</label>
-                            <input type="number" name="MeetingRoomsCount" id="form-meeting-rooms" value="@hotel.MeetingRoomsCount" class="form-control" />
+                        <div class="full-width" style="background: white; padding: 1.25rem; border-radius: 0.75rem; border: 1px solid var(--border-color); margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <h4 style="font-size: 0.85rem; font-weight: 800; color: var(--navy-deep); margin-bottom: 0; text-transform: uppercase;">Meeting Rooms & Event Halls</h4>
+                                <button type="button" class="update-btn-top" onclick="openMeetingRoomModal()" style="background: var(--primary-color);">
+                                    <i class="fas fa-plus"></i> Add Meeting Room
+                                </button>
+                            </div>
+                            <input type="hidden" name="MeetingRooms" id="form-meeting-rooms-json" value="" />
+                            <div id="meeting-room-table-container" style="overflow-x: auto;">
+                                <table class="table table-sm table-hover" style="font-size: 0.85rem; border: 1px solid #f1f5f9; border-radius: 0.5rem; overflow: hidden;">
+                                    <thead style="background: #f8fafc;">
+                                        <tr>
+                                            <th style="padding: 0.75rem;">Hall Name</th>
+                                            <th style="padding: 0.75rem;">Dimensions (W x L x H)</th>
+                                            <th style="padding: 0.75rem;">Max Capacity</th>
+                                            <th style="padding: 0.75rem;">Equipment</th>
+                                            <th style="padding: 0.75rem; text-align: center;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="meeting-room-tbody">
+                                        <!-- Dynamically populated -->
+                                        <tr><td colspan="5" class="text-center text-muted py-3">No meeting rooms added yet.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
+
+                        <!-- Summary Fields (Auto-calculated or manually adjusted) -->
                         <div class="form-group-inline">
-                            <label class="form-label">Max Theatre Cap.</label>
-                            <input type="number" name="LargestRoomCapacityTheatre" id="form-cap-theatre" value="@hotel.LargestRoomCapacityTheatre" class="form-control" />
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Max Classroom Cap.</label>
-                            <input type="number" name="LargestRoomCapacityClassroom" id="form-cap-classroom" value="@hotel.LargestRoomCapacityClassroom" class="form-control" />
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Max Banquet Cap.</label>
-                            <input type="number" name="LargestRoomCapacityBanquet" id="form-cap-banquet" value="@hotel.LargestRoomCapacityBanquet" class="form-control" />
+                            <label class="form-label">Total Meeting Rooms</label>
+                            <input type="number" name="MeetingRoomsCount" id="form-meeting-rooms" value="@hotel.MeetingRoomsCount" class="form-control" readonly />
                         </div>
                         <div class="form-group-inline">
                             <label class="form-label">Total Meeting Space (sqm)</label>
@@ -996,7 +1085,7 @@
             <!-- 5. Public Facilities -->
             <div class="collapsible-card">
                 <div class="collapsible-header" onclick="toggleCollapsible(this)">
-                    <h3><i class="fas fa-building" style="color: var(--primary-color);"></i> 5. Public Facilities</h3>
+                    <h3><i class="fas fa-building" style="color: var(--primary-color);"></i> 5.Facilities</h3>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <button type="button" class="btn-save-section" onclick="event.stopPropagation(); saveRegistry(this, 'public_facilities')" title="Update Section">
                             <i class="fas fa-cloud-arrow-up"></i>
@@ -1456,35 +1545,75 @@
                 </div>
                 <div class="collapsible-content">
                     <div class="form-grid">
-                        <div class="form-group-inline">
-                            <label class="form-label">HACCP/GSTC Cert.</label>
-                            <select name="SustainabilityCertification" id="form-sust-cert" class="form-control">
-                                <option value="Yes" selected="@(hotel.SustainabilityCertification == "Yes")">Yes</option>
-                                <option value="No" selected="@(hotel.SustainabilityCertification == "No")">No</option>
-                                <option value="In progress" selected="@(hotel.SustainabilityCertification == "In progress")">In Progress</option>
-                            </select>
+                        <!-- Column 1: Certificates & Licenses -->
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            <h4 style="font-size: 0.75rem; color: var(--primary-color); font-weight: 800; text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-color); padding-bottom: 0.25rem;">Certificates & Licenses</h4>
+                            
+                            <div class="form-group-inline">
+                                <label class="form-label">HACCP/GSTC Cert.</label>
+                                <select name="SustainabilityCertification" id="form-sust-cert" class="form-control">
+                                    <option value="Yes" selected="@(hotel.SustainabilityCertification == "Yes")">Yes</option>
+                                    <option value="No" selected="@(hotel.SustainabilityCertification == "No")">No</option>
+                                    <option value="In progress" selected="@(hotel.SustainabilityCertification == "In progress")">In Progress</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group-inline">
+                                <label class="form-label">Tourism Service Competence License</label>
+                                <select name="TourismServiceCompetenceLicenseCertificate" id="form-tour-competence" class="form-control">
+                                    <option value="Yes" selected="@(hotel.TourismServiceCompetenceLicenseCertificate == "Yes")">Yes</option>
+                                    <option value="No" selected="@(hotel.TourismServiceCompetenceLicenseCertificate == "No")">No</option>
+                                    <option value="In progress" selected="@(hotel.TourismServiceCompetenceLicenseCertificate == "In progress")">In Progress</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group-inline">
+                                <label class="form-label">Fire Safety Cert.</label>
+                                <select name="FireSafetyCertificate" id="form-fire-safety-cert" class="form-control">
+                                    <option value="Yes" selected="@(hotel.FireSafetyCertificate == "Yes")">Yes</option>
+                                    <option value="No" selected="@(hotel.FireSafetyCertificate == "No")">No</option>
+                                    <option value="In progress" selected="@(hotel.FireSafetyCertificate == "In progress")">In Progress</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group-inline">
+                                <label class="form-label">Environmental Clearance Cert.</label>
+                                <select name="EnvironmentalClearanceCertificate" id="form-env-clearance" class="form-control">
+                                    <option value="Yes" selected="@(hotel.EnvironmentalClearanceCertificate == "Yes")">Yes</option>
+                                    <option value="No" selected="@(hotel.EnvironmentalClearanceCertificate == "No")">No</option>
+                                    <option value="In progress" selected="@(hotel.EnvironmentalClearanceCertificate == "In progress")">In Progress</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group-inline">
+                                <label class="form-label">Food Safety & Hygiene Cert.</label>
+                                <select name="FoodSafetyAndHygieneCertificate" id="form-food-safety-hygiene" class="form-control">
+                                    <option value="Yes" selected="@(hotel.FoodSafetyAndHygieneCertificate == "Yes")">Yes</option>
+                                    <option value="No" selected="@(hotel.FoodSafetyAndHygieneCertificate == "No")">No</option>
+                                    <option value="In progress" selected="@(hotel.FoodSafetyAndHygieneCertificate == "In progress")">In Progress</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Other Eco-labels</label>
-                            <input type="text" name="OtherEcoLabels" id="form-eco-labels" value="@hotel.OtherEcoLabels" class="form-control" placeholder="e.g. Green Key..." />
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Food Waste Program</label>
-                            <input type="hidden" name="FoodWasteProgram" id="form-waste-prog" value="@(hotel.FoodWasteProgram == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-waste-prog" @(hotel.FoodWasteProgram == true ? "checked" : "") />
-                                <span class="checkbox-text">Enabled</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Refill Water Stations</label>
-                            <input type="hidden" name="SustainabilityRefillWaterStations" id="form-sust-refill" value="@(hotel.SustainabilityRefillWaterStations == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-sust-refill" @(hotel.SustainabilityRefillWaterStations == true ? "checked" : "") />
-                                <span class="checkbox-text">Enabled</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
+
+                        <!-- Column 2: Sustainability Features -->
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            <h4 style="font-size: 0.75rem; color: var(--primary-color); font-weight: 800; text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-color); padding-bottom: 0.25rem;">Sustainability Features</h4>
+
+                            <div class="form-group-inline">
+                                <label class="form-label">Other Eco-labels</label>
+                                <input type="text" name="OtherEcoLabels" id="form-eco-labels" value="@hotel.OtherEcoLabels" class="form-control" placeholder="e.g. Green Key..." />
+                            </div>
+
+                            <div class="form-group-inline">
+                                <label class="form-label">Food Waste Program</label>
+                                <input type="hidden" name="FoodWasteProgram" id="form-waste-prog" value="@(hotel.FoodWasteProgram == true ? "true" : "false")" />
+                                <label class="premium-checkbox">
+                                    <input type="checkbox" class="sync-checkbox" data-target="form-waste-prog" @(hotel.FoodWasteProgram == true ? "checked" : "") />
+                                    <span class="checkbox-text">Enabled</span>
+                                    <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                                </label>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -1501,15 +1630,41 @@
                         <i class="fas fa-chevron-down chevron"></i>
                     </div>
                 </div>
-                <div class="collapsible-content">
-                    <div class="form-grid">
-                        <div class="form-group-inline">
-                            <label class="form-label">Total Staff</label>
-                            <input type="number" name="TotalStaff" id="form-total-staff" value="@hotel.TotalStaff" class="form-control" />
+                <div class="collapsible-content" style="padding: 0;">
+                    <div style="display: grid; grid-template-columns: 1fr 1.2fr; min-height: 250px;">
+                        <!-- Left Side: Staffing (Subtle background) -->
+                        <div style="background: #f8fafc; padding: 2rem; border-right: 1.5px solid var(--border-color);">
+                            <h4 style="font-size: 0.85rem; font-weight: 800; color: var(--navy-deep); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Staffing Distribution</h4>
+                            <div class="form-grid" style="grid-template-columns: 1fr; gap: 1.25rem;">
+                                <div class="form-group-inline" style="justify-content: space-between;">
+                                    <label class="form-label" style="margin-bottom: 0;">Line Staff</label>
+                                    <input type="number" name="LineStaff" id="form-line-staff" value="@hotel.LineStaff" class="form-control staff-input" style="width: 100px; text-align: center; font-weight: 700;" />
+                                </div>
+                                <div class="form-group-inline" style="justify-content: space-between;">
+                                    <label class="form-label" style="margin-bottom: 0;">Management Staff</label>
+                                    <input type="number" name="ManagementStaff" id="form-mgmt-staff" value="@hotel.ManagementStaff" class="form-control staff-input" style="width: 100px; text-align: center; font-weight: 700;" />
+                                </div>
+                                <div class="form-group-inline" style="justify-content: space-between; margin-top: 0.5rem; padding-top: 1rem; border-top: 1px dashed var(--border-color);">
+                                    <label class="form-label" style="margin-bottom: 0; color: var(--primary-color);">Total Staff</label>
+                                    <input type="number" name="TotalStaff" id="form-total-staff" value="@hotel.TotalStaff" class="form-control" style="width: 100px; text-align: center; font-weight: 800; background: white; border-color: var(--primary-color); color: var(--primary-color);" readonly />
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Front Desk Languages</label>
-                            <input type="text" name="InternationalLanguagesFrontDesk" id="form-languages" value="@hotel.InternationalLanguagesFrontDesk" class="form-control" placeholder="English, Arabic, etc." />
+
+                        <!-- Right Side: Languages -->
+                        <div style="padding: 2rem;">
+                            <h4 style="font-size: 0.85rem; font-weight: 800; color: var(--navy-deep); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Front Desk Languages</h4>
+                            <input type="hidden" name="InternationalLanguagesFrontDesk" id="form-languages-hidden" value="@hotel.InternationalLanguagesFrontDesk" />
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                @foreach (var lang in new[] { "English", "French", "Swahili", "Chinese (Mandarin)", "Spanish", "German", "Italian", "Portuguese" })
+                                {
+                                    <label class="premium-checkbox" style="width: 100%;">
+                                        <input type="checkbox" class="lang-checkbox" value="@lang" />
+                                        <span class="checkbox-text">@lang</span>
+                                        <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                                    </label>
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1725,6 +1880,223 @@
     </div>
 </div>
 
+
+<!-- Specialty Restaurant Modal -->
+<div id="restaurantModal" class="modal-overlay">
+    <div class="modal-content-animate" style="max-width: 650px;">
+        <div class="glass-card" style="padding: 2rem; position: relative; border-top: 4px solid var(--primary-color);">
+            <button onclick="closeRestaurantModal()" style="position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; font-size: 1.25rem; color: var(--text-muted); cursor: pointer;"><i class="fas fa-times"></i></button>
+            <h2 style="margin-bottom: 0.5rem; color: var(--navy-deep);"><i class="fas fa-utensils"></i> Add Specialty Restaurant</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 2rem;">Register details for your establishment's specialized dining facilities.</p>
+
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label class="form-label">Restaurant Type</label>
+                    <select id="restType" class="form-control" onchange="autoFillCuisine(this.value)">
+                        <option value="">Select Type...</option>
+                        <optgroup label="🌏 Asian">
+                            <option>Chinese</option>
+                            <option>Japanese</option>
+                            <option>Korean</option>
+                            <option>Indian</option>
+                        </optgroup>
+                        <optgroup label="🌍 Middle Eastern">
+                            <option>Lebanese</option>
+                            <option>Syrian</option>
+                            <option>Turkish</option>
+                            <option>Arabian</option>
+                        </optgroup>
+                        <optgroup label="🌍 African">
+                            <option>Sudanese</option>
+                            <option>Ethiopian Cultural</option>
+                        </optgroup>
+                        <optgroup label="🌍 European">
+                            <option>Italian</option>
+                            <option>French</option>
+                            <option>Spanish</option>
+                            <option>Armenian</option>
+                        </optgroup>
+                        <optgroup label="🌎 American">
+                            <option>Mexican</option>
+                        </optgroup>
+                        <optgroup label="➕ Other">
+                            <option>Other</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Custom Name (Optional)</label>
+                    <input type="text" id="restName" placeholder="e.g. Golden Dragon" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Seating Capacity</label>
+                    <input type="number" id="restCapacity" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Cuisine Category</label>
+                    <input type="text" id="restCuisine" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Options</label>
+                    <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                        <label style="font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 0.4rem;">
+                            <input type="checkbox" id="restHalal" /> Halal
+                        </label>
+                        <label style="font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 0.4rem;">
+                            <input type="checkbox" id="restVegan" /> Vegan
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group full-width">
+                    <label class="form-label">Notes</label>
+                    <textarea id="restNotes" class="form-control" rows="2" placeholder="Any special features..."></textarea>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button type="button" onclick="closeRestaurantModal()" class="btn-premium btn-secondary" style="flex: 1;">Cancel</button>
+                <button type="button" onclick="addRestaurant()" class="btn-premium" style="flex: 2;">Add Restaurant</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Souvenir Shop Modal -->
+<div id="shopModal" class="modal-overlay">
+    <div class="modal-content-animate" style="max-width: 600px;">
+        <div class="glass-card" style="padding: 2rem; position: relative; border-top: 4px solid var(--primary-color);">
+            <button onclick="closeShopModal()" style="position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; font-size: 1.25rem; color: var(--text-muted); cursor: pointer;"><i class="fas fa-times"></i></button>
+            <h2 style="margin-bottom: 0.5rem; color: var(--navy-deep);"><i class="fas fa-shopping-bag"></i> Add Souvenir Shop</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 2rem;">Add details for retail facilities within the property.</p>
+
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label class="form-label">Shop Type</label>
+                    <select id="shopType" class="form-control">
+                        <option>Handicrafts</option>
+                        <option>Cultural Items</option>
+                        <option>Local Products</option>
+                        <option>Luxury Gifts</option>
+                        <option>Books & Stationery</option>
+                        <option>Clothing & Textiles</option>
+                        <option>Jewelry</option>
+                        <option>Food & Snacks</option>
+                        <option>Beauty Salon</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Shop Name</label>
+                    <input type="text" id="shopName" placeholder="e.g. Heritage Crafts" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <input type="text" id="shopCategory" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Operating Hours</label>
+                    <input type="text" id="shopHours" placeholder="e.g. 9 AM - 8 PM" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Location (Optional)</label>
+                    <input type="text" id="shopLocation" placeholder="e.g. Ground Floor" class="form-control" />
+                </div>
+                <div class="form-group full-width">
+                    <label class="form-label">Notes</label>
+                    <textarea id="shopNotes" class="form-control" rows="2"></textarea>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button type="button" onclick="closeShopModal()" class="btn-premium btn-secondary" style="flex: 1;">Cancel</button>
+                <button type="button" onclick="addShop()" class="btn-premium" style="flex: 2;">Add Shop</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Meeting Room Modal -->
+<div id="meetingRoomModal" class="modal-overlay">
+    <div class="modal-content-animate" style="max-width: 650px;">
+        <div class="glass-card" style="padding: 2rem; position: relative; border-top: 4px solid var(--primary-color);">
+            <button type="button" onclick="closeMeetingRoomModal()" style="position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; font-size: 1.25rem; color: var(--text-muted); cursor: pointer;"><i class="fas fa-times"></i></button>
+            <h2 style="margin-bottom: 0.5rem; color: var(--navy-deep);"><i class="fas fa-handshake"></i> Add Meeting Room / Event Hall</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 2rem;">Register technical specifications for your event spaces.</p>
+
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label class="form-label">Hall / Room Name</label>
+                    <input type="text" id="meetHallName" placeholder="e.g. Grand Ballroom, Boardroom A" class="form-control" />
+                </div>
+
+                <div class="form-group full-width">
+                    <label class="form-label">Room Setting</label>
+                    <select id="meetSetting" class="form-control">
+                        <option value="Indoor">Indoor</option>
+                        <option value="Open Air">Open Air</option>
+                        <option value="Semi-Outdoor">Semi-Outdoor</option>
+                    </select>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;" class="full-width">
+                    <div class="form-group">
+                        <label class="form-label">Width (m)</label>
+                        <input type="number" id="meetWidth" step="0.1" class="form-control room-dim-input" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Length (m)</label>
+                        <input type="number" id="meetLength" step="0.1" class="form-control room-dim-input" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Ceiling Height (m)</label>
+                        <input type="number" id="meetCeiling" step="0.1" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Max Capacity (Pax)</label>
+                    <input type="number" id="meetMaxCap" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Area Size (sqm)</label>
+                    <input type="number" id="meetAreaSize" class="form-control" readonly />
+                </div>
+
+                <div class="form-group full-width">
+                    <label class="form-label">Equipment & Facilities</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; background: #f8fafc; padding: 1rem; border-radius: 0.75rem; border: 1.5px solid var(--border-color);">
+                        <label class="premium-checkbox" style="width: 100%;">
+                            <input type="checkbox" id="meetSoundSystem" />
+                            <span class="checkbox-text">Sound System</span>
+                            <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                        </label>
+                        <label class="premium-checkbox" style="width: 100%;">
+                            <input type="checkbox" id="meetHVAC" />
+                            <span class="checkbox-text">Air Conditioner (HVAC)</span>
+                            <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                        </label>
+                        <label class="premium-checkbox" style="width: 100%;">
+                            <input type="checkbox" id="meetScreen" />
+                            <span class="checkbox-text">Projector / Screen</span>
+                            <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                        </label>
+                        <label class="premium-checkbox" style="width: 100%;">
+                            <input type="checkbox" id="meetInterpreter" />
+                            <span class="checkbox-text">Interpreter Booth</span>
+                            <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button type="button" onclick="closeMeetingRoomModal()" class="btn-premium btn-secondary" style="flex: 1;">Cancel</button>
+                <button type="button" onclick="addMeetingRoom()" class="btn-premium" style="flex: 2;">Add Room</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script>
@@ -1745,6 +2117,29 @@
             setTimeout(() => { if (map) map.invalidateSize(); }, 200);
         }
     }
+
+    function calculateAccommodationTotals() {
+        let totals = { rooms: 0, beds: 0 };
+        $('.room-count-input').each(function() {
+            const val = parseInt($(this).val()) || 0;
+            totals.rooms += val;
+            
+            // Bed logic: Twin = val * 2, Others = val * 1 for this calculation
+            // Unless the user specifies beds per room elsewhere.
+            const id = $(this).attr('id');
+            if (id.includes('twin')) {
+                totals.beds += (val * 2);
+            } else if (id.includes('suite') || id.includes('pres')) {
+                totals.beds += (val * 2); // Suites usually have at least 2 beds
+            } else {
+                totals.beds += val;
+            }
+        });
+        $('#form-total-rooms').val(totals.rooms);
+        $('#form-total-beds').val(totals.beds);
+    }
+
+    $(document).on('input', '.room-count-input', calculateAccommodationTotals);
 
     // Global Branch Data Store for real-time UI synchronization
     window.allBranchesData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.ToDictionary(b => b.ConsigneeUnitId.ToString(), b => new {
@@ -1864,10 +2259,11 @@
 
                     // Populate Basic Info
                     $('#form-trade-name').val(hotel.name);
+                    $('#form-address-general').val(hotel.city);
                     $('#form-registration-name').val(hotel.registrationName);
                     $('#form-address').val(hotel.specificAddress);
                     $('#form-subcity-basic').val(hotel.subcity);
-                    $('#form-airport-dist').val(hotel.distanceFromAirport);
+                    // $('#form-airport-dist').val(hotel.distanceFromAirport);
                     $('#form-star-cat').val(hotel.starCategory);
                     $('#form-total-rooms').val(hotel.totalRooms);
                     $('#form-total-beds').val(hotel.totalBeds);
@@ -1882,6 +2278,7 @@
                     $('#form-suites').val(hotel.suites);
                     $('#form-pres-suites').val(hotel.presidentialSuites);
                     $('#form-acc-rooms').val(hotel.accessibleRooms);
+                    calculateAccommodationTotals();
 
                     // Populate F&B
                     $('#form-all-day-dining').val(String(hotel.allDayDining));
@@ -1893,9 +2290,6 @@
                     $('#form-shops-count').val(hotel.souvenirShops);
                     $('#form-del-cat').val(String(hotel.delegationCatering));
                     $('#form-del-cat-max').val(hotel.delegationCateringMaxPax);
-                    $('#form-refill-water').val(String(hotel.refillWaterStations));
-                    $('#form-veg-options').val(String(hotel.vegVeganOptions));
-                    $('#form-no-plastic').val(String(hotel.noSingleUsePlastics));
 
                     // Populate Meetings
                     $('#form-meeting-rooms').val(hotel.meetingRoomsCount);
@@ -1967,12 +2361,19 @@
                     $('#form-sust-cert').val(hotel.sustainabilityCertification);
                     $('#form-eco-labels').val(hotel.otherEcoLabels);
                     $('#form-waste-prog').val(String(hotel.foodWasteProgram));
-                    $('#form-sust-refill').val(String(hotel.sustainabilityRefillWaterStations));
+                    $('#form-tour-competence').val(hotel.tourismServiceCompetenceLicenseCertificate);
+                    $('#form-fire-safety-cert').val(hotel.fireSafetyCertificate);
+                    $('#form-env-clearance').val(hotel.environmentalClearanceCertificate);
+                    $('#form-food-safety-hygiene').val(hotel.foodSafetyAndHygieneCertificate);
 
                     $('#form-total-staff').val(hotel.totalStaff);
-                    $('#form-languages').val(hotel.internationalLanguagesFrontDesk);
+                    $('#form-line-staff').val(hotel.lineStaff);
+                    $('#form-mgmt-staff').val(hotel.managementStaff);
+                    $('#form-languages-hidden').val(hotel.internationalLanguagesFrontDesk);
+                    syncLanguagesFromValue(hotel.internationalLanguagesFrontDesk);
 
                     syncToggleGroups();
+                    initStructuredLists(hotel);
                     updateMap(hotel.latitude || 9.03, hotel.longitude || 38.74);
                 }
             } catch (error) {
@@ -2075,18 +2476,319 @@
                 };
                 assetData.displayValue = `${assetData.specialization} • ${assetData.seatingCapacity} Seats`;
             } else {
-                assetData.name = $('#assetTypeName').val().trim();
-                assetData.count = parseInt($('#assetCount').val());
-                assetData.displayValue = `${assetData.count} Units`;
-                
-                if (!assetData.name) { alert('Please specify the asset type.'); return; }
-                if (isNaN(assetData.count) || assetData.count < 1) { alert('Please enter a valid count.'); return; }
+                assetData.name = $('#assetTypeName').val() || 'Unnamed Asset';
+                assetData.displayValue = 'General Equipment';
             }
 
             assets[sectionId].push(assetData);
             renderAssets(sectionId);
             closeAssetModal();
         }
+
+        // --- Specialty Restaurant, Souvenir Shop & Meeting Room Logic ---
+        let restaurantList = [];
+        let shopList = [];
+        let meetingRoomList = [];
+
+        function openRestaurantModal() {
+            $('#restType, #restName, #restCapacity, #restCuisine, #restNotes').val('');
+            $('#restHalal, #restVegan').prop('checked', false);
+            $('#restaurantModal').fadeIn(300).css('display', 'flex');
+        }
+
+        function closeRestaurantModal() { $('#restaurantModal').fadeOut(300); }
+
+        function openShopModal() {
+            $('#shopType, #shopName, #shopCategory, #shopHours, #shopLocation, #shopNotes').val('');
+            $('#shopModal').fadeIn(300).css('display', 'flex');
+        }
+
+        function closeShopModal() { $('#shopModal').fadeOut(300); }
+
+        function autoFillCuisine(type) {
+            if (type && type !== 'Other') {
+                $('#restCuisine').val(type);
+                if (!$('#restName').val()) $('#restName').val(type + ' Restaurant');
+            }
+        }
+
+        function addRestaurant() {
+            const type = $('#restType').val();
+            if (!type) { Swal.fire('Error', 'Please select a restaurant type.', 'error'); return; }
+
+            const restaurant = {
+                id: Date.now(),
+                type: type,
+                name: $('#restName').val() || `${type} Restaurant`,
+                capacity: parseInt($('#restCapacity').val()) || 0,
+                cuisine: $('#restCuisine').val() || type,
+                halal: $('#restHalal').is(':checked'),
+                vegan: $('#restVegan').is(':checked'),
+                notes: $('#restNotes').val()
+            };
+
+            restaurantList.push(restaurant);
+            renderRestaurants();
+            closeRestaurantModal();
+            updateHiddenField('SpecialtyRestaurants', restaurantList);
+        }
+
+        function removeRestaurant(id) {
+            restaurantList = restaurantList.filter(r => r.id !== id);
+            renderRestaurants();
+            updateHiddenField('SpecialtyRestaurants', restaurantList);
+        }
+
+        function renderRestaurants() {
+            const tbody = $('#restaurant-tbody');
+            tbody.empty();
+            let html = '';
+            
+            if (restaurantList.length === 0) {
+                tbody.append('<tr><td colspan="4" class="text-center text-muted py-3">No restaurants added yet.</td></tr>');
+                return;
+            }
+
+            restaurantList.forEach(r => {
+                const options = [];
+                if (r.halal) options.push('Halal');
+                if (r.vegan) options.push('Vegan');
+                const optionsText = options.length > 0 ? `<br><small class="text-success">${options.join(', ')}</small>` : '';
+
+                html += `
+                <tr>
+                    <td style="padding: 0.75rem;"><div style="font-weight: 700; color: var(--primary-color);">${r.name}</div></td>
+                    <td style="padding: 0.75rem;">${r.type} / ${r.cuisine}${optionsText}</td>
+                    <td style="padding: 0.75rem;">${r.capacity} Seats</td>
+                    <td style="padding: 0.75rem; text-align: center;">
+                        <button type="button" class="btn-remove-asset" onclick="removeRestaurant(${r.id})">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>`;
+            });
+            tbody.append(html);
+        }
+
+        function addShop() {
+            const type = $('#shopType').val();
+            const shop = {
+                id: Date.now(),
+                type: type,
+                name: $('#shopName').val() || `${type} Shop`,
+                category: $('#shopCategory').val() || type,
+                hours: $('#shopHours').val(),
+                location: $('#shopLocation').val(),
+                notes: $('#shopNotes').val()
+            };
+
+            shopList.push(shop);
+            renderShops();
+            closeShopModal();
+            updateHiddenField('SouvenirShops', shopList);
+        }
+
+        function removeShop(id) {
+            shopList = shopList.filter(s => s.id !== id);
+            renderShops();
+            updateHiddenField('SouvenirShops', shopList);
+        }
+
+        function renderShops() {
+            const tbody = $('#shop-tbody');
+            tbody.empty();
+            let html = '';
+
+            if (shopList.length === 0) {
+                tbody.append('<tr><td colspan="4" class="text-center text-muted py-3">No souvenir shops added yet.</td></tr>');
+                return;
+            }
+
+            shopList.forEach(s => {
+                html += `
+                <tr>
+                    <td style="padding: 0.75rem;"><div style="font-weight: 700; color: #db2777;">${s.name}</div></td>
+                    <td style="padding: 0.75rem;">${s.type} / ${s.category}</td>
+                    <td style="padding: 0.75rem;">${s.location || 'N/A'}</td>
+                    <td style="padding: 0.75rem; text-align: center;">
+                        <button type="button" class="btn-remove-asset" onclick="removeShop(${s.id})">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>`;
+            });
+            tbody.append(html);
+        }
+
+        function updateHiddenField(fieldName, list) {
+            const json = JSON.stringify(list);
+            // Case-insensitive match for the field
+            $(`input[name="${fieldName}"]`).val(json);
+            
+            // Special handling for total counts if needed
+            if (fieldName === 'MeetingRooms') {
+                $('#form-meeting-rooms').val(list.length);
+            } else if (fieldName === 'SpecialtyRestaurants') {
+                $('#form-spec-rest').val(json);
+            } else if (fieldName === 'SouvenirShops') {
+                $('#form-shops-count').val(json);
+            }
+        }
+
+        // --- Meeting Room Operations ---
+        function openMeetingRoomModal() {
+            $('#meetHallName, #meetWidth, #meetLength, #meetCeiling, #meetMaxCap, #meetAreaSize').val('');
+            $('#meetSoundSystem, #meetHVAC, #meetScreen, #meetInterpreter').prop('checked', false);
+            $('#meetingRoomModal').fadeIn(300).css('display', 'flex');
+        }
+
+        function closeMeetingRoomModal() { $('#meetingRoomModal').fadeOut(300); }
+
+        $(document).on('input', '.room-dim-input', function() {
+            const w = parseFloat($('#meetWidth').val()) || 0;
+            const l = parseFloat($('#meetLength').val()) || 0;
+            $('#meetAreaSize').val((w * l).toFixed(2));
+        });
+
+        function addMeetingRoom() {
+            const name = $('#meetHallName').val();
+            if (!name) { Swal.fire('Error', 'Please enter a hall/room name.', 'error'); return; }
+
+            const room = {
+                id: Date.now(),
+                name: name,
+                setting: $('#meetSetting').val(),
+                width: parseFloat($('#meetWidth').val()) || 0,
+                length: parseFloat($('#meetLength').val()) || 0,
+                ceilingHeight: parseFloat($('#meetCeiling').val()) || 0,
+                capacity: parseInt($('#meetMaxCap').val()) || 0,
+                areaSize: parseFloat($('#meetAreaSize').val()) || 0,
+                hasSoundSystem: $('#meetSoundSystem').is(':checked'),
+                hasHVAC: $('#meetHVAC').is(':checked'),
+                hasScreen: $('#meetScreen').is(':checked'),
+                hasInterpreter: $('#meetInterpreter').is(':checked')
+            };
+
+            meetingRoomList.push(room);
+            renderMeetingRooms();
+            closeMeetingRoomModal();
+            updateHiddenField('MeetingRooms', meetingRoomList);
+        }
+
+        function removeMeetingRoom(id) {
+            meetingRoomList = meetingRoomList.filter(m => m.id !== id);
+            renderMeetingRooms();
+            updateHiddenField('MeetingRooms', meetingRoomList);
+        }
+
+        function renderMeetingRooms() {
+            const container = $('#meeting-room-tbody');
+            container.empty();
+
+            if (meetingRoomList.length === 0) {
+                container.append('<tr><td colspan="5" class="text-center text-muted py-3">No meeting rooms added yet.</td></tr>');
+                return;
+            }
+
+            meetingRoomList.forEach(room => {
+                let equipment = [];
+                if (room.hasSoundSystem) equipment.push('<span class="badge" style="background:#e0f2fe; color:#0369a1;">Sound</span>');
+                if (room.hasHVAC) equipment.push('<span class="badge" style="background:#f0fdf4; color:#15803d;">HVAC</span>');
+                if (room.hasScreen) equipment.push('<span class="badge" style="background:#faf5ff; color:#7e22ce;">Screen</span>');
+                if (room.hasInterpreter) equipment.push('<span class="badge" style="background:#fff7ed; color:#c2410c;">Interp</span>');
+
+                container.append(`
+                    <tr>
+                        <td style="padding: 0.75rem;"><div style="font-weight: 700; color: var(--navy-deep);">${room.name}</div><div style="font-size:0.7rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">${room.setting || 'Indoor'}</div></td>
+                        <td style="padding: 0.75rem;">${room.width} x ${room.length} x ${room.ceilingHeight} m</td>
+                        <td style="padding: 0.75rem;">${room.capacity} Pax</td>
+                        <td style="padding: 0.75rem; display: flex; gap: 0.3rem; flex-wrap: wrap;">${equipment.join('')}</td>
+                        <td style="padding: 0.75rem; text-align: center;">
+                            <button type="button" class="btn-save-section" style="background: #fee2e2; color: #dc2626; border: none; padding: 0.4rem;" onclick="removeMeetingRoom(${room.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `);
+            });
+        }
+
+        $(document).on('input', '.staff-input', function() {
+            const line = parseInt($('#form-line-staff').val()) || 0;
+            const mgmt = parseInt($('#form-mgmt-staff').val()) || 0;
+            $('#form-total-staff').val(line + mgmt);
+        });
+
+        $(document).on('change', '.lang-checkbox', function() {
+            const selected = $('.lang-checkbox:checked').map(function() { return this.value; }).get().join(', ');
+            $('#form-languages-hidden').val(selected);
+        });
+
+        function syncLanguagesFromValue(val) {
+            $('.lang-checkbox').prop('checked', false);
+            if (!val) return;
+            const selected = val.split(',').map(s => s.trim());
+            $('.lang-checkbox').each(function() {
+                if (selected.includes(this.value)) {
+                    $(this).prop('checked', true);
+                }
+            });
+        }
+
+        function initStructuredLists(hotel) {
+            try {
+                restaurantList = JSON.parse(hotel.specialtyRestaurants || '[]');
+                renderRestaurants();
+            } catch(e) { 
+                restaurantList = []; 
+                if(hotel.specialtyRestaurants) {
+                    // Legacy support: convert string to single item
+                    restaurantList.push({ id: Date.now(), type: 'Other', name: hotel.specialtyRestaurants, cuisine: 'General' });
+                    renderRestaurants();
+                }
+            }
+
+            try {
+                shopList = JSON.parse(hotel.souvenirShops || '[]');
+                renderShops();
+            } catch(e) { 
+                shopList = []; 
+                if(hotel.souvenirShops && !isNaN(hotel.souvenirShops)) {
+                    // Legacy support: convert count to placeholder items
+                    const count = parseInt(hotel.souvenirShops);
+                    for(let i=0; i<count; i++) {
+                        shopList.push({ id: Date.now() + i, type: 'Other', name: 'Existing Shop ' + (i+1) });
+                    }
+                    renderShops();
+                }
+            }
+
+            try {
+                meetingRoomList = JSON.parse(hotel.meetingRooms || '[]');
+                renderMeetingRooms();
+                $('#form-meeting-rooms').val(meetingRoomList.length);
+            } catch(e) {
+                meetingRoomList = [];
+                if(hotel.meetingRoomsCount > 0) {
+                    // Legacy: if we have a count but no list, maybe add one generic entry or just leave as is
+                    // meetingRoomList.push({ id: Date.now(), name: 'Main Meeting Hall', capacity: hotel.largestRoomCapacityTheatre || 0 });
+                }
+                renderMeetingRooms();
+            }
+        }
+        //     } else {
+        //         assetData.name = $('#assetTypeName').val().trim();
+        //         assetData.count = parseInt($('#assetCount').val());
+        //         assetData.displayValue = `${assetData.count} Units`;
+                
+        //         if (!assetData.name) { alert('Please specify the asset type.'); return; }
+        //         if (isNaN(assetData.count) || assetData.count < 1) { alert('Please enter a valid count.'); return; }
+        //     }
+
+        //     assets[sectionId].push(assetData);
+        //     renderAssets(sectionId);
+        //     closeAssetModal();
+        // }
 
         function removeAsset(sectionId, assetId) {
             assets[sectionId] = assets[sectionId].filter(a => a.id !== assetId);
@@ -2188,10 +2890,9 @@
                 formData.append('RegistrationName', $('#form-registration-name').val());
                 formData.append('SpecificAddress', $('#form-address').val());
                 formData.append('Subcity', $('#form-subcity-basic').val());
-                formData.append('DistanceFromAirport', $('#form-airport-dist').val());
+                formData.append('City', $('#form-address-general').val());
+                // formData.append('DistanceFromAirport', $('#form-airport-dist').val());
                 formData.append('StarCategory', $('#form-star-cat').val());
-                formData.append('TotalRooms', $('#form-total-rooms').val());
-                formData.append('TotalBeds', $('#form-total-beds').val());
                 formData.append('ContactInformation', $('#form-contact-info').val());
                 formData.append('ReservationsContact', $('#form-res-contact').val());
                 formData.append('SustainabilityFocalPoint', $('#form-sust-focal').val());
@@ -2205,6 +2906,8 @@
                 formData.append('Suites', $('#form-suites').val());
                 formData.append('PresidentialSuites', $('#form-pres-suites').val());
                 formData.append('AccessibleRooms', $('#form-acc-rooms').val());
+                formData.append('TotalRooms', $('#form-total-rooms').val());
+                formData.append('TotalBeds', $('#form-total-beds').val());
             }
 
             // 3. Food & Beverage
@@ -2218,17 +2921,12 @@
                 formData.append('SouvenirShops', $('#form-shops-count').val());
                 formData.append('DelegationCatering', $('#form-del-cat').val());
                 formData.append('DelegationCateringMaxPax', $('#form-del-cat-max').val());
-                formData.append('RefillWaterStations', $('#form-refill-water').val());
-                formData.append('VegVeganOptions', $('#form-veg-options').val());
-                formData.append('NoSingleUsePlastics', $('#form-no-plastic').val());
             }
 
             // 4. Meetings & Events
             if (mode === 'meetings_events' || mode === 'all') {
                 formData.append('MeetingRoomsCount', $('#form-meeting-rooms').val());
-                formData.append('LargestRoomCapacityTheatre', $('#form-cap-theatre').val());
-                formData.append('LargestRoomCapacityClassroom', $('#form-cap-classroom').val());
-                formData.append('LargestRoomCapacityBanquet', $('#form-cap-banquet').val());
+                formData.append('MeetingRooms', JSON.stringify(meetingRoomList));
                 formData.append('TotalMeetingSpaceSqm', $('#form-total-meeting-sqm').val());
             }
 
@@ -2308,13 +3006,18 @@
                 formData.append('SustainabilityCertification', $('#form-sust-cert').val());
                 formData.append('OtherEcoLabels', $('#form-eco-labels').val());
                 formData.append('FoodWasteProgram', $('#form-waste-prog').val());
-                formData.append('SustainabilityRefillWaterStations', $('#form-sust-refill').val());
+                formData.append('TourismServiceCompetenceLicenseCertificate', $('#form-tour-competence').val());
+                formData.append('FireSafetyCertificate', $('#form-fire-safety-cert').val());
+                formData.append('EnvironmentalClearanceCertificate', $('#form-env-clearance').val());
+                formData.append('FoodSafetyAndHygieneCertificate', $('#form-food-safety-hygiene').val());
             }
 
             // 12. Staffing
             if (mode === 'staffing' || mode === 'all') {
                 formData.append('TotalStaff', $('#form-total-staff').val());
-                formData.append('InternationalLanguagesFrontDesk', $('#form-languages').val());
+                formData.append('LineStaff', $('#form-line-staff').val());
+                formData.append('ManagementStaff', $('#form-mgmt-staff').val());
+                formData.append('InternationalLanguagesFrontDesk', $('#form-languages-hidden').val());
             }
 
             const response = await fetch('/HotelOwner/CommitRegistry', {
@@ -2555,10 +3258,10 @@
 
         // Map IdentificationDTO Description -> category key using CNET_WebConstantes category IDs
         const fieldCatMap = {
-            RegistrationName:'basic', DistanceFromAirport:'basic', StarCategory:'basic', TotalRooms:'basic', TotalBeds:'basic', ContactInformation:'basic', ReservationsContact:'basic', SustainabilityFocalPoint:'basic',
+            RegistrationName:'basic', SubCity:'basic', SpecificAddress:'basic', DistanceFromAirport:'basic', StarCategory:'basic', TotalRooms:'basic', TotalBeds:'basic', ContactInformation:'basic', ReservationsContact:'basic', SustainabilityFocalPoint:'basic',
             KingSizeRooms:'accommodation', TwinBedRooms:'accommodation', JuniorSuites:'accommodation', Suites:'accommodation', PresidentialSuites:'accommodation', AccessibleRooms:'accommodation',
             AllDayDining:'food_beverage', AllDayDiningSeats:'food_beverage', SpecialtyRestaurants:'food_beverage', CoffeeShop:'food_beverage', BarsCount:'food_beverage', NightClub:'food_beverage', SouvenirShops:'food_beverage', DelegationCatering:'food_beverage', DelegationCateringMaxPax:'food_beverage', RefillWaterStations:'food_beverage', VegVeganOptions:'food_beverage', NoSingleUsePlastics:'food_beverage',
-            MeetingRoomsCount:'meetings_events', LargestRoomCapacityTheatre:'meetings_events', LargestRoomCapacityClassroom:'meetings_events', LargestRoomCapacityBanquet:'meetings_events', TotalMeetingSpaceSqm:'meetings_events',
+            MeetingRoomsCount:'meetings_events', LargestRoomCapacityTheatre:'meetings_events', LargestRoomCapacityClassroom:'meetings_events', LargestRoomCapacityBanquet:'meetings_events', TotalMeetingSpaceSqm:'meetings_events', MeetingRooms:'meetings_events',
             InternetBandwidthDown:'public_facilities', InternetBandwidthUp:'public_facilities', LobbyAreaSqm:'public_facilities', GreenAreaSqm:'public_facilities', PoolAvailable:'public_facilities', PoolType:'public_facilities', SpaAvailable:'public_facilities', SpaGender:'public_facilities', MassageService:'public_facilities', ChildrensPlayground:'public_facilities', ChildrenDayCare:'public_facilities', StaffCanteen:'public_facilities',
             WheelchairRamps:'accessibility', ElevatorsCount:'accessibility', ElevatorsWheelchairSized:'accessibility', PublicAccessibleBathroom:'accessibility',
             CCTVPublicAreas:'security_safety', FireExtinguishersLastInspection:'security_safety', HoseReels:'security_safety', SmokeDetectorsInRooms:'security_safety', SmokeDetectorsInPublicAreas:'security_safety', SprinklerCoverage:'security_safety', FireAlarmControlPanel:'security_safety', EmergencyExitsCount:'security_safety', BagScanner:'security_safety', WalkThroughScanner:'security_safety', HandScanner:'security_safety',
@@ -2566,6 +3269,7 @@
             WifiPropertyWide:'ict_services', WifiAvgSpeed:'ict_services', InHouseLaundry:'ict_services', Reception24hr:'ict_services', VipCheckIn:'ict_services', PassportScanner:'ict_services', CurrencyScanner:'ict_services',
             StandbyGeneratorCapacityKva:'utilities_resilience', StandbyGeneratorCoverage:'utilities_resilience', WaterTreatment:'utilities_resilience', WasteSegregation:'utilities_resilience', Recycling:'utilities_resilience', HazardousWasteHandling:'utilities_resilience',
             SustainabilityCertification:'sustainability', OtherEcoLabels:'sustainability', FoodWasteProgram:'sustainability', SustainabilityRefillWaterStations:'sustainability',
+            TourismServiceCompetenceLicenseCertificate:'sustainability', FireSafetyCertificate:'sustainability', EnvironmentalClearanceCertificate:'sustainability', FoodSafetyAndHygieneCertificate:'sustainability',
             TotalStaff:'staffing', InternationalLanguagesFrontDesk:'staffing'
         };
 
@@ -2613,9 +3317,16 @@
             
             // 1. Gather existing data Map
             const dataMap = {};
+            const hData = window.allBranchesData[_currentSummaryUnitId] || {};
+            
             (_currentIdentifications || []).forEach(id => {
                 dataMap[id.Description] = id.IdNumber;
             });
+
+            // Ensure core fields are included if not present in identifications
+            if (!dataMap['SubCity']) dataMap['SubCity'] = hData.SubCity || hData.Subcity || "";
+            if (!dataMap['SpecificAddress']) dataMap['SpecificAddress'] = hData.SpecificAddress || "";
+            if (!dataMap['RegistrationName']) dataMap['RegistrationName'] = hData.RegistrationName || "";
 
             // 2. Group all fields from fieldCatMap (the master list)
             const grouped = {};
@@ -2637,6 +3348,18 @@
                     displayVal = '<span style="color:#059669;font-weight:800;"><i class="fas fa-check-circle"></i> Yes</span>';
                 } else if (rawVal === 'False') {
                     displayVal = '<span style="color:#94a3b8;font-weight:700;"><i class="fas fa-minus-circle"></i> No</span>';
+                } else if (typeof rawVal === 'string' && (rawVal.startsWith('[') || rawVal.startsWith('{'))) {
+                    // Try to parse JSON for specialty lists
+                    try {
+                        const list = JSON.parse(rawVal);
+                        if (Array.isArray(list) && list.length > 0) {
+                            displayVal = `<ul style="margin: 0.25rem 0 0; padding-left: 1.1rem; list-style-type: disc;">` + 
+                                list.map(item => `<li style="margin-bottom: 0.15rem; font-weight:700;">${item.name || item.type || 'Unnamed'}</li>`).join('') + 
+                                `</ul>`;
+                        } else {
+                            displayVal = '0';
+                        }
+                    } catch(e) { displayVal = rawVal; }
                 } else {
                     displayVal = rawVal;
                 }

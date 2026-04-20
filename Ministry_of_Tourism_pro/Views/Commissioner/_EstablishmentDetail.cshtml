@@ -1,0 +1,202 @@
+@model Ministry_of_Tourism_pro.Application.DTOs.HotelDto
+@using Ministry_of_Tourism_pro.WebConstants
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@{
+    var categories = new List<(int Id, string Name, string Icon, List<string> Props)>
+    {
+        (CNET_WebConstantes.CAT_PROPERTY_PROFILE, "Basic Information", "fa-id-card", new List<string> { "City", "RegistrationName", "SubCity", "StarCategory", "SpecificAddress", "ContactInformation", "SustainabilityFocalPoint", "ReservationsContact" }),
+        (CNET_WebConstantes.CAT_ROOM_INVENTORY, "Accommodation Infrastructure", "fa-bed", new List<string> { "KingSizeRooms", "TwinBedRooms", "JuniorSuites", "Suites", "PresidentialSuites", "AccessibleRooms", "TotalRooms", "TotalBeds" }),
+        (CNET_WebConstantes.CAT_FOOD_BEVERAGE_RETAIL, "Food & Beverage", "fa-utensils", new List<string> { "AllDayDining", "AllDayDiningSeats", "SpecialtyRestaurants", "CoffeeShop", "BarsCount", "NightClub", "SouvenirShops", "DelegationCatering", "DelegationCateringMaxPax" }),
+        (CNET_WebConstantes.CAT_MEETINGS_EVENTS, "Meetings & Events", "fa-calendar-check", new List<string> { "MeetingRoomsCount", "LargestRoomCapacityTheatre", "LargestRoomCapacityClassroom", "LargestRoomCapacityBanquet", "TotalMeetingSpaceSqm" }),
+        (CNET_WebConstantes.CAT_PUBLIC_FACILITIES, "Public Facilities", "fa-swimming-pool", new List<string> { "InternetBandwidthDown", "InternetBandwidthUp", "LobbyAreaSqm", "GreenAreaSqm", "PoolAvailable", "PoolType", "SpaAvailable", "SpaGender", "MassageService", "ChildrensPlayground", "ChildrenDayCare", "StaffCanteen" }),
+        (CNET_WebConstantes.CAT_ACCESSIBILITY, "Accessibility", "fa-wheelchair", new List<string> { "WheelchairRamps", "ElevatorsCount", "ElevatorsWheelchairSized", "PublicAccessibleBathroom" }),
+        (CNET_WebConstantes.CAT_SECURITY_SAFETY, "Security & Safety", "fa-shield-halved", new List<string> { "CCTVPublicAreas", "FireExtinguishersLastInspection", "HoseReels", "SmokeDetectorsInRooms", "SmokeDetectorsInPublicAreas", "SprinklerCoverage", "FireAlarmControlPanel", "EmergencyExitsCount", "BagScanner", "WalkThroughScanner", "HandScanner" }),
+        (CNET_WebConstantes.CAT_TRANSPORT_PARKING, "Transport & Parking", "fa-car", new List<string> { "ParkingSpacesCount", "BusParkingCount", "ShuttleToCop", "ShuttleToAirport", "PublicTransportWithin500m", "EvChargingPoints", "EvChargerTypes" }),
+        (CNET_WebConstantes.CAT_ICT_GUEST_SERVICES, "ICT & Guest Services", "fa-wifi", new List<string> { "WifiPropertyWide", "WifiAvgSpeed", "InHouseLaundry", "Reception24hr", "VipCheckIn", "PassportScanner", "CurrencyScanner" }),
+        (CNET_WebConstantes.CAT_UTILITIES_RESILIENCE, "Utilities & Resilience", "fa-bolt", new List<string> { "StandbyGeneratorCapacityKva", "StandbyGeneratorCoverage", "WaterTreatment", "WasteSegregation", "Recycling", "HazardousWasteHandling" }),
+        (CNET_WebConstantes.CAT_SUSTAINABILITY_CERTIFICATIONS, "Sustainability", "fa-leaf", new List<string> { "SustainabilityCertification", "OtherEcoLabels", "FoodWasteProgram", "TourismServiceCompetenceLicenseCertificate", "FireSafetyCertificate", "EnvironmentalClearanceCertificate", "FoodSafetyAndHygieneCertificate" }),
+        (CNET_WebConstantes.CAT_STAFFING_LANGUAGES, "Staffing & Languages", "fa-users-gears", new List<string> { "TotalStaff", "InternationalLanguagesFrontDesk" })
+    };
+
+    var labelMapping = new Dictionary<string, string>
+    {
+        { "City", "Address" },
+        { "SubCity", "Sub City" },
+        { "RegistrationName", "Registration Name" },
+        { "StarCategory", "Star Category" },
+        { "SpecificAddress", "Specific Address" },
+        { "ContactInformation", "Contact (Email/Phone)" },
+        { "SustainabilityFocalPoint", "Sustainability Focal" },
+        { "ReservationsContact", "Reservations Contact" },
+        { "BarsCount", "Bars" },
+        { "TotalRooms", "Total Rooms" },
+        { "TotalBeds", "Total Beds" }
+    };
+}
+
+<style>
+    .detail-partial-container {
+        padding: 1.5rem 2rem;
+        background: #f8fafc;
+    }
+    .collapsible-card { 
+        background: white; 
+        border-radius: 1rem; 
+        border: 1px solid var(--border-color); 
+        margin-bottom: 1.25rem; 
+        overflow: hidden; 
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .collapsible-card.active { 
+        border-color: var(--primary-color); 
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    }
+    .collapsible-header { 
+        padding: 1.25rem 1.5rem; 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        cursor: pointer; 
+        user-select: none;
+        transition: background 0.2s;
+    }
+    .collapsible-header:hover {
+        background: #f1f5f9;
+    }
+    .collapsible-header h3 { 
+        margin: 0; 
+        font-size: 0.95rem; 
+        font-weight: 800; 
+        color: var(--navy-deep); 
+        display: flex; 
+        align-items: center; 
+        gap: 0.85rem; 
+    }
+    .collapsible-content { 
+        border-top: 1px solid var(--border-color); 
+        padding: 1.5rem; 
+        display: none; 
+        animation: slideDown 0.3s ease-out;
+    }
+    @@keyframes slideDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .collapsible-card.active .collapsible-content { display: block; }
+    
+    .form-grid { 
+        display: grid; 
+        grid-template-columns: 1fr 1fr; 
+        gap: 0.5rem 2rem; 
+    }
+    .detail-row { 
+        display: flex; 
+        justify-content: space-between; 
+        padding: 0.65rem 0; 
+        border-bottom: 1px solid rgba(0,0,0,0.03); 
+        font-size: 0.85rem; 
+        align-items: center;
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { color: var(--text-muted); font-weight: 600; }
+    .detail-value { color: var(--navy-deep); font-weight: 700; text-align: right; }
+    .chevron { transition: transform 0.3s ease; color: var(--text-muted); }
+    .collapsible-card.active .chevron { transform: rotate(180deg); color: var(--primary-color); }
+
+    .category-icon-circle {
+        width: 36px; height: 36px;
+        background: #eff6ff;
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        color: var(--primary-color);
+        font-size: 1rem;
+    }
+</style>
+
+<div class="detail-partial-container">
+    <div style="margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+            <h2 style="font-weight: 800; color: var(--navy-deep); margin: 0; font-size: 1.25rem; letter-spacing: -0.3px;">@Model.Name</h2>
+            <p style="color: var(--text-muted); margin: 0.25rem 0 0; font-size: 0.85rem; font-weight: 600;">
+                <i class="fas fa-map-marker-alt" style="margin-right: 0.4rem; color: var(--primary-color);"></i> @Model.SubCity, @Model.City
+            </p>
+        </div>
+        <div style="text-align: right;">
+            <div style="font-size: 0.65rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">TIN Number</div>
+            <div style="font-weight: 700; color: var(--navy-deep); font-size: 1.1rem;">@Model.TIN</div>
+        </div>
+    </div>
+
+    <div style="display: grid; gap: 1.25rem;">
+        @for (int i = 0; i < categories.Count; i++)
+        {
+            var cat = categories[i];
+            <div class="collapsible-card @(i == 0 ? "active" : "")" id="cat-card-@i">
+                <div class="collapsible-header" onclick="document.getElementById('cat-card-@i').classList.toggle('active')">
+                    <h3>
+                        <div class="category-icon-circle">
+                            <i class="fas @cat.Icon"></i>
+                        </div>
+                        @cat.Name
+                    </h3>
+                    <i class="fas fa-chevron-down chevron"></i>
+                </div>
+                <div class="collapsible-content">
+                    <div class="form-grid">
+                        @foreach (var propName in cat.Props)
+                        {
+                            var prop = Model.GetType().GetProperty(propName);
+                            var value = prop?.GetValue(Model);
+                            var label = labelMapping.ContainsKey(propName) ? labelMapping[propName] : System.Text.RegularExpressions.Regex.Replace(propName, "([A-Z])", " $1").Trim();
+                            
+                            <div class="detail-row">
+                                <span class="detail-label">@label</span>
+                                <span class="detail-value">
+                                    @if (value == null || (value is string s && string.IsNullOrEmpty(s)) || (value is int iv && iv == 0 && propName != "TotalRooms"))
+                                    {
+                                        <span style="color: #cbd5e1; font-weight: 400; font-style: italic;">N/A</span>
+                                    }
+                                    else if (value is bool b)
+                                    {
+                                        if (b) { <span style="background:#d1fae5; color:#065f46; padding:0.15rem 0.5rem; border-radius:1rem; font-size:0.75rem;"><i class="fas fa-check"></i> Yes</span>
+                                        } else { <span style="background:#fee2e2; color:#991b1b; padding:0.15rem 0.5rem; border-radius:1rem; font-size:0.75rem;"><i class="fas fa-times"></i> No</span>
+                                        }
+                                    }
+                                    else if (value is DateTime dt)
+                                    {
+                                        @dt.ToString("MMM dd, yyyy")
+                                    }
+                                    else if (propName == "SpecialtyRestaurants" || propName == "SouvenirShops")
+                                    {
+                                        var jsonStr = value?.ToString();
+                                        if (!string.IsNullOrEmpty(jsonStr) && jsonStr.StartsWith("["))
+                                        {
+                                            try {
+                                                var items = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Newtonsoft.Json.Linq.JObject>>(jsonStr);
+                                                if (items != null && items.Any()) {
+                                                    var names = items.Select(x => x["name"]?.ToString() ?? x["type"]?.ToString()).Where(n => !string.IsNullOrEmpty(n));
+                                                    @string.Join(", ", names) <span style="font-size: 0.7rem; color: var(--primary-color); font-weight: 800; font-style: italic;">(@items.Count added)</span>
+                                                } else {
+                                                    <span style="color: #cbd5e1; font-weight: 400; font-style: italic;">None added</span>
+                                                }
+                                            } catch { @value }
+                                        }
+                                        else { @value }
+                                    }
+                                    else
+                                    {
+                                        @value
+                                        @if (propName.Contains("Sqm")) { <text> m²</text> }
+                                        @if (propName.Contains("Kva")) { <text> kVA</text> }
+                                    }
+                                </span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

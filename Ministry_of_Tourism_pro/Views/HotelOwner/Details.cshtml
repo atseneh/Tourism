@@ -5,7 +5,7 @@
 
     var categories = new List<(int Id, string Name, string Icon, List<string> Props)>
     {
-        (CNET_WebConstantes.CAT_PROPERTY_PROFILE, "Property Profile", "fa-id-card", new List<string> { "RegistrationName", "DistanceFromAirport", "StarCategory", "TotalRooms", "TotalBeds", "ContactInformation", "ReservationsContact", "SustainabilityFocalPoint" }),
+        (CNET_WebConstantes.CAT_PROPERTY_PROFILE, "Property Profile", "fa-id-card", new List<string> { "RegistrationName", "SubCity", "SpecificAddress", "DistanceFromAirport", "StarCategory", "TotalRooms", "TotalBeds", "ContactInformation", "ReservationsContact", "SustainabilityFocalPoint" }),
         (CNET_WebConstantes.CAT_ROOM_INVENTORY, "Room Inventory", "fa-bed", new List<string> { "KingSizeRooms", "TwinBedRooms", "JuniorSuites", "Suites", "PresidentialSuites", "AccessibleRooms" }),
         (CNET_WebConstantes.CAT_FOOD_BEVERAGE_RETAIL, "Food & Beverage", "fa-utensils", new List<string> { "AllDayDining", "AllDayDiningSeats", "SpecialtyRestaurants", "CoffeeShop", "BarsCount", "NightClub", "SouvenirShops", "DelegationCatering", "DelegationCateringMaxPax", "RefillWaterStations", "VegVeganOptions", "NoSingleUsePlastics" }),
         (CNET_WebConstantes.CAT_MEETINGS_EVENTS, "Meetings & Events", "fa-calendar-check", new List<string> { "MeetingRoomsCount", "LargestRoomCapacityTheatre", "LargestRoomCapacityClassroom", "LargestRoomCapacityBanquet", "TotalMeetingSpaceSqm" }),
@@ -15,7 +15,7 @@
         (CNET_WebConstantes.CAT_TRANSPORT_PARKING, "Transport & Parking", "fa-car", new List<string> { "ParkingSpacesCount", "BusParkingCount", "ShuttleToCop", "ShuttleToAirport", "PublicTransportWithin500m", "EvChargingPoints", "EvChargerTypes" }),
         (CNET_WebConstantes.CAT_ICT_GUEST_SERVICES, "ICT & Guest Services", "fa-wifi", new List<string> { "WifiPropertyWide", "WifiAvgSpeed", "InHouseLaundry", "Reception24hr", "VipCheckIn", "PassportScanner", "CurrencyScanner" }),
         (CNET_WebConstantes.CAT_UTILITIES_RESILIENCE, "Utilities & Resilience", "fa-bolt", new List<string> { "StandbyGeneratorCapacityKva", "StandbyGeneratorCoverage", "WaterTreatment", "WasteSegregation", "Recycling", "HazardousWasteHandling" }),
-        (CNET_WebConstantes.CAT_SUSTAINABILITY_CERTIFICATIONS, "Sustainability", "fa-leaf", new List<string> { "SustainabilityCertification", "OtherEcoLabels", "FoodWasteProgram", "SustainabilityRefillWaterStations" }),
+        (CNET_WebConstantes.CAT_SUSTAINABILITY_CERTIFICATIONS, "Sustainability", "fa-leaf", new List<string> { "SustainabilityCertification", "OtherEcoLabels", "FoodWasteProgram", "SustainabilityRefillWaterStations", "TourismServiceCompetenceLicenseCertificate", "FireSafetyCertificate", "EnvironmentalClearanceCertificate", "FoodSafetyAndHygieneCertificate" }),
         (CNET_WebConstantes.CAT_STAFFING_LANGUAGES, "Staffing & Languages", "fa-users-gears", new List<string> { "TotalStaff", "InternationalLanguagesFrontDesk" })
     };
 }
@@ -166,6 +166,23 @@
                                                 else if (value is DateTime dt)
                                                 {
                                                     @dt.ToString("MMM dd, yyyy")
+                                                }
+                                                else if (propName == "SpecialtyRestaurants" || propName == "SouvenirShops")
+                                                {
+                                                    var jsonStr = value?.ToString();
+                                                    if (!string.IsNullOrEmpty(jsonStr) && jsonStr.StartsWith("["))
+                                                    {
+                                                        try {
+                                                            var items = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Newtonsoft.Json.Linq.JObject>>(jsonStr);
+                                                            if (items != null && items.Any()) {
+                                                                var names = items.Select(x => x["name"]?.ToString() ?? x["type"]?.ToString()).Where(n => !string.IsNullOrEmpty(n));
+                                                                @string.Join(", ", names) <span class="text-primary" style="font-size: 0.75rem;">(@items.Count added)</span>
+                                                            } else {
+                                                                <span class="text-muted">None added</span>
+                                                            }
+                                                        } catch { @value }
+                                                    }
+                                                    else { @value }
                                                 }
                                                 else
                                                 {

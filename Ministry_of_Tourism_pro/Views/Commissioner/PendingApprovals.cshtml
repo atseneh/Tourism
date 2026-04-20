@@ -1,4 +1,4 @@
-@model IEnumerable<CNET_V7_Domain.Domain.ViewSchema.VwConsigneeViewDTO>
+@model IEnumerable<Ministry_of_Tourism_pro.Application.DTOs.ApprovalQueueItemDto>
 @using Ministry_of_Tourism_pro.Models
 @{
     ViewData["Title"] = "Sector Approval Queue";
@@ -188,6 +188,31 @@
     .eval-no  { color: #ef4444; }
     .eval-badge-yes { background: #d1fae5; color: #065f46; }
     .eval-badge-no  { background: #fee2e2; color: #991b1b; }
+
+    /* ── Details slide-out panel (Right) ── */
+    #detailsOverlay {
+        display: none;
+        position: fixed; inset: 0;
+        background: rgba(15,23,42,0.55);
+        backdrop-filter: blur(3px);
+        z-index: 3000;
+    }
+    #detailsPanel {
+        position: fixed; top: 0; right: 0; bottom: 0;
+        width: 850px; max-width: 95vw;
+        background: #f8fafc;
+        box-shadow: -10px 0 40px rgba(0,0,0,0.15);
+        display: none;
+        flex-direction: column;
+        z-index: 3001;
+        transform: translateX(100%);
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        pointer-events: none;
+    }
+    #detailsPanel.open {
+        transform: translateX(0);
+        pointer-events: all;
+    }
 </style>
 
 <div class="animate-fade-in" style="height: calc(100vh - 120px); display: flex; flex-direction: column;">
@@ -221,7 +246,7 @@
             <label>Sector Type</label>
             <select id="filterType" class="filter-input">
                 <option value="">All Types</option>
-                @foreach (var type in Model.Select(c => c.ChildPreferenceDescrption).Where(t => !string.IsNullOrEmpty(t)).Distinct().OrderBy(t => t))
+                @foreach (var type in Model.Select(c => c.PreferenceDescription).Where(t => !string.IsNullOrEmpty(t)).Distinct().OrderBy(t => t))
                 {
                     <option value="@type">@type</option>
                 }
@@ -255,10 +280,11 @@
             <table class="compact-table" style="width: 100%; border-collapse: separate; border-spacing: 0;">
                 <thead>
                     <tr>
-                        <th style="padding-left: 2rem !important;">Establishment Name</th>
+                        <th style="padding-left: 2rem !important;">Property Name</th>
                         <th>Reference Info</th>
-                        <th>Location</th>
-                        <th>Preference Details</th>
+                        <th>Subcity</th>
+                        <th>Specific Address</th>
+                        <th>Star Rating</th>
                         <th>State</th>
                         <th style="text-align: right; padding-right: 2rem !important;">Actions</th>
                     </tr>
@@ -268,12 +294,12 @@
                     {
                         <tr class="approval-row"
                             id="row-@consignee.Id"
-                            data-name="@consignee.FirstName?.ToLower()"
+                            data-name="@consignee.PropertyName?.ToLower()"
                             data-tin="@consignee.Tin?.ToLower()"
-                            data-type="@consignee.ChildPreferenceDescrption?.ToLower()"
+                            data-type="@consignee.PreferenceDescription?.ToLower()"
                             data-zone="@(consignee.SpecificAddress?.ToLower() ?? "addis ababa")">
                             <td style="padding-left: 2rem !important;">
-                                <div style="font-weight: 700; color: var(--navy-deep);">@consignee.FirstName</div>
+                                <div style="font-weight: 700; color: var(--navy-deep);">@consignee.PropertyName</div>
                                 <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600;">@consignee.AddressLine1</div>
                             </td>
                             <td>
@@ -281,19 +307,19 @@
                                 <div style="font-size: 0.7rem; color: var(--text-muted);">REF: #@consignee.Code</div>
                             </td>
                             <td>
-                                <div style="display: flex; align-items: center; gap: 0.4rem;">
-                                    <i class="fas fa-map-marker-alt" style="color: var(--primary-color); font-size: 0.75rem;"></i>
-                                    <span>@(consignee.SpecificAddress ?? "Addis")</span>
-                                </div>
+                                <div style="font-weight: 600; color: var(--text-dark);">@(consignee.Subcity ?? "N/A")</div>
+                            </td>
+                            <td>
+                                <div style="font-size: 0.8rem; color: var(--text-muted);">@(consignee.SpecificAddress ?? "N/A")</div>
                             </td>
                             <td>
                                 <span class="badge" style="font-size: 0.7rem; background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 0.2rem 0.6rem;">
-                                    @consignee.ChildPreferenceDescrption
+                                    @consignee.StarRating
                                 </span>
                             </td>
                             <!-- State column -->
                             <td>
-                                @if (consignee.ConsigneeIsActive == true)
+                                @if (consignee.IsActive == true)
                                 {
                                     <span id="state-@consignee.Id" class="state-badge state-approved">
                                         <i class="fas fa-check-circle"></i> Approved
@@ -316,20 +342,18 @@
                                         <i class="fas fa-bolt"></i> Actions <i class="fas fa-chevron-down" style="font-size:0.65rem;"></i>
                                     </button>
                                     <div id="menu-@consignee.Id" class="action-menu">
-                                        <button class="action-menu-item approve" onclick="doApprove(@consignee.Id, '@consignee.FirstName'); closeAllMenus();">
+                                        <button class="action-menu-item approve" onclick="doApprove(@consignee.Id, '@consignee.PropertyName'); closeAllMenus();">
                                             <i class="fas fa-check-circle"></i> Approve
                                         </button>
-                                        <button class="action-menu-item danger" onclick="doDecline(@consignee.Id, '@consignee.FirstName'); closeAllMenus();">
+                                        <button class="action-menu-item danger" onclick="doDecline(@consignee.Id, '@consignee.PropertyName'); closeAllMenus();">
                                             <i class="fas fa-ban"></i> Decline
                                         </button>
-                                        <button class="action-menu-item audit" onclick="openAuditPanel(@consignee.Id, '@consignee.FirstName'); closeAllMenus();">
+                                        <button class="action-menu-item audit" onclick="openDetailsPanel(@consignee.Id, '@consignee.PropertyName'); closeAllMenus();">
+                                            <i class="fas fa-eye"></i> Detail View
+                                        </button>
+                                        <button class="action-menu-item audit" onclick="openAuditPanel(@consignee.Id, '@consignee.PropertyName'); closeAllMenus();">
                                             <i class="fas fa-clipboard-list"></i> Sector Registry Audit
                                         </button>
-                                        <a asp-action="Review" asp-route-id="@consignee.Code"
-                                           class="action-menu-item"
-                                           style="color: var(--text-dark); text-decoration:none;">
-                                            <i class="fas fa-eye"></i> Full Review
-                                        </a>
                                     </div>
                                 </div>
                             </td>
@@ -353,6 +377,56 @@
 
 <!-- ═══ Toast Notification ═══ -->
 <div id="toastNotification"></div>
+
+<!-- ═══ Details Side Panel (Right) ═══ -->
+<div id="detailsOverlay" onclick="closeDetailsPanel()"></div>
+<div id="detailsPanel">
+    <div style="background: linear-gradient(135deg, #0f172a, #1e293b); padding: 1.75rem 2.5rem; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+            <div style="font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:0.1em; color:rgba(255,255,255,0.5); margin-bottom:0.25rem;">Establishment Detailed Intelligence</div>
+            <h4 id="detailsPanelTitle" style="margin:0; color:white; font-weight:700; font-size:1.25rem; letter-spacing: -0.5px;">Loading Details...</h4>
+        </div>
+        <button type="button" onclick="closeDetailsPanel()"
+                style="background:rgba(255,255,255,0.1); border:none; border-radius:10px; width:40px; height:40px; cursor:pointer; color:white; font-size:1.1rem; display:flex; align-items:center; justify-content:center; transition: all 0.2s;">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <!-- Control Bar (Filter + Collapse/Expand All) -->
+    <div style="background: white; border-bottom: 1px solid var(--border-color); padding: 0.75rem 2.5rem; display: flex; gap: 1rem; align-items: flex-end;">
+        <div style="flex: 1;">
+            <label style="display: block; font-size: 0.65rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.35rem; letter-spacing: 0.05em;">Section Filter</label>
+            <select id="detailsCategoryFilter" class="filter-input" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;" onchange="filterDetailsByCategory(this.value)">
+                <option value="all">All Registry Sections</option>
+                <option value="0">Property Profile</option>
+                <option value="1">Room Inventory</option>
+                <option value="2">Food & Beverage</option>
+                <option value="3">Meetings & Events</option>
+                <option value="4">Public Facilities</option>
+                <option value="5">Accessibility</option>
+                <option value="6">Security & Safety</option>
+                <option value="7">Transport & Parking</option>
+                <option value="8">ICT & Guest Services</option>
+                <option value="9">Utilities & Resilience</option>
+                <option value="10">Sustainability</option>
+                <option value="11">Staffing & Languages</option>
+            </select>
+        </div>
+        <button type="button" id="btnToggleAllDetails" onclick="toggleAllDetails()" 
+                style="height: 36px; padding: 0 1rem; background: var(--bg-muted); border: 1.5px solid var(--border-color); border-radius: 0.5rem; font-size: 0.75rem; font-weight: 700; color: var(--navy-deep); cursor: pointer; display: flex; align-items: center; gap: 0.4rem; transition: all 0.2s;">
+            <i class="fas fa-compress-alt" id="toggleAllIcon"></i> <span id="toggleAllText">Collapse All</span>
+        </button>
+    </div>
+    <div id="detailsPanelBody" style="flex: 1; overflow-y: auto; background: #f8fafc;">
+        <div style="padding: 6rem 2rem; text-align: center; color: var(--text-muted);">
+            <div style="position: relative; display: inline-block; margin-bottom: 2rem;">
+                <i class="fas fa-circle-notch fa-spin" style="font-size: 3rem; color: var(--primary-color);"></i>
+                <i class="fas fa-hotel" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 1.2rem; color: var(--navy-deep);"></i>
+            </div>
+            <p style="font-weight: 700; font-size: 1.1rem; color: var(--navy-deep);">Synthesizing establishment record...</p>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Please wait while we fetch the latest registry identifiers.</p>
+        </div>
+    </div>
+</div>
 
 <!-- ═══ Audit Side Panel ═══ -->
 <div id="auditOverlay" onclick="closeAuditPanel()"></div>
@@ -492,24 +566,149 @@
         }
 
         /* ══════════════════════════════
-           Approve / Decline actions (no redirect)
+           Approve / Decline actions (AJAX)
         ══════════════════════════════ */
-        function doApprove(id, name) {
-            const badge = document.getElementById('state-' + id);
-            if (badge) {
-                badge.className = 'state-badge state-approved';
-                badge.innerHTML = '<i class="fas fa-check-circle"></i> Approved';
+        async function doApprove(id, name) {
+            try {
+                const response = await fetch('Approve', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ id: id })
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    const badge = document.getElementById('state-' + id);
+                    if (badge) {
+                        badge.className = 'state-badge state-approved';
+                        badge.innerHTML = '<i class="fas fa-check-circle"></i> Approved';
+                    }
+                    showToast(`"${name}" has been <strong>Approved</strong> successfully.`, 'approve');
+                } else {
+                    showToast("Approval failed: " + result.message, "decline");
+                }
+            } catch (err) {
+                console.error("Approve error:", err);
+                showToast("Connection error during approval.", "decline");
             }
-            showToast(`"${name}" has been <strong>Approved</strong> successfully.`, 'approve');
         }
 
-        function doDecline(id, name) {
-            const badge = document.getElementById('state-' + id);
-            if (badge) {
-                badge.className = 'state-badge state-declined';
-                badge.innerHTML = '<i class="fas fa-ban"></i> Declined';
+        async function doDecline(id, name) {
+            const comment = prompt("Please provide a reason for declining this application:", "");
+            if (comment === null) return; // Cancelled
+
+            try {
+                const response = await fetch('Reject', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ id: id, comment: comment })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    const badge = document.getElementById('state-' + id);
+                    if (badge) {
+                        badge.className = 'state-badge state-declined';
+                        badge.innerHTML = '<i class="fas fa-ban"></i> Declined';
+                    }
+                    showToast(`"${name}" has been <strong>Declined</strong>.`, 'decline');
+                } else {
+                    showToast("Decline failed: " + result.message, "decline");
+                }
+            } catch (err) {
+                console.error("Decline error:", err);
+                showToast("Connection error during decline.", "decline");
             }
-            showToast(`"${name}" has been <strong>Declined</strong>.`, 'decline');
+        }
+
+        /* ══════════════════════════════
+           Details side panel (Left)
+        ══════════════════════════════ */
+        async function openDetailsPanel(id, name) {
+            document.getElementById('detailsPanelTitle').textContent = name;
+            const body = document.getElementById('detailsPanelBody');
+            body.innerHTML = `
+                <div style="padding: 4rem 2rem; text-align: center; color: var(--text-muted);">
+                    <i class="fas fa-circle-notch fa-spin" style="font-size: 2rem; margin-bottom: 1rem; color: var(--primary-color);"></i>
+                    <p style="font-weight: 600;">Fetching establishment data...</p>
+                </div>`;
+
+            // Show overlay
+            document.getElementById('detailsOverlay').style.display = 'block';
+
+            // Show panel
+            const panel = document.getElementById('detailsPanel');
+            panel.style.display = 'flex';
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => panel.classList.add('open'));
+            });
+
+            try {
+                const response = await fetch(`GetDetailPartial?id=${id}`);
+                if (response.ok) {
+                    const html = await response.text();
+                    body.innerHTML = html;
+                } else {
+                    body.innerHTML = `
+                        <div style="padding: 4rem 2rem; text-align: center; color: #ef4444;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                            <p style="font-weight: 700;">Failed to load details.</p>
+                            <p style="font-size: 0.8rem;">The record might have been moved or the session expired.</p>
+                        </div>`;
+                }
+            } catch (err) {
+                console.error("Error loading details:", err);
+                body.innerHTML = `<div style="padding: 2rem; color: red;">Error: ${err.message}</div>`;
+            }
+        }
+
+        function closeDetailsPanel() {
+            const panel = document.getElementById('detailsPanel');
+            const overlay = document.getElementById('detailsOverlay');
+            panel.classList.remove('open');
+            setTimeout(() => {
+                panel.style.display = 'none';
+                overlay.style.display = 'none';
+                // Reset filter and toggle button state
+                $('#detailsCategoryFilter').val('all');
+                $('#toggleAllText').text('Collapse All');
+                $('#toggleAllIcon').removeClass('fa-expand-alt').addClass('fa-compress-alt');
+            }, 320);
+        }
+
+        /* ── Detail Panel Filters/Toggles ── */
+        function filterDetailsByCategory(val) {
+            const cards = $('.collapsible-card');
+            if (val === 'all') {
+                cards.show();
+            } else {
+                cards.hide();
+                $(`#cat-card-${val}`).show();
+            }
+            // If filtering to one, ensure it's expanded
+            if (val !== 'all') {
+                const card = document.getElementById(`cat-card-${val}`);
+                if (card && !card.classList.contains('active')) {
+                    card.classList.add('active');
+                }
+            }
+        }
+
+        function toggleAllDetails() {
+            const cards = $('.collapsible-card:visible');
+            const anyOpen = cards.filter('.active').length > 0;
+            
+            if (anyOpen) {
+                // Collapse all
+                cards.removeClass('active');
+                $('#toggleAllText').text('Expand All');
+                $('#toggleAllIcon').removeClass('fa-compress-alt').addClass('fa-expand-alt');
+            } else {
+                // Expand all
+                cards.addClass('active');
+                $('#toggleAllText').text('Collapse All');
+                $('#toggleAllIcon').removeClass('fa-expand-alt').addClass('fa-compress-alt');
+            }
         }
 
         /* ══════════════════════════════

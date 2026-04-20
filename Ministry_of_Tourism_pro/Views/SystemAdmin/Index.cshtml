@@ -12,7 +12,7 @@
         --secondary: #6366f1;
         --bg-glass: rgba(255, 255, 255, 0.85);
         --border-glass: rgba(255, 255, 255, 0.3);
-        --row-height: 28px; 
+        --row-height: 45px; 
     }
 
     body {
@@ -141,7 +141,7 @@
     }
 
     .grid-table tr:hover {
-        background: #f1f5f9;
+        background: #f8fafc;
     }
 
     .grid-table td {
@@ -151,6 +151,18 @@
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 150px;
+        vertical-align: middle;
+    }
+
+    .grid-footer {
+        padding: 0.75rem 1rem;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.75rem;
+        color: #64748b;
     }
 
     .status-badge {
@@ -323,6 +335,14 @@
                 </tbody>
             </table>
         </div>
+        <div class="grid-footer">
+            <div id="filterStatus">Showing all users</div>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <span>Total Accounts: <strong class="text-dark">@Model.Count</strong></span>
+                <span style="opacity: 0.5;">|</span>
+                <span>Active: <strong class="text-success">@Model.Count(u => u.IsActive)</strong></span>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -396,6 +416,7 @@
                 }
             });
             document.getElementById('userCount').textContent = visibleCount;
+            document.getElementById('filterStatus').textContent = query ? `Showing ${visibleCount} users matching "${query}"` : 'Showing all users';
         });
     </script>
 }

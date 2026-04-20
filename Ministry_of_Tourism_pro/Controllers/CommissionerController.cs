@@ -51,10 +51,31 @@ namespace Ministry_of_Tourism_pro.Controllers
             // Using GetFilterDynamic for view-based data
             var consignees = await _sharedHelpers.GetFilterDynamic<List<CNET_V7_Domain.Domain.ViewSchema.VwConsigneeViewDTO>>("VwConsigneeView", parameters);
             
-            // Limit to top 20
-            var Consignees = consignees?.ToList() ?? new List<CNET_V7_Domain.Domain.ViewSchema.VwConsigneeViewDTO>();
+            var approvalList = new List<Ministry_of_Tourism_pro.Application.DTOs.ApprovalQueueItemDto>();
+
+            if (consignees != null)
+            {
+                foreach (var c in consignees.Take(20)) // Limit for performance
+                {
+                    var identifications = await _sharedHelpers.GetFilterData<List<IdentificationDTO>>("Identification", new Dictionary<string, string> { { "consignee", c.Id.ToString() } });
+                    
+                    approvalList.Add(new Ministry_of_Tourism_pro.Application.DTOs.ApprovalQueueItemDto
+                    {
+                        Id = (int)c.Id,
+                        PropertyName = c.FirstName ?? "N/A",
+                        Tin = c.Tin ?? "N/A",
+                        Code = c.Code ?? "N/A",
+                        Subcity = c.SubCityName ?? "N/A",
+                        SpecificAddress = identifications?.FirstOrDefault(x => x.Description == "SpecificAddress")?.IdNumber ?? "N/A",
+                        StarRating = identifications?.FirstOrDefault(x => x.Description == "StarCategory")?.IdNumber ?? "N/A",
+                        IsActive = c.ConsigneeIsActive,
+                        AddressLine1 = c.AddressLine1 ?? "",
+                        PreferenceDescription = c.ChildPreferenceDescrption ?? ""
+                    });
+                }
+            }
             
-            return View(Consignees);
+            return View(approvalList);
         }
 
         public async Task<IActionResult> Reports()
@@ -110,10 +131,14 @@ namespace Ministry_of_Tourism_pro.Controllers
                         Region = c.CityName ?? "Addis Ababa",
                         TIN = c.Tin ?? "N/A",
                         Phone = c.Phone1 ?? "N/A",
+                        Email = c.Email ?? identifications.FirstOrDefault(x => x.Description == "ContactInformation")?.IdNumber ?? string.Empty,
                         TotalRooms = int.TryParse(identifications.FirstOrDefault(x => x.Description == "TotalRooms")?.IdNumber, out var tr) ? tr : 0,
+                        TotalBeds = int.TryParse(identifications.FirstOrDefault(x => x.Description == "TotalBeds")?.IdNumber, out var tb) ? tb : 0,
                         TotalUnits = c.ConsigneeUnitId.HasValue ? 1 : 0, // Simplified: one unit per record in this view
                         TotalSpaces = int.TryParse(identifications.FirstOrDefault(x => x.Description == "MeetingRoomsCount")?.IdNumber, out var ms) ? ms : 0,
-                        StarRating = identifications.FirstOrDefault(x => x.Description == "StarCategory")?.IdNumber ?? string.Empty
+                        StarRating = identifications.FirstOrDefault(x => x.Description == "StarCategory")?.IdNumber ?? string.Empty,
+                        ManagerName = identifications.FirstOrDefault(x => x.Description == "ReservationsContact")?.IdNumber ?? string.Empty,
+                        SpecificAddress = c.SpecificAddress ?? string.Empty
                     };
                     report.GeneralRegistry.Add(generalItem);
 
@@ -175,14 +200,26 @@ namespace Ministry_of_Tourism_pro.Controllers
 
                 // E. Rating Summary
                 report.RatingSummary = report.GeneralRegistry
-                    .GroupBy(x => x.Category)
+                    .Select(x => {
+                        var rating = x.StarRating;
+                        if (string.IsNullOrEmpty(rating) || rating == "0") 
+                            rating = x.Category.Contains("Star") ? x.Category : "Not Assigned";
+                        
+                        // Clean up "5 Star" etc.
+                        if (!string.IsNullOrEmpty(rating) && char.IsDigit(rating[0]) && !rating.Contains("Star"))
+                            rating = rating + " Star";
+
+                        return new { x.TotalRooms, x.TotalBeds, Rating = rating };
+                    })
+                    .GroupBy(x => x.Rating)
                     .Select(g => new RatingSummaryItem {
                         Category = g.Key,
                         PropertyCount = g.Count(),
                         TotalRooms = g.Sum(x => x.TotalRooms),
+                        TotalBeds = g.Sum(x => x.TotalBeds),
                         AvgRoomsPerProperty = g.Any() ? Math.Round(g.Average(x => x.TotalRooms), 1) : 0
                     })
-                    .OrderByDescending(x => x.Category)
+                    .OrderByDescending(x => x.Category == "Not Assigned" ? "0" : x.Category)
                     .ToList();
 
                 return Json(report);
@@ -212,18 +249,128 @@ namespace Ministry_of_Tourism_pro.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Approve(int id)
+        [HttpGet]
+        public async Task<IActionResult> GetDetailPartial(int id)
         {
-            await _hotelService.UpdateHotelStatusAsync(id, HotelStatus.Approved);
-            return RedirectToAction(nameof(Overview));
+            try
+            {
+                // 1. Fetch Establishment from View
+                var parameters = new Dictionary<string, string> { { "id", id.ToString() } };
+                var consignees = await _sharedHelpers.GetFilterDynamic<List<CNET_V7_Domain.Domain.ViewSchema.VwConsigneeViewDTO>>("VwConsigneeView", parameters);
+                var c = consignees?.FirstOrDefault();
+                
+                if (c == null) return NotFound();
+
+                // 2. Fetch Identifications
+                var identifications = await _sharedHelpers.GetFilterData<List<IdentificationDTO>>("Identification", new Dictionary<string, string> 
+                { 
+                    { "consignee", id.ToString() }
+                }) ?? new List<IdentificationDTO>();
+
+                // 3. Map to HotelDto
+                var hotel = new HotelDto
+                {
+                    Id = (int)c.Id,
+                    Name = c.FirstName ?? "N/A",
+                    TradeName = c.FirstName ?? "N/A",
+                    RegistrationName = c.FirstName ?? "N/A",
+                    TIN = c.Tin ?? "N/A",
+                    Code = c.Code ?? "N/A",
+                    City = c.CityName ?? "Addis Ababa",
+                    Region = c.RegionName ?? "Addis Ababa",
+                    SubCity = c.SubCityName ?? "N/A",
+                    SpecificAddress = c.SpecificAddress ?? identifications.FirstOrDefault(x => x.Description == "SpecificAddress")?.IdNumber ?? "N/A",
+                    Phone1 = c.Phone1 ?? "N/A",
+                    Email = c.Email ?? identifications.FirstOrDefault(x => x.Description == "ContactInformation")?.IdNumber ?? "N/A",
+                    
+                    // Infrastructure Mapping
+                    StarCategory = identifications.FirstOrDefault(x => x.Description == "StarCategory")?.IdNumber ?? "N/A",
+                    TotalRooms = int.TryParse(identifications.FirstOrDefault(x => x.Description == "TotalRooms")?.IdNumber, out var tr) ? tr : 0,
+                    TotalBeds = int.TryParse(identifications.FirstOrDefault(x => x.Description == "TotalBeds")?.IdNumber, out var tb) ? tb : 0,
+                    // DistanceFromAirport = identifications.FirstOrDefault(x => x.Description == "DistanceFromAirport")?.IdNumber ?? "N/A",
+                    ReservationsContact = identifications.FirstOrDefault(x => x.Description == "ReservationsContact")?.IdNumber ?? "N/A",
+                    SustainabilityFocalPoint = identifications.FirstOrDefault(x => x.Description == "SustainabilityFocalPoint")?.IdNumber ?? "N/A",
+
+                    // Rooms
+                    KingSizeRooms = int.TryParse(identifications.FirstOrDefault(x => x.Description == "KingSizeRooms")?.IdNumber, out var kr) ? kr : 0,
+                    TwinBedRooms = int.TryParse(identifications.FirstOrDefault(x => x.Description == "TwinBedRooms")?.IdNumber, out var tbr) ? tbr : 0,
+                    JuniorSuites = int.TryParse(identifications.FirstOrDefault(x => x.Description == "JuniorSuites")?.IdNumber, out var js) ? js : 0,
+                    Suites = int.TryParse(identifications.FirstOrDefault(x => x.Description == "Suites")?.IdNumber, out var sr) ? sr : 0,
+                    PresidentialSuites = int.TryParse(identifications.FirstOrDefault(x => x.Description == "PresidentialSuites")?.IdNumber, out var psr) ? psr : 0,
+                    AccessibleRooms = int.TryParse(identifications.FirstOrDefault(x => x.Description == "AccessibleRooms")?.IdNumber, out var ar) ? ar : 0,
+
+                    // F&B
+                    AllDayDining = identifications.FirstOrDefault(x => x.Description == "AllDayDining")?.IdNumber?.ToLower() == "true",
+                    AllDayDiningSeats = int.TryParse(identifications.FirstOrDefault(x => x.Description == "AllDayDiningSeats")?.IdNumber, out var ads) ? ads : 0,
+                    BarsCount = int.TryParse(identifications.FirstOrDefault(x => x.Description == "BarsCount")?.IdNumber, out var bc) ? bc : 0,
+
+                    // Events
+                    MeetingRoomsCount = int.TryParse(identifications.FirstOrDefault(x => x.Description == "MeetingRoomsCount")?.IdNumber, out var mrc) ? mrc : 0,
+                    LargestRoomCapacityTheatre = int.TryParse(identifications.FirstOrDefault(x => x.Description == "LargestRoomCapacityTheatre")?.IdNumber, out var lrt) ? lrt : 0,
+
+                    // Facilities
+                    WifiPropertyWide = identifications.FirstOrDefault(x => x.Description == "WifiPropertyWide")?.IdNumber?.ToLower() == "true",
+                    StandbyGeneratorCapacityKva = int.TryParse(identifications.FirstOrDefault(x => x.Description == "StandbyGeneratorCapacityKva")?.IdNumber, out var sgc) ? sgc : 0,
+                    
+                    ImagePaths = new List<string> { "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800" }
+                };
+
+                return PartialView("_EstablishmentDetail", hotel);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         [HttpPost]
-        public async Task<IActionResult> Reject(int id, string comment)
+        public async Task<IActionResult> Approve(int id)
         {
-            await _hotelService.UpdateHotelStatusAsync(id, HotelStatus.Rejected, comment);
-            return RedirectToAction(nameof(PendingApprovals));
+            try 
+            {
+                // 1. Update Consignee IsActive = true
+                var consignees = await _sharedHelpers.GetFilterData<List<CNET_V7_Domain.Domain.ConsigneeSchema.ConsigneeDTO>>("Consignee", new Dictionary<string, string> { { "id", id.ToString() } });
+                if (consignees != null && consignees.Any())
+                {
+                    var consignee = consignees.First();
+                    consignee.IsActive = true;
+                    await _sharedHelpers.SendReqAsync<CNET_V7_Domain.Domain.ConsigneeSchema.ConsigneeDTO, CNET_V7_Domain.Domain.ConsigneeSchema.ConsigneeDTO>("Consignee", HttpMethod.Put, consignee);
+                }
+
+                // 2. Update Hotel Status
+                await _hotelService.UpdateHotelStatusAsync(id, HotelStatus.Approved);
+                
+                return Json(new { success = true, message = "Establishment approved and activated." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Reject(int id, string? comment)
+        {
+            try 
+            {
+                // 1. Update Consignee IsActive = false
+                var consignees = await _sharedHelpers.GetFilterData<List<CNET_V7_Domain.Domain.ConsigneeSchema.ConsigneeDTO>>("Consignee", new Dictionary<string, string> { { "id", id.ToString() } });
+                if (consignees != null && consignees.Any())
+                {
+                    var consignee = consignees.First();
+                    consignee.IsActive = false;
+                    await _sharedHelpers.SendReqAsync<CNET_V7_Domain.Domain.ConsigneeSchema.ConsigneeDTO, CNET_V7_Domain.Domain.ConsigneeSchema.ConsigneeDTO>("Consignee", HttpMethod.Put, consignee);
+                }
+
+                // 2. Update Hotel Status
+                await _hotelService.UpdateHotelStatusAsync(id, HotelStatus.Rejected, comment);
+                
+                return Json(new { success = true, message = "Establishment declined and deactivated." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
     }
 }

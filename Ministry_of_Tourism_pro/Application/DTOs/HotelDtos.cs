@@ -73,7 +73,7 @@ namespace Ministry_of_Tourism_pro.Application.DTOs
         public bool? CoffeeShop { get; set; }
         public int? BarsCount { get; set; }
         public bool? NightClub { get; set; }
-        public int? SouvenirShops { get; set; }
+        public string? SouvenirShops { get; set; }
         public bool? DelegationCatering { get; set; }
         public int? DelegationCateringMaxPax { get; set; }
         public bool? RefillWaterStations { get; set; }
@@ -86,6 +86,7 @@ namespace Ministry_of_Tourism_pro.Application.DTOs
         public int? LargestRoomCapacityClassroom { get; set; }
         public int? LargestRoomCapacityBanquet { get; set; }
         public double? TotalMeetingSpaceSqm { get; set; }
+        public string? MeetingRooms { get; set; }
 
         // Public Facilities
         public double? InternetBandwidthDown { get; set; }
@@ -151,9 +152,15 @@ namespace Ministry_of_Tourism_pro.Application.DTOs
         public string? OtherEcoLabels { get; set; }
         public bool? FoodWasteProgram { get; set; }
         public bool? SustainabilityRefillWaterStations { get; set; }
+        public string? TourismServiceCompetenceLicenseCertificate { get; set; }
+        public string? FireSafetyCertificate { get; set; }
+        public string? EnvironmentalClearanceCertificate { get; set; }
+        public string? FoodSafetyAndHygieneCertificate { get; set; }
 
         // Staffing & Languages
         public int? TotalStaff { get; set; }
+        public int? LineStaff { get; set; }
+        public int? ManagementStaff { get; set; }
         public string? InternationalLanguagesFrontDesk { get; set; }
 
         // Internal Data Storage
@@ -206,12 +213,16 @@ namespace Ministry_of_Tourism_pro.Application.DTOs
 
         // All Excel specific fields should also be in CreateHotelDto (simplified for brevity here, but usually identical to HotelDto)
         // [Add matching fields from HotelDto here if necessary for creation flow]
+        public string? MeetingRooms { get; set; }
 
         // Legacy fields (optional compatibility)
         public string Name { get => TradeName; set => TradeName = value; }
         public string ContactEmail { get => Email; set => Email = value; }
         public string ContactPhone { get => Phone1; set => Phone1 = value; }
         public string? SubCity { get => Subcity; set => Subcity = value; }
+        public int? LineStaff { get; set; }
+        public int? ManagementStaff { get; set; }
+        public string? InternationalLanguagesFrontDesk { get; set; }
         public class RoomTypeDetailDto
         {
             public string RoomType { get; set; } = string.Empty; // Single, Double, etc.

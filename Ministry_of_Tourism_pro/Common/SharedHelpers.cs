@@ -133,7 +133,7 @@ namespace Ministry_of_Tourism_pro.Common
 
             return xrolemapper;
         }
-        public virtual async Task<UserDTO?> UpdateUser(UserUpdateDTO userDto)
+        public virtual async Task<UserDTO?> UpdateUser(Ministry_of_Tourism_pro.Models.UserUpdateDTO userDto)
         {
             var response = await _httpClient.PostAsJsonAsync("CommonLibrary/update_user", userDto);
             if (response.IsSuccessStatusCode)

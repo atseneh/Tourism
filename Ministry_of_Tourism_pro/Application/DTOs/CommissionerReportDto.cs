@@ -18,10 +18,14 @@ namespace Ministry_of_Tourism_pro.Application.DTOs
         public string Region { get; set; } = string.Empty;
         public string TIN { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
         public int TotalRooms { get; set; }
+        public int TotalBeds { get; set; }
         public int TotalUnits { get; set; }
         public int TotalSpaces { get; set; }
         public string StarRating { get; set; } = string.Empty;
+        public string ManagerName { get; set; } = string.Empty;
+        public string SpecificAddress { get; set; } = string.Empty;
     }
 
     public class AccommodationReportItem
@@ -59,6 +63,7 @@ namespace Ministry_of_Tourism_pro.Application.DTOs
         public string Category { get; set; } = string.Empty;
         public int PropertyCount { get; set; }
         public int TotalRooms { get; set; }
+        public int TotalBeds { get; set; }
         public double AvgRoomsPerProperty { get; set; }
     }
 }

@@ -18,7 +18,7 @@
     <style>
         :root {
             --navy-deep: #0f172a;
-            --primary-color: #3b82f6;
+            --primary-color: #10383a;
             --text-muted: #64748b;
             --border-color: #e2e8f0;
         }
@@ -151,7 +151,7 @@
 
         .btn-premium {
             width: 100%;
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            background: linear-gradient(135deg, #10383a 0%, #0b2c2e 100%);
             color: white;
             border: none;
             padding: 1.1rem;
@@ -164,10 +164,9 @@
             justify-content: center;
             transition: all 0.3s;
             font-family: inherit;
-            margin-top: 1.5rem;
-            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
+            box-shadow: 0 10px 25px -5px rgba(16, 56, 58, 0.4);
         }
-        .btn-premium:hover { transform: translateY(-3px); box-shadow: 0 15px 30px -5px rgba(37, 99, 235, 0.6); }
+        .btn-premium:hover { transform: translateY(-3px); box-shadow: 0 15px 30px -5px rgba(16, 56, 58, 0.6); }
         .btn-premium:active { transform: translateY(-1px); }
 
         .animate-fade-in { animation: fadeIn 1s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -215,7 +214,7 @@
 
                 <div class="form-group">
                     <label asp-for="Email" class="form-label">UserName or Email</label>
-                    <input asp-for="Email" class="form-control" placeholder="username@example.com" />
+                    <input asp-for="Email" class="form-control" placeholder="username@example.com" autocomplete="off" />
                 </div>
 
                 <div class="form-group">

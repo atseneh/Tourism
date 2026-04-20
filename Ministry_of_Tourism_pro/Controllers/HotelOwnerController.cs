@@ -22,7 +22,7 @@ namespace Ministry_of_Tourism_pro.Controllers
             { "RegistrationName", CNET_WebConstantes.CAT_PROPERTY_PROFILE },
             { "SpecificAddress", CNET_WebConstantes.CAT_PROPERTY_PROFILE },
             { "Subcity", CNET_WebConstantes.CAT_PROPERTY_PROFILE },
-            { "DistanceFromAirport", CNET_WebConstantes.CAT_PROPERTY_PROFILE },
+            // { "DistanceFromAirport", CNET_WebConstantes.CAT_PROPERTY_PROFILE },
             { "StarCategory", CNET_WebConstantes.CAT_PROPERTY_PROFILE },
             { "TotalRooms", CNET_WebConstantes.CAT_PROPERTY_PROFILE },
             { "TotalBeds", CNET_WebConstantes.CAT_PROPERTY_PROFILE },
@@ -52,6 +52,7 @@ namespace Ministry_of_Tourism_pro.Controllers
             { "LargestRoomCapacityClassroom", CNET_WebConstantes.CAT_MEETINGS_EVENTS },
             { "LargestRoomCapacityBanquet", CNET_WebConstantes.CAT_MEETINGS_EVENTS },
             { "TotalMeetingSpaceSqm", CNET_WebConstantes.CAT_MEETINGS_EVENTS },
+            { "MeetingRooms", CNET_WebConstantes.CAT_MEETINGS_EVENTS },
             { "InternetBandwidthDown", CNET_WebConstantes.CAT_PUBLIC_FACILITIES },
             { "InternetBandwidthUp", CNET_WebConstantes.CAT_PUBLIC_FACILITIES },
             { "LobbyAreaSqm", CNET_WebConstantes.CAT_PUBLIC_FACILITIES },
@@ -103,7 +104,13 @@ namespace Ministry_of_Tourism_pro.Controllers
             { "OtherEcoLabels", CNET_WebConstantes.CAT_SUSTAINABILITY_CERTIFICATIONS },
             { "FoodWasteProgram", CNET_WebConstantes.CAT_SUSTAINABILITY_CERTIFICATIONS },
             { "SustainabilityRefillWaterStations", CNET_WebConstantes.CAT_SUSTAINABILITY_CERTIFICATIONS },
+            { "TourismServiceCompetenceLicenseCertificate", CNET_WebConstantes.CAT_SUSTAINABILITY_CERTIFICATIONS },
+            { "FireSafetyCertificate", CNET_WebConstantes.CAT_SUSTAINABILITY_CERTIFICATIONS },
+            { "EnvironmentalClearanceCertificate", CNET_WebConstantes.CAT_SUSTAINABILITY_CERTIFICATIONS },
+            { "FoodSafetyAndHygieneCertificate", CNET_WebConstantes.CAT_SUSTAINABILITY_CERTIFICATIONS },
             { "TotalStaff", CNET_WebConstantes.CAT_STAFFING_LANGUAGES },
+            { "LineStaff", CNET_WebConstantes.CAT_STAFFING_LANGUAGES },
+            { "ManagementStaff", CNET_WebConstantes.CAT_STAFFING_LANGUAGES },
             { "InternationalLanguagesFrontDesk", CNET_WebConstantes.CAT_STAFFING_LANGUAGES }
         };
 
@@ -272,7 +279,7 @@ namespace Ministry_of_Tourism_pro.Controllers
                 switch (mode.ToLower())
                 {
                     case "basic":
-                        await SyncInfrastructure(model, new[] { "RegistrationName", "SpecificAddress", "Subcity", "DistanceFromAirport", "StarCategory", "TotalRooms", "TotalBeds", "ContactInformation", "ReservationsContact", "SustainabilityFocalPoint" });
+                        await SyncInfrastructure(model, new[] { "RegistrationName", "SpecificAddress", "Subcity", /* "DistanceFromAirport", */ "StarCategory", "TotalRooms", "TotalBeds", "ContactInformation", "ReservationsContact", "SustainabilityFocalPoint" });
                         break;
 
                     case "accommodation":
@@ -284,7 +291,7 @@ namespace Ministry_of_Tourism_pro.Controllers
                         break;
 
                     case "meetings_events":
-                        await SyncInfrastructure(model, new[] { "MeetingRoomsCount", "LargestRoomCapacityTheatre", "LargestRoomCapacityClassroom", "LargestRoomCapacityBanquet", "TotalMeetingSpaceSqm" });
+                        await SyncInfrastructure(model, new[] { "MeetingRoomsCount", "MeetingRooms", "TotalMeetingSpaceSqm" });
                         break;
 
                     case "public_facilities":
@@ -312,11 +319,14 @@ namespace Ministry_of_Tourism_pro.Controllers
                         break;
 
                     case "sustainability":
-                        await SyncInfrastructure(model, new[] { "SustainabilityCertification", "OtherEcoLabels", "FoodWasteProgram", "SustainabilityRefillWaterStations" });
+                        await SyncInfrastructure(model, new[] { 
+                            "SustainabilityCertification", "OtherEcoLabels", "FoodWasteProgram", "SustainabilityRefillWaterStations",
+                            "TourismServiceCompetenceLicenseCertificate", "FireSafetyCertificate", "EnvironmentalClearanceCertificate", "FoodSafetyAndHygieneCertificate"
+                        });
                         break;
 
                     case "staffing":
-                        await SyncInfrastructure(model, new[] { "TotalStaff", "InternationalLanguagesFrontDesk" });
+                        await SyncInfrastructure(model, new[] { "TotalStaff", "LineStaff", "ManagementStaff", "InternationalLanguagesFrontDesk" });
                         break;
 
                     case "all":

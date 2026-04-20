@@ -29,7 +29,7 @@ namespace Ministry_of_Tourism_pro.Application.Services
                     Name = $"{namePrefix} Addis", 
                     TradeName = $"{namePrefix} Addis",
                     RegistrationName = $"{namePrefix} International PLC",
-                    DistanceFromAirport = "5 km",
+                    // DistanceFromAirport = "5 km",
                     StarCategory = i % 5 == 0 ? "5" : (i % 4 == 0 ? "4" : "3"),
                     TotalRooms = 100 + i,
                     TotalBeds = 150 + i,

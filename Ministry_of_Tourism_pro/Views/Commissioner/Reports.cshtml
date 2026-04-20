@@ -4,15 +4,20 @@
 }
 
 <style>
-    @@media print {
-        .no-print, nav, header, .dashboard-sidebar, .btn-premium, .glass-card.no-print, .report-header-section { display: none !important; }
+       @@media print {
+        .no-print, nav, header, .dashboard-sidebar, .btn-premium, .glass-card.no-print, .report-header-section, .report-tabs, .grid-footer { display: none !important; }
         .print-only { display: block !important; }
-        .glass-card { border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
+        .glass-card { border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; overflow: visible !important; }
         body { background: white !important; }
-        .main-content { padding: 0 !important; margin: 0 !important; }
-        .grid-scroll-container { height: auto !important; overflow: visible !important; width: 100% !important; }
-        .grid-footer { display: flex !important; background: transparent !important; border: none !important; }
+        .main-content { padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; }
+        .grid-scroll-container { height: auto !important; overflow: visible !important; width: 100% !important; border: none !important; }
+        .report-view { display: none; }
+        .report-view.active { display: block !important; }
+        .report-table { border: 1px solid #000 !important; page-break-inside: auto; }
+        .report-table th, .report-table td { border: 1px solid #ddd !important; }
+        .report-table th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; }
     }
+
     .print-only { display: none; }
     
     /* Typography & Spacing Optimization */
@@ -134,12 +139,14 @@
     </div>
 
     <!-- Report Navigation Tabs -->
-    <div class="report-tabs no-print">
+    <div class="report-tabs no-print" style="overflow-x: auto; white-space: nowrap;">
         <div class="report-tab active" onclick="switchReport('general', this)">General Registry</div>
-        <div class="report-tab" onclick="switchReport('accommodation', this)">Accommodation Detail Report</div>
-        <div class="report-tab" onclick="switchReport('dining', this)">Dining Detail Report</div>
-        <div class="report-tab" onclick="switchReport('venue', this)">Venue Detail Report</div>
-        <div class="report-tab" onclick="switchReport('ratingSummary', this)">Rating Summary Report</div>
+        <div class="report-tab" onclick="switchReport('accommodation', this)">Accommodation Detail</div>
+        <div class="report-tab" onclick="switchReport('accommodationSummary', this)">Accommodation Summary</div>
+        <div class="report-tab" onclick="switchReport('dining', this)">Dining Detail</div>
+        <div class="report-tab" onclick="switchReport('venue', this)">Venue Detail</div>
+        <div class="report-tab" onclick="switchReport('venueSummary', this)">Venue Summary</div>
+        <div class="report-tab" onclick="switchReport('ratingSummary', this)">Rating Summary</div>
     </div>
 
     <!-- Filter & Action Bar: Integrated -->
@@ -150,13 +157,16 @@
                 <input type="text" id="reportSearch" onkeyup="filterReport()" placeholder="Search registry..." class="form-control" style="padding-left: 2.5rem; margin: 0; background: white; height: 36px; font-size: 0.75rem; border-color: var(--border-color);">
             </div>
             
-            <select id="ratingFilter" onchange="filterReport()" class="filter-select" style="width: 150px;">
+            <select id="ratingFilter" onchange="filterReport()" class="filter-select" style="width: 180px;">
                 <option value="all">Rating: All</option>
-                <option value="5 Star">5 Star</option>
-                <option value="4 Star">4 Star</option>
-                <option value="3 Star">3 Star</option>
-                <option value="2 Star">2 Star</option>
-                <option value="1 Star">1 Star</option>
+                <option value="5">5 Star</option>
+                <option value="4">4 Star</option>
+                <option value="3">3 Star</option>
+                <option value="2">2 Star</option>
+                <option value="1">1 Star</option>
+                <option value="Tourist Recommended">Tourist Recommended</option>
+                <option value="Motel">Motel</option>
+                <option value="Guest House">Guest House</option>
                 <option value="Not Assigned">Unassigned</option>
             </select>
 
@@ -190,16 +200,16 @@
                 <table class="report-table" style="width: 100%; border-collapse: collapse;" id="propertyTable">
                     <thead>
                         <tr>
-                            <th style="width: 25%;">Property & Category</th>
-                            <th style="width: 20%;">Location & Contact</th>
-                            <th style="width: 18%;">Accommodations</th>
-                            <th style="width: 18%;">Dining & Catering</th>
-                            <th style="width: 19%;">Event Infrastructure</th>
+                            <th style="width: 25%;">Property & Type</th>
+                            <th style="width: 15%;">Star Rating</th>
+                            <th style="width: 30%;">Location & Contact</th>
+                            <th style="width: 15%;">Accommodations</th>
+                            <th style="width: 15%;">Event Spaces</th>
                         </tr>
                     </thead>
                     <tbody id="generalRealBody" class="real-data-body">
                         <tr>
-                            <td colspan="5" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                            <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-muted);">
                                 <i class="fas fa-circle-notch fa-spin" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
                                 Fetching live registry data...
                             </td>
@@ -225,6 +235,33 @@
                         </tr>
                     </thead>
                     <tbody id="accommodationRealBody" class="real-data-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="accommodationSummaryView" class="report-view">
+        <div class="glass-card" style="padding: 0; overflow: hidden; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+            <div class="grid-scroll-container">
+                <table class="report-table" style="width: 100%; border-collapse: collapse;" id="accommodationSummaryTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 35%;">Property Name</th>
+                            <th style="width: 15%;">Room Types</th>
+                            <th style="width: 15%;">Total Room Count</th>
+                            <th style="width: 15%;">Total Max Pax</th>
+                            <th style="width: 20%;">Portfolio Capacity</th>
+                        </tr>
+                    </thead>
+                    <tbody id="accommodationSummaryRealBody" class="real-data-body"></tbody>
+                    <tfoot id="accommodationSummaryFooter" style="background:#f8fafc; border-top: 2px solid var(--navy-deep);">
+                        <tr style="font-weight: 900; color: var(--navy-deep);">
+                            <td colspan="2" style="text-align: right; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em;">Grand Portfolio Total</td>
+                            <td id="accSumGrandUnits" style="color: var(--primary-color);">0 Units</td>
+                            <td id="accSumGrandPax" style="color: #059669;">0 Pax</td>
+                            <td id="accSumGrandDate" style="color: var(--text-muted); font-size: 0.65rem;">AS OF @DateTime.Now.ToString("MM/dd/yyyy")</td>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>
@@ -270,6 +307,26 @@
         </div>
     </div>
 
+    <div id="venueSummaryView" class="report-view">
+        <div class="glass-card" style="padding: 0; overflow: hidden; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+            <div class="grid-scroll-container">
+                <table class="report-table" style="width: 100%; border-collapse: collapse;" id="venueSummaryTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 30%;">Property Name</th>
+                            <th style="width: 15%;">Venue Count</th>
+                            <th style="width: 15%;">Total Seating Capacity</th>
+                            <th style="width: 15%;">Total Standing Capacity</th>
+                            <th style="width: 15%;">Total Area (m²)</th>
+                            <th style="width: 10%;">Infrastructure Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody id="venueSummaryRealBody" class="real-data-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <div id="ratingSummaryView" class="report-view">
         <div class="glass-card" style="padding: 0; overflow: hidden; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
             <div class="grid-scroll-container">
@@ -277,8 +334,9 @@
                     <thead>
                         <tr>
                             <th style="width: 30%;">Rating Category</th>
-                            <th style="width: 20%;">Property Count</th>
-                            <th style="width: 25%;">Total Rooms</th>
+                            <th style="width: 15%;">Property Count</th>
+                            <th style="width: 15%;">Total Rooms</th>
+                            <th style="width: 15%;">Total Beds</th>
                             <th style="width: 25%;">Avg Rooms/Property</th>
                         </tr>
                     </thead>
@@ -291,7 +349,7 @@
         <!-- Grid Footer -->
         <div class="grid-footer">
             <div style="display: flex; gap: 1.5rem;">
-                <span>Total Registered: <span style="color: var(--navy-deep); font-weight: 800;">@Model.Count()</span></span>
+                <span>Total Registered: <span id="totalRegisteredCount" style="color: var(--navy-deep); font-weight: 800;">0</span></span>
                 <span>Active Filter View: <span id="visibleCount" style="color: var(--primary-color); font-weight: 800;">@Model.Count()</span></span>
             </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -319,12 +377,16 @@
             rows.forEach(row => {
                 const name = row.getAttribute('data-name');
                 const location = row.getAttribute('data-location') || "";
-                const rating = row.getAttribute('data-rating') || "";
+                const rating = (row.getAttribute('data-rating') || "").toLowerCase();
                 const type = row.getAttribute('data-type') || "";
                 
                 let matchesSearch = name.includes(searchText) || location.includes(searchText);
-                let matchesRating = ratingVal === 'all' || rating.includes(ratingVal);
-                if (ratingVal === 'Not Assigned') matchesRating = (rating === 'Not Assigned' || rating === 'General Sector');
+                
+                let matchesRating = ratingVal === 'all' || 
+                                   (ratingVal === 'Not Assigned' && (rating === 'not assigned' || rating === 'general sector' || rating === '')) ||
+                                   rating === ratingVal.toLowerCase() ||
+                                   rating.includes(ratingVal.toLowerCase() + " star") ||
+                                   (ratingVal.length === 1 && rating.startsWith(ratingVal));
 
                 let matchesType = typeVal === 'all' || 
                                  (typeVal === 'Tourist Recommended' && rating.includes('Tourist Recommended')) ||
@@ -352,21 +414,23 @@
             // Update tabs
             document.querySelectorAll('.report-tab').forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
-
+            
             // Update views
             document.querySelectorAll('.report-view').forEach(v => v.classList.remove('active'));
             document.getElementById(reportType + 'View').classList.add('active');
-
+            
             // Update title
             const titles = {
                 'general': 'General Infrastructure Registry',
                 'accommodation': 'Accommodation Detail Report',
+                'accommodationSummary': 'Accommodation Summary Report',
                 'dining': 'Dining Detail Report',
                 'venue': 'Venue Detail Report',
+                'venueSummary': 'Venue Summary Report',
                 'ratingSummary': 'Rating Summary Report'
             };
             document.getElementById('reportTitle').innerText = titles[reportType];
-
+            
             // Re-filter the new view
             filterReport();
         }
@@ -420,30 +484,74 @@
         }
 
         function populateRealReports(report) {
+            const propertyRatings = {};
+            const propertyTypes = {};
+            
+            // Build lookup maps for filtering consistency across tabs
+            if (report.generalRegistry) {
+                $('#totalRegisteredCount').text(report.generalRegistry.length);
+                report.generalRegistry.forEach(h => {
+                    const pName = h.propertyName.toLowerCase();
+                    const type = h.category.toLowerCase().includes("resort") ? "Resort" : (h.category.toLowerCase().includes("lodge") ? "Lodge" : "Hotel");
+                    
+                    let dataRating = h.starRating || "";
+                    if (dataRating && !isNaN(parseInt(dataRating)) && !dataRating.includes("Star")) dataRating = parseInt(dataRating) + " Star";
+                    if (!dataRating || dataRating === "") dataRating = h.category;
+                    
+                    propertyRatings[pName] = dataRating;
+                    propertyTypes[pName] = type;
+                });
+            }
+
             // 1. General Registry
             const generalBody = $('#generalRealBody').empty();
             if (report.generalRegistry && report.generalRegistry.length > 0) {
                 report.generalRegistry.forEach(h => {
-                    const type = h.category.toLowerCase().includes("resort") ? "Resort" : (h.category.toLowerCase().includes("lodge") ? "Lodge" : "Hotel");
+                    const pName = h.propertyName.toLowerCase();
+                    const type = propertyTypes[pName];
+                    const dataRating = propertyRatings[pName];
+
                     generalBody.append(`
+                        <tr class="report-row" data-name="${pName}" data-location="${(h.region + ' ' + h.city).toLowerCase()}" data-rating="${dataRating}" data-type="${type}">
                             <td>
                                 <div style="font-weight: 800; color: var(--navy-deep); font-size: 0.85rem;">${h.propertyName}</div>
-                                <div style="display: flex; align-items: center; gap: 0.4rem; margin-top: 2px;">
-                                    ${h.starRating && h.starRating !== "" ? 
-                                        `<div style="display: flex; gap: 1px; color: #f59e0b; font-size: 0.55rem;">${[1,2,3,4,5].map(i => `<i class="fas ${h.starRating.includes(i.toString()) ? "fa-star" : "fa-star fa-regular"}"></i>`).join('')}</div>` :
-                                        (h.category === "General Sector" ? '<span style="color: #94a3b8; font-size: 0.6rem; font-weight: 800;">UNASSIGNED</span>' : 
-                                         h.category.includes("Tourist Recommended") ? '<span style="color: #059669; font-size: 0.6rem; font-weight: 800;"><i class="fas fa-thumbs-up" style="margin-right: 3px;"></i> RECOMMENDED</span>' : 
-                                         `<div style="display: flex; gap: 1px; color: #f59e0b; font-size: 0.55rem;">${[1,2,3,4,5].map(i => `<i class="fas ${h.category.includes(i.toString()) ? "fa-star" : "fa-star fa-regular"}"></i>`).join('')}</div>`)
-                                    }
+                                <div style="font-size: 0.6rem; color: var(--text-muted); margin-top: 4px; font-weight: 700; text-transform: uppercase;">${h.category}</div>
+                            </td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                                    ${(() => {
+                                        const ratingStr = h.starRating || h.category || "";
+                                        const match = ratingStr.match(/(\d)/);
+                                        const count = match ? parseInt(match[1]) : 0;
+                                        
+                                        if (count > 0 && count <= 5) {
+                                            return `<div style="display: flex; gap: 2px; color: #f59e0b; font-size: 0.65rem;">${[1,2,3,4,5].map(i => `<i class="${i <= count ? "fa-solid fa-star" : "fa-regular fa-star"}"></i>`).join('')}</div>`;
+                                        }
+                                        
+                                        if (ratingStr.includes("Tourist Recommended")) {
+                                            return '<span style="color: #059669; font-size: 0.6rem; font-weight: 800;"><i class="fas fa-thumbs-up" style="margin-right: 3px;"></i> RECOMMENDED</span>';
+                                        }
+                                        if (ratingStr.includes("General Sector") || ratingStr.includes("Not Assigned") || ratingStr === "" || ratingStr === "General") {
+                                            return '<span style="color: #94a3b8; font-size: 0.6rem; font-weight: 800;">UNASSIGNED</span>';
+                                        }
+                                        return '<span style="color: #94a3b8; font-size: 0.6rem; font-weight: 800;">UNASSIGNED</span>';
+                                    })()}
                                 </div>
                             </td>
                             <td>
-                                <div style="font-weight: 700; color: #334155; font-size: 0.75rem;">${h.city}</div>
-                                <div style="font-size: 0.65rem; color: var(--text-muted); margin-top: 2px;">TIN: ${h.tin} • ${h.phone}</div>
+                                <div style="font-weight: 700; color: #334155; font-size: 0.75rem;">${h.region}, ${h.city}</div>
+                                <div style="font-size: 0.65rem; color: var(--text-muted); margin-top: 2px;">${h.specificAddress || ""}</div>
+                                <div style="font-size: 0.65rem; color: var(--primary-color); font-weight: 700; margin-top: 4px;">TIN: ${h.tin}</div>
+                                <div style="font-size: 0.65rem; color: var(--text-muted);">${h.phone} ${h.email ? '• ' + h.email : ''}</div>
                             </td>
-                            <td><div style="font-weight: 800; color: var(--primary-color); font-size: 0.85rem;">${h.totalRooms} Total Rooms</div></td>
-                            <td><div style="font-weight: 800; color: #f59e0b;">${h.totalUnits} Units</div></td>
-                            <td><div style="font-weight: 800; color: #8b5cf6;">${h.totalSpaces} Spaces</div></td>
+                            <td>
+                                <div style="font-weight: 800; color: var(--primary-color); font-size: 0.85rem;">${h.totalRooms} Rooms</div>
+                                <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600;">${h.totalBeds} Total Beds</div>
+                            </td>
+                            <td>
+                                <div style="font-weight: 800; color: #8b5cf6;">${h.totalSpaces} Spaces</div>
+                                <div style="font-size: 0.65rem; color: var(--text-muted); margin-top: 2px;">Conference Infra</div>
+                            </td>
                         </tr>
                     `);
                 });
@@ -451,29 +559,97 @@
                 generalBody.append('<tr><td colspan="5" style="text-align:center; padding:2rem;">No live registry records found.</td></tr>');
             }
 
-            // 2. Accommodation
+            // 2. Accommodation Detail
             const accommodationBody = $('#accommodationRealBody').empty();
             if (report.accommodationInfrastructure && report.accommodationInfrastructure.length > 0) {
+                const grouped = {};
                 report.accommodationInfrastructure.forEach(h => {
+                    if (!grouped[h.propertyName]) grouped[h.propertyName] = [];
+                    grouped[h.propertyName].push(h);
+                });
+
+                Object.keys(grouped).forEach(name => {
+                    const items = grouped[name];
+                    const pName = name.toLowerCase();
+                    let totalCount = 0;
+                    let totalMaxPax = 0;
+                    
+                    items.forEach((h, index) => {
+                        totalCount += h.count;
+                        totalMaxPax += (h.count * h.maxPax);
+                        
+                        accommodationBody.append(`
+                            <tr class="report-row" data-name="${pName}" data-rating="${propertyRatings[pName] || ''}" data-type="Accommodation">
+                                ${index === 0 ? `<td rowspan="${items.length + 1}" style="font-weight: 800; color: var(--navy-deep); vertical-align: middle; background: white; border-right: 1px solid var(--border-color);">${h.propertyName}</td>` : ''}
+                                <td>${h.roomType}</td>
+                                <td><i class="fas fa-bed" style="opacity: 0.5; margin-right: 5px;"></i> ${h.bedConfig}</td>
+                                <td style="font-weight: 800; color: var(--primary-color);">${h.count}</td>
+                                <td style="font-weight: 700; color: #059669;">N/A</td>
+                                <td>${h.maxPax} Guests</td>
+                            </tr>
+                        `);
+                    });
+                    
+                    // Add Summary Row for each hotel
                     accommodationBody.append(`
-                        <tr class="report-row" data-name="${h.propertyName.toLowerCase()}" data-type="Accommodation">
-                            <td style="font-weight: 700;">${h.propertyName}</td>
-                            <td>${h.roomType}</td>
-                            <td><i class="fas fa-bed" style="opacity: 0.5; margin-right: 5px;"></i> ${h.bedConfig}</td>
-                            <td style="font-weight: 800; color: var(--primary-color);">${h.count}</td>
-                            <td style="font-weight: 700; color: #059669;">N/A</td>
-                            <td>${h.maxPax} Guests</td>
+                        <tr class="report-row" data-name="${pName}" data-rating="${propertyRatings[pName] || ''}" data-type="Accommodation" style="background: #f1f5f9; border-top: 2px solid var(--border-color);">
+                            <td colspan="2" style="font-weight: 900; color: var(--navy-deep); text-align: right; text-transform: uppercase; font-size: 0.7rem;">Total for ${name}</td>
+                            <td style="font-weight: 900; color: var(--primary-color); font-size: 0.85rem;">${totalCount} Units</td>
+                            <td style="color: var(--text-muted); font-size: 0.7rem; font-weight: 700;">Avg Cap: ${(totalMaxPax / (totalCount || 1)).toFixed(1)}</td>
+                            <td style="font-weight: 900; color: var(--navy-deep); font-size: 0.85rem;">${totalMaxPax} Pax Cap</td>
                         </tr>
                     `);
                 });
             }
 
-            // 3. Dining
+            // 2b. Accommodation Summary
+            const accSummaryBody = $('#accommodationSummaryRealBody').empty();
+            if (report.accommodationInfrastructure && report.accommodationInfrastructure.length > 0) {
+                const grouped = {};
+                let grandUnits = 0;
+                let grandPax = 0;
+
+                report.accommodationInfrastructure.forEach(h => {
+                    if (!grouped[h.propertyName]) grouped[h.propertyName] = { count: 0, types: 0, maxPax: 0 };
+                    grouped[h.propertyName].count += h.count;
+                    grouped[h.propertyName].types += 1;
+                    grouped[h.propertyName].maxPax += (h.count * h.maxPax);
+                    
+                    grandUnits += h.count;
+                    grandPax += (h.count * h.maxPax);
+                });
+
+                // Update Grand Totals in Footer
+                $('#accSumGrandUnits').text(grandUnits.toLocaleString() + ' Units');
+                $('#accSumGrandPax').text(grandPax.toLocaleString() + ' Pax');
+
+                Object.keys(grouped).sort().forEach(name => {
+                    const data = grouped[name];
+                    const pName = name.toLowerCase();
+                    const grade = data.count > 50 ? "High Capacity" : (data.count > 20 ? "Mid Range" : "Boutique/Standard");
+                    const gradeColor = data.count > 50 ? "#1e40af" : (data.count > 20 ? "#0369a1" : "#475569");
+                    
+                    accSummaryBody.append(`
+                        <tr class="report-row" data-name="${pName}" data-rating="${propertyRatings[pName] || ''}" data-type="AccommodationSummary">
+                            <td style="font-weight: 800; color: var(--navy-deep);">${name}</td>
+                            <td style="font-weight: 700;">${data.types} Categories</td>
+                            <td style="font-weight: 900; color: var(--primary-color);">${data.count} Units</td>
+                            <td style="font-weight: 800; color: #059669;">${data.maxPax} Pax</td>
+                            <td>
+                                <span style="display:inline-block; padding: 2px 8px; border-radius: 4px; background: #f1f5f9; color: ${gradeColor}; font-size: 0.65rem; font-weight: 800; text-transform: uppercase;">${grade}</span>
+                            </td>
+                        </tr>
+                    `);
+                });
+            }
+
+            // 3. Dining Detail
             const diningBody = $('#diningRealBody').empty();
             if (report.foodAndBeverage && report.foodAndBeverage.length > 0) {
                 report.foodAndBeverage.forEach(h => {
+                    const pName = h.propertyName.toLowerCase();
                     diningBody.append(`
-                        <tr class="report-row" data-name="${h.propertyName.toLowerCase()}" data-type="Dining">
+                        <tr class="report-row" data-name="${pName}" data-rating="${propertyRatings[pName] || ''}" data-type="Dining">
                             <td style="font-weight: 700;">${h.propertyName}</td>
                             <td style="color: var(--navy-deep); font-weight: 600;">${h.facilityName}</td>
                             <td>${h.specialization}</td>
@@ -485,18 +661,52 @@
                 });
             }
 
-            // 4. Venue
+            // 4. Venue Detail
             const venueBody = $('#venueRealBody').empty();
             if (report.meetingsEvents && report.meetingsEvents.length > 0) {
                 report.meetingsEvents.forEach(h => {
+                    const pName = h.propertyName.toLowerCase();
                     venueBody.append(`
-                        <tr class="report-row" data-name="${h.propertyName.toLowerCase()}" data-type="Venue">
+                        <tr class="report-row" data-name="${pName}" data-rating="${propertyRatings[pName] || ''}" data-type="Venue">
                             <td style="font-weight: 700;">${h.propertyName}</td>
                             <td style="color: #8b5cf6; font-weight: 600;">${h.venueName}</td>
                             <td>${h.type}</td>
                             <td style="font-weight: 800; color: var(--navy-deep);">${h.seatingCapacity}</td>
                             <td style="font-weight: 700; color: #6366f1;">${h.standingCapacity}</td>
                             <td>${h.areaSqm}</td>
+                        </tr>
+                    `);
+                });
+            }
+
+            // 4b. Venue Summary
+            const venueSummaryBody = $('#venueSummaryRealBody').empty();
+            if (report.meetingsEvents && report.meetingsEvents.length > 0) {
+                const grouped = {};
+                report.meetingsEvents.forEach(h => {
+                    if (!grouped[h.propertyName]) grouped[h.propertyName] = { count: 0, seating: 0, standing: 0, area: 0 };
+                    grouped[h.propertyName].count += 1;
+                    grouped[h.propertyName].seating += h.seatingCapacity;
+                    grouped[h.propertyName].standing += h.standingCapacity;
+                    grouped[h.propertyName].area += h.areaSqm;
+                });
+
+                Object.keys(grouped).sort().forEach(name => {
+                    const data = grouped[name];
+                    const pName = name.toLowerCase();
+                    const grade = data.count > 5 ? "Convention Center" : (data.count > 2 ? "Professional Hub" : "Standard Venue");
+                    const gradeColor = data.count > 5 ? "#8b5cf6" : (data.count > 2 ? "#6366f1" : "#475569");
+
+                    venueSummaryBody.append(`
+                        <tr class="report-row" data-name="${pName}" data-rating="${propertyRatings[pName] || ''}" data-type="VenueSummary">
+                            <td style="font-weight: 800; color: var(--navy-deep);">${name}</td>
+                            <td style="font-weight: 700; color: #8b5cf6;">${data.count} Spaces</td>
+                            <td style="font-weight: 800; color: var(--navy-deep);">${data.seating.toLocaleString()}</td>
+                            <td style="font-weight: 700; color: #6366f1;">${data.standing.toLocaleString()}</td>
+                            <td style="font-weight: 700; color: #059669;">${data.area.toLocaleString()} m²</td>
+                            <td>
+                                <span style="display:inline-block; padding: 2px 8px; border-radius: 4px; background: #f5f3ff; color: ${gradeColor}; font-size: 0.65rem; font-weight: 800; text-transform: uppercase;">${grade}</span>
+                            </td>
                         </tr>
                     `);
                 });
@@ -511,6 +721,7 @@
                             <td style="font-weight: 800; color: var(--navy-deep);">${s.category}</td>
                             <td style="font-weight: 700; color: var(--primary-color);">${s.propertyCount}</td>
                             <td style="font-weight: 700;">${s.totalRooms.toLocaleString()}</td>
+                            <td style="font-weight: 700;">${s.totalBeds.toLocaleString()}</td>
                             <td>${s.avgRoomsPerProperty.toFixed(1)}</td>
                         </tr>
                     `);

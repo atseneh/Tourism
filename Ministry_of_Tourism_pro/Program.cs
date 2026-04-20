@@ -7,8 +7,8 @@ using Ministry_of_Tourism_pro.WebConstants;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
-builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
+builder.Services.AddControllersWithViews();
+//builder.Services.AddRazorPages();
 builder.Services.AddHttpContextAccessor();
 
 // Register HttpClient factory for API communication
@@ -33,7 +33,8 @@ builder.Services.AddAuthentication(CNET_WebConstantes.CookieScheme)
         options.Cookie.Name = CNET_WebConstantes.CookieScheme;
     });
 
-// Register Session
+// Register Session and Caching
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
