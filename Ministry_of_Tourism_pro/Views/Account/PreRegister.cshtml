@@ -207,19 +207,33 @@
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                    <div class="form-group">
-                        <label asp-for="Email" class="form-label">Email Address</label>
-                        <input asp-for="Email" class="form-control" placeholder="contact@org.com" />
-                        <span asp-validation-for="Email" class="validation-message"></span>
+                <div class="form-group">
+                    <label asp-for="Phone" class="form-label">Phone Number</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input asp-for="Phone" class="form-control" id="phone-input" placeholder="0911..." />
+                        <button type="button" id="btn-send-otp" class="btn-premium" style="width: 140px; margin: 0; padding: 0.5rem; font-size: 0.85rem; background: var(--navy-deep);">
+                            <i class="fas fa-sms" style="margin-right: 0.5rem;"></i>Send OTP
+                        </button>
                     </div>
-                    <div class="form-group">
-                        <label asp-for="Phone" class="form-label">Phone Number</label>
-                        <input asp-for="Phone" class="form-control" placeholder="0911..." />
-                        <span asp-validation-for="Phone" class="validation-message"></span>
+                    <span asp-validation-for="Phone" class="validation-message"></span>
+                </div>
+
+                <!-- OTP Verification Area -->
+                <div id="otp-verification-area" style="display: none; margin-bottom: 1.5rem; animation: fadeIn 0.3s ease;">
+                    <div class="form-group" style="background: #f0fdf4; padding: 1.25rem; border-radius: 18px; border: 1.5px solid #bbf7d0;">
+                        <label class="form-label" style="color: #166534; display: flex; justify-content: space-between;">
+                            <span>Verification Code</span>
+                            <span id="otp-timer" style="text-transform: none; color: #16a34a;"></span>
+                        </label>
+                        <div style="display: flex; gap: 0.75rem;">
+                            <input type="text" id="otp-code-input" class="form-control" placeholder="Enter 6-digits" maxlength="6" style="text-align: center; font-weight: 800; letter-spacing: 4px; font-size: 1.2rem; border-color: #86efac;" />
+                            <button type="button" id="btn-confirm-otp" class="btn-premium" style="width: 110px; margin: 0; background: #166534; border-radius: 12px;">Verify</button>
+                        </div>
+                        <p id="otp-status-msg" style="margin: 0.5rem 0 0; font-size: 0.75rem; font-weight: 600;"></p>
                     </div>
                 </div>
 
-                <button type="submit" class="btn-premium">
+                <button type="submit" id="btn-submit-reg" class="btn-premium" disabled style="opacity: 0.6; cursor: not-allowed;">
                     <span>Submit Registration</span>
                     <i class="fas fa-paper-plane" style="margin-left: 0.75rem; font-size: 0.85rem;"></i>
                 </button>
@@ -230,5 +244,114 @@
             </div>
         </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        let otpData = {
+            messageId: '',
+            vc: '',
+            phoneNumber: ''
+        };
+
+        $(document).ready(function() {
+            $('#btn-send-otp').click(function() {
+                const phone = $('#phone-input').val();
+                if (!phone || phone.length < 10) {
+                    alert('Please enter a valid phone number.');
+                    return;
+                }
+
+                const btn = $(this);
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+
+                $.ajax({
+                    url: '/Account/SendOTP',
+                    type: 'POST',
+                    data: { phoneNumber: phone },
+                    success: function(response) {
+                        if (response.success) {
+                            otpData.messageId = response.data.messageId;
+                            otpData.vc = response.data.code; // The 'code' from sendotp is used as 'vc' in verifyotp
+                            otpData.phoneNumber = phone;
+                            
+                            $('#otp-verification-area').slideDown();
+                            $('#otp-status-msg').css('color', '#16a34a').text('Code sent successfully to ' + phone);
+                            btn.html('<i class="fas fa-check"></i> Sent');
+                            startTimer(60);
+                        } else {
+                            alert('Error: ' + response.message);
+                            btn.prop('disabled', false).html('<i class="fas fa-sms"></i> Send OTP');
+                        }
+                    },
+                    error: function() {
+                        alert('System error occurred.');
+                        btn.prop('disabled', false).html('<i class="fas fa-sms"></i> Send OTP');
+                    }
+                });
+            });
+
+            $('#btn-confirm-otp').click(function() {
+                const code = $('#otp-code-input').val();
+                if (!code || code.length < 4) { // OTPs are usually 4-6 digits
+                    alert('Please enter the code correctly.');
+                    return;
+                }
+
+                const btn = $(this);
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+
+                const payload = {
+                    phoneNumber: otpData.phoneNumber,
+                    vc: otpData.vc,
+                    code: code,
+                    messageId: otpData.messageId
+                };
+
+                $.ajax({
+                    url: '/Account/VerifyOTP',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    success: function(response) {
+                        if (response.success) {
+                            $('#otp-status-msg').css('color', '#166534').text('Phone verified successfully!');
+                            $('#otp-verification-area').find('.form-group').css('background', '#dcfce7').css('border-color', '#22c55e');
+                            btn.hide();
+                            $('#otp-code-input').prop('disabled', true);
+                            $('#btn-send-otp').prop('disabled', true);
+                            $('#phone-input').prop('readonly', true);
+                            
+                            // Enable registration
+                            $('#btn-submit-reg').prop('disabled', false).css('opacity', '1').css('cursor', 'pointer');
+                        } else {
+                            alert('Verification failed: ' + response.message);
+                            btn.prop('disabled', false).text('Verify');
+                        }
+                    },
+                    error: function() {
+                        alert('System error occurred during verification.');
+                        btn.prop('disabled', false).text('Verify');
+                    }
+                });
+            });
+
+            function startTimer(duration) {
+                let timer = duration, minutes, seconds;
+                const display = $('#otp-timer');
+                const interval = setInterval(function () {
+                    minutes = parseInt(timer / 60, 10);
+                    seconds = parseInt(timer % 60, 10);
+
+                    seconds = seconds < 10 ? "0" + seconds : seconds;
+                    display.text("Resend in " + seconds + "s");
+
+                    if (--timer < 0) {
+                        clearInterval(interval);
+                        display.text("");
+                        $('#btn-send-otp').prop('disabled', false).html('<i class="fas fa-sms"></i> Resend Code');
+                    }
+                }, 1000);
+            }
+        });
+    </script>
 </body>
 </html>

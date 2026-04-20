@@ -80,9 +80,13 @@ namespace Ministry_of_Tourism_pro.Controllers
             { "BagScanner", CNET_WebConstantes.CAT_SECURITY_SAFETY },
             { "WalkThroughScanner", CNET_WebConstantes.CAT_SECURITY_SAFETY },
             { "HandScanner", CNET_WebConstantes.CAT_SECURITY_SAFETY },
+            { "ElectronicDoorlock", CNET_WebConstantes.CAT_SECURITY_SAFETY },
+            { "ElevatorFloorController", CNET_WebConstantes.CAT_SECURITY_SAFETY },
+            { "OncallDoctor", CNET_WebConstantes.CAT_SECURITY_SAFETY },
             { "ParkingSpacesCount", CNET_WebConstantes.CAT_TRANSPORT_PARKING },
             { "BusParkingCount", CNET_WebConstantes.CAT_TRANSPORT_PARKING },
-            { "ShuttleToCop", CNET_WebConstantes.CAT_TRANSPORT_PARKING },
+            { "ValetParking", CNET_WebConstantes.CAT_TRANSPORT_PARKING },
+            { "ParkingWithin100m", CNET_WebConstantes.CAT_TRANSPORT_PARKING },
             { "ShuttleToAirport", CNET_WebConstantes.CAT_TRANSPORT_PARKING },
             { "PublicTransportWithin500m", CNET_WebConstantes.CAT_TRANSPORT_PARKING },
             { "EvChargingPoints", CNET_WebConstantes.CAT_TRANSPORT_PARKING },
@@ -94,6 +98,10 @@ namespace Ministry_of_Tourism_pro.Controllers
             { "VipCheckIn", CNET_WebConstantes.CAT_ICT_GUEST_SERVICES },
             { "PassportScanner", CNET_WebConstantes.CAT_ICT_GUEST_SERVICES },
             { "CurrencyScanner", CNET_WebConstantes.CAT_ICT_GUEST_SERVICES },
+            { "OnlineOrderingSystem", CNET_WebConstantes.CAT_ICT_GUEST_SERVICES },
+            { "OnlineBookingSystem", CNET_WebConstantes.CAT_ICT_GUEST_SERVICES },
+            { "TableReservation", CNET_WebConstantes.CAT_ICT_GUEST_SERVICES },
+            { "IpTv", CNET_WebConstantes.CAT_ICT_GUEST_SERVICES },
             { "StandbyGeneratorCapacityKva", CNET_WebConstantes.CAT_UTILITIES_RESILIENCE },
             { "StandbyGeneratorCoverage", CNET_WebConstantes.CAT_UTILITIES_RESILIENCE },
             { "WaterTreatment", CNET_WebConstantes.CAT_UTILITIES_RESILIENCE },
@@ -307,7 +315,7 @@ namespace Ministry_of_Tourism_pro.Controllers
                         break;
 
                     case "transport_parking":
-                        await SyncInfrastructure(model, new[] { "ParkingSpacesCount", "BusParkingCount", "ShuttleToCop", "ShuttleToAirport", "PublicTransportWithin500m", "EvChargingPoints", "EvChargerTypes" });
+                        await SyncInfrastructure(model, new[] { "ParkingSpacesCount", "BusParkingCount", "ValetParking", "ParkingWithin100m", "ShuttleToAirport", "PublicTransportWithin500m", "EvChargingPoints", "EvChargerTypes" });
                         break;
 
                     case "ict_services":

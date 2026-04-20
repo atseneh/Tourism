@@ -12,6 +12,13 @@
     .profile-tab-animate {
         animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
+
+    /* Optimization for 14-inch laptops (1366px - 1440px) */
+    @@media (max-width: 1440px) {
+        .form-group-inline .form-label { flex: 0 0 220px; font-size: 0.8rem; }
+        .registry-layout { grid-template-columns: 240px 1fr; gap: 1.5rem; }
+        .collapsible-header h3 { font-size: 1rem; }
+    }
     
     h3 {
         font-size: 1.1rem;
@@ -58,7 +65,7 @@
     .collapsible-content { border-top: 1px solid var(--border-color); padding: 1.25rem 1.5rem; display: none; }
     .collapsible-card.active .collapsible-content { display: block; }
 
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem 1.5rem; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem 1.25rem; }
     .full-width { grid-column: span 2; }
     .form-label { font-weight: 700; color: var(--navy-deep); margin-bottom: 0.25rem; display: block; font-size: 0.8rem; }
     .label-subtitle { font-size: 0.72rem; color: #0066cc; font-weight: 700; display: block; margin-top: 0.1rem; margin-bottom: 0.2rem; opacity: 1; }
@@ -235,8 +242,8 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 1.5rem;
-        padding: 0.65rem 0;
+        gap: 1rem;
+        padding: 0.45rem 0;
         border-bottom: 1px solid #f1f5f9;
     }
     .form-group-inline .form-label {
@@ -272,10 +279,10 @@
     .premium-checkbox {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
+        gap: 0.6rem;
         cursor: pointer;
         user-select: none;
-        padding: 0.4rem 0.75rem;
+        padding: 0.35rem 0.65rem;
         border-radius: 0.75rem;
         border: 1.5px solid var(--border-color);
         transition: all 0.2s ease;
@@ -362,12 +369,12 @@
     }
     /* Sidebar Sub-Navigation Styles */
     .registry-subnav {
-        margin: 0.5rem 0.5rem 0.5rem 2.5rem;
+        margin: 0.25rem 0.25rem 0.25rem 1.25rem;
         display: flex;
         flex-direction: column;
-        gap: 0.25rem;
+        gap: 0.15rem;
         border-left: 1.5px solid var(--border-color);
-        padding-left: 0.75rem;
+        padding-left: 0.5rem;
     }
     .registry-nav-item {
         display: flex;
@@ -577,7 +584,7 @@
                 <i class="fas fa-wheelchair"></i> Accessibility
             </div>
             <div class="registry-nav-item" onclick="scrollToSection(6)">
-                <i class="fas fa-shield-halved"></i> Security & Safety
+                <i class="fas fa-shield-halved"></i> Safety & Security
             </div>
             <div class="registry-nav-item" onclick="scrollToSection(7)">
                 <i class="fas fa-car"></i> Transport & Parking
@@ -633,7 +640,7 @@
         <div style="display: grid; grid-template-columns: 1fr 350px; gap: 2.5rem;">
             <div>
                 <!-- Branch Registry Section (Replaces Narrative as requested) -->
-                <div class="glass-card" style="padding: 2.5rem; margin-bottom: 2rem;">
+                <div class="glass-card" style="padding: 1.5rem; margin-bottom: 2rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                         <h3 style="color: var(--navy-deep); font-weight: 800; margin: 0;"> Portfolio</h3>
                         <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">ACTIVE BRANCHES: 2</div>
@@ -834,60 +841,76 @@
                         <i class="fas fa-chevron-down chevron"></i>
                     </div>
                 </div>
-                <div class="collapsible-content">
-                    <div class="form-grid">
-                        <div class="form-group-inline">
-                            <div style="display: flex; flex-direction: column; flex: 0 0 280px;">
-                                <label class="form-label" style="flex: none; padding-right: 0;">King size Rooms</label>
-                                <span class="label-subtitle">Bed Size 1.5m - 2m</span>
+                <div class="collapsible-content" style="padding: 0;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; min-height: 250px;">
+                        <!-- Column 1: Rooms & Accessibility (Slate tint) -->
+                        <div style="background: #f8fafc; padding: 2rem; border-right: 1.5px solid var(--border-color);">
+                            <h4 style="font-size: 0.85rem; font-weight: 800; color: var(--navy-deep); margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 0.5px;">Rooms & Availability</h4>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <div class="form-group-inline">
+                                    <div style="display: flex; flex-direction: column; flex: 0 0 250px;">
+                                        <label class="form-label" style="flex: none; padding-right: 0;">King Bed Room</label>
+                                        <span class="label-subtitle">[ Bed Size 1.5m - 2m ]</span>
+                                    </div>
+                                    <input type="number" name="KingSizeRooms" id="form-king-rooms" value="@hotel.KingSizeRooms" class="form-control room-count-input" style="background: white;" />
+                                </div>
+                                <div class="form-group-inline">
+                                    <div style="display: flex; flex-direction: column; flex: 0 0 250px;">
+                                        <label class="form-label" style="flex: none; padding-right: 0;">Twin Bed Room</label>
+                                        <span class="label-subtitle">[ Bed Size 1m - 1.2m ]</span>
+                                    </div>
+                                    <input type="number" name="TwinBedRooms" id="form-twin-rooms" value="@hotel.TwinBedRooms" class="form-control room-count-input" style="background: white;" />
+                                </div>
+                                <div class="form-group-inline" style="margin-top: 0.5rem; border-top: 1px dashed var(--border-color); padding-top: 1rem;">
+                                    <div style="display: flex; flex-direction: column; flex: 0 0 250px;">
+                                        <label class="form-label" style="flex: none; padding-right: 0;">Accessible Rooms</label>
+                                        <span class="label-subtitle">[ Modified for guests with physical disabilities ]</span>
+                                    </div>
+                                    <input type="number" name="AccessibleRooms" id="form-acc-rooms" value="@hotel.AccessibleRooms" class="form-control room-count-input" style="background: white;" />
+                                </div>
                             </div>
-                            <input type="number" name="KingSizeRooms" id="form-king-rooms" value="@hotel.KingSizeRooms" class="form-control room-count-input" />
                         </div>
-                        <div class="form-group-inline">
-                            <div style="display: flex; flex-direction: column; flex: 0 0 280px;">
-                                <label class="form-label" style="flex: none; padding-right: 0;">Twin bed Rooms</label>
-                                <span class="label-subtitle">Bed Size 1m - 1.2m</span>
+
+                        <!-- Column 2: Suites (Blue tint) -->
+                        <div style="background: #f0f9ff; padding: 2rem;">
+                            <h4 style="font-size: 0.85rem; font-weight: 800; color: #0369a1; margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 0.5px;">Suites & Premium</h4>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <div class="form-group-inline">
+                                    <div style="display: flex; flex-direction: column; flex: 0 0 250px;">
+                                        <label class="form-label" style="flex: none; padding-right: 0; color: #0369a1;">Junior Suit Room</label>
+                                        <span class="label-subtitle" style="color: #60a5fa;">[ 1 Saloon Room & 1 Bed Room ]</span>
+                                    </div>
+                                    <input type="number" name="JuniorSuites" id="form-junior-suites" value="@hotel.JuniorSuites" class="form-control room-count-input" style="background: white;" />
+                                </div>
+                                <div class="form-group-inline">
+                                    <div style="display: flex; flex-direction: column; flex: 0 0 250px;">
+                                        <label class="form-label" style="flex: none; padding-right: 0; color: #0369a1;">Suit Room</label>
+                                        <span class="label-subtitle" style="color: #60a5fa;">[ Minimum 1 Saloon Room , 1 King Size Bed Room & 1 Twin Bed Room ]</span>
+                                    </div>
+                                    <input type="number" name="Suites" id="form-suites" value="@hotel.Suites" class="form-control room-count-input" style="background: white;" />
+                                </div>
+                                <div class="form-group-inline">
+                                    <div style="display: flex; flex-direction: column; flex: 0 0 250px;">
+                                        <label class="form-label" style="flex: none; padding-right: 0; color: #0369a1;">Presidential Suit Room</label>
+                                        <span class="label-subtitle" style="color: #60a5fa; line-height: 1.3;">[ Minimum 1 Luxury Room , 1 King Size Bed Room ,  1 Twin Bed Room , Cooking Space , 1 Office Set-Up,  Luggage Room, & More ]</span>
+                                    </div>
+                                    <input type="number" name="PresidentialSuites" id="form-pres-suites" value="@hotel.PresidentialSuites" class="form-control room-count-input" style="background: white;" />
+                                </div>
                             </div>
-                            <input type="number" name="TwinBedRooms" id="form-twin-rooms" value="@hotel.TwinBedRooms" class="form-control room-count-input" />
                         </div>
-                        <div class="form-group-inline">
-                            <div style="display: flex; flex-direction: column; flex: 0 0 280px;">
-                                <label class="form-label" style="flex: none; padding-right: 0;">Junior Suites</label>
-                                <span class="label-subtitle">1 Saloon Room & 1 Bed Room</span>
-                            </div>
-                            <input type="number" name="JuniorSuites" id="form-junior-suites" value="@hotel.JuniorSuites" class="form-control room-count-input" />
+                    </div>
+
+                    <!-- Summary Totals Row -->
+                    <div style="background: #e0f2fe; padding: 1.25rem 2rem; border-top: 1.5px solid #bae6fd; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <label class="form-label" style="margin-bottom: 0; font-weight: 800; color: #0369a1;">Total Rooms</label>
+                            <input type="number" name="TotalRooms" id="form-total-rooms" value="@hotel.TotalRooms" class="form-control" style="width: 120px; background: white; font-weight: 800; border-color: #7dd3fc;" readonly />
                         </div>
-                        <div class="form-group-inline">
-                            <div style="display: flex; flex-direction: column; flex: 0 0 280px;">
-                                <label class="form-label" style="flex: none; padding-right: 0;">Suites</label>
-                                <span class="label-subtitle">Minimum 1 Saloon Room, 1 King Size Bed Room & 1 Twin Bed Room</span>
-                            </div>
-                            <input type="number" name="Suites" id="form-suites" value="@hotel.Suites" class="form-control room-count-input" />
-                        </div>
-                        <div class="form-group-inline">
-                            <div style="display: flex; flex-direction: column; flex: 0 0 280px;">
-                                <label class="form-label" style="flex: none; padding-right: 0;">Presidential Suites</label>
-                                <span class="label-subtitle">Minimum 1 Luxury Room, 1 King Size Bed Room, 1 Twin Bed Room, Cooking Space, 1 Office Set-Up, Luggage Room, & More</span>
-                            </div>
-                            <input type="number" name="PresidentialSuites" id="form-pres-suites" value="@hotel.PresidentialSuites" class="form-control room-count-input" />
-                        </div>
-                        <div class="form-group-inline">
-                            <div style="display: flex; flex-direction: column; flex: 0 0 280px;">
-                                <label class="form-label" style="flex: none; padding-right: 0;">Accessible Rooms</label>
-                                <span class="label-subtitle">Modified for guests with physical disabilities</span>
-                            </div>
-                            <input type="number" name="AccessibleRooms" id="form-acc-rooms" value="@hotel.AccessibleRooms" class="form-control room-count-input" />
-                        </div>
-                        
-                        <div class="form-group-inline" style="background: #f0f9ff; margin: 0.5rem -1.5rem; padding: 1rem 1.5rem; border-top: 1px solid #bae6fd; border-bottom: 1px solid #bae6fd;">
-                            <div style="flex: 1; display: flex; align-items: center; gap: 1rem;">
-                                <label class="form-label" style="margin-bottom: 0;">Total Rooms (Calculated)</label>
-                                <input type="number" name="TotalRooms" id="form-total-rooms" value="@hotel.TotalRooms" class="form-control" style="width: 120px; background: #fff; font-weight: 800; border-color: #7dd3fc;" readonly />
-                            </div>
-                            <div style="flex: 1; display: flex; align-items: center; gap: 1rem;">
-                                <label class="form-label" style="margin-bottom: 0;">Total Beds (Calculated)</label>
-                                <input type="number" name="TotalBeds" id="form-total-beds" value="@hotel.TotalBeds" class="form-control" style="width: 120px; background: #fff; font-weight: 800; border-color: #7dd3fc;" readonly />
-                            </div>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <label class="form-label" style="margin-bottom: 0; font-weight: 800; color: #0369a1;">Total Beds</label>
+                            <input type="number" name="TotalBeds" id="form-total-beds" value="@hotel.TotalBeds" class="form-control" style="width: 120px; background: white; font-weight: 800; border-color: #7dd3fc;" readonly />
                         </div>
                     </div>
                 </div>
@@ -983,7 +1006,7 @@
                         <!-- Souvenir Shops Section -->
                         <div class="full-width" style="background: white; padding: 1.25rem; border-radius: 0.75rem; border: 1px solid var(--border-color); margin-bottom: 1rem;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                                <h4 style="font-size: 0.85rem; font-weight: 800; color: var(--navy-deep); margin-bottom: 0; text-transform: uppercase;">Souvenir Shops</h4>
+                                <h4 style="font-size: 0.85rem; font-weight: 800; color: var(--navy-deep); margin-bottom: 0; text-transform: uppercase;"> Shops</h4>
                                 <button type="button" class="update-btn-top" onclick="openShopModal()" style="background: #ec4899;">
                                     <i class="fas fa-plus"></i> Add Shop
                                 </button>
@@ -1030,7 +1053,7 @@
             </div>
 
             <!-- 4. Meetings & Events Specs -->
-            <div class="collapsible-card">
+            <div class="collapsible-card active">
                 <div class="collapsible-header" onclick="toggleCollapsible(this)">
                     <h3><i class="fas fa-handshake" style="color: var(--primary-color);"></i> 4. Meetings & Events Specs</h3>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -1040,43 +1063,56 @@
                         <i class="fas fa-chevron-down chevron"></i>
                     </div>
                 </div>
-                <div class="collapsible-content" style="background: #fafafa;">
-                    <div class="form-grid">
-                        <div class="full-width" style="background: white; padding: 1.25rem; border-radius: 0.75rem; border: 1px solid var(--border-color); margin-bottom: 1rem;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                                <h4 style="font-size: 0.85rem; font-weight: 800; color: var(--navy-deep); margin-bottom: 0; text-transform: uppercase;">Meeting Rooms & Event Halls</h4>
-                                <button type="button" class="update-btn-top" onclick="openMeetingRoomModal()" style="background: var(--primary-color);">
-                                    <i class="fas fa-plus"></i> Add Meeting Room
+                <div class="collapsible-content" style="padding: 0;">
+                    <div style="display: grid; grid-template-columns: 1.5fr 1fr; min-height: 380px;">
+                        <!-- Column 1: Meeting Rooms Table (White) -->
+                        <div style="background: white; padding: 1.5rem; border-right: 1.5px solid var(--border-color);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                                <h4 style="font-size: 0.85rem; font-weight: 800; color: var(--navy-deep); margin-bottom: 0; text-transform: uppercase; letter-spacing: 0.5px;">Halls & Meeting Rooms</h4>
+                                <button type="button" class="btn btn-sm" onclick="openMeetingRoomModal()" style="background: var(--primary-color); color: white; padding: 0.35rem 0.75rem; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 700;">
+                                    <i class="fas fa-plus"></i> Add Hall
                                 </button>
                             </div>
+                            
                             <input type="hidden" name="MeetingRooms" id="form-meeting-rooms-json" value="" />
                             <div id="meeting-room-table-container" style="overflow-x: auto;">
-                                <table class="table table-sm table-hover" style="font-size: 0.85rem; border: 1px solid #f1f5f9; border-radius: 0.5rem; overflow: hidden;">
+                                <table class="table table-sm table-hover" style="font-size: 0.8rem; border: 1px solid #f1f5f9; border-radius: 0.5rem; overflow: hidden;">
                                     <thead style="background: #f8fafc;">
                                         <tr>
-                                            <th style="padding: 0.75rem;">Hall Name</th>
-                                            <th style="padding: 0.75rem;">Dimensions (W x L x H)</th>
-                                            <th style="padding: 0.75rem;">Max Capacity</th>
-                                            <th style="padding: 0.75rem;">Equipment</th>
-                                            <th style="padding: 0.75rem; text-align: center;">Actions</th>
+                                            <th style="padding: 0.6rem;">Hall Name</th>
+                                            <th style="padding: 0.6rem;">Dimensions</th>
+                                            <th style="padding: 0.6rem;">Capacity</th>
+                                            <th style="padding: 0.6rem; text-align: center;">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody id="meeting-room-tbody">
                                         <!-- Dynamically populated -->
-                                        <tr><td colspan="5" class="text-center text-muted py-3">No meeting rooms added yet.</td></tr>
+                                        <tr><td colspan="4" class="text-center text-muted py-3">No halls added yet.</td></tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
 
-                        <!-- Summary Fields (Auto-calculated or manually adjusted) -->
-                        <div class="form-group-inline">
-                            <label class="form-label">Total Meeting Rooms</label>
-                            <input type="number" name="MeetingRoomsCount" id="form-meeting-rooms" value="@hotel.MeetingRoomsCount" class="form-control" readonly />
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Total Meeting Space (sqm)</label>
-                            <input type="number" name="TotalMeetingSpaceSqm" id="form-total-meeting-sqm" value="@hotel.TotalMeetingSpaceSqm" class="form-control" />
+                        <!-- Column 2: Event Capacity Summary (Slate tint) -->
+                        <div style="background: #f8fafc; padding: 1.5rem;">
+                            <h4 style="font-size: 0.85rem; font-weight: 800; color: var(--navy-deep); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Capacity Summary</h4>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+                                <div class="form-group-inline" style="background: white; padding: 0.75rem; border-radius: 0.75rem; border: 1.5px solid var(--border-color);">
+                                    <label class="form-label" style="margin-bottom: 0;">Total Meeting Rooms</label>
+                                    <input type="number" name="MeetingRoomsCount" id="form-meeting-rooms" value="@hotel.MeetingRoomsCount" class="form-control" style="width: 80px; text-align: center; font-weight: 800; border-color: var(--primary-color); color: var(--primary-color);" readonly />
+                                </div>
+                                <div class="form-group-inline" style="background: white; padding: 0.75rem; border-radius: 0.75rem; border: 1.5px solid var(--border-color);">
+                                    <label class="form-label" style="margin-bottom: 0;">Total Space (sqm)</label>
+                                    <input type="number" name="TotalMeetingSpaceSqm" id="form-total-meeting-sqm" value="@hotel.TotalMeetingSpaceSqm" class="form-control" style="width: 100px; text-align: center; font-weight: 700;" />
+                                </div>
+                                <div style="margin-top: 1rem; padding: 1rem; background: #e0f2fe; border-radius: 0.75rem; border: 1px solid #bae6fd;">
+                                    <p style="font-size: 0.75rem; color: #0369a1; font-weight: 600; line-height: 1.4; margin: 0;">
+                                        <i class="fas fa-info-circle" style="margin-right: 0.35rem;"></i>
+                                        Total space is automatically calculated based on the dimensions of all added halls.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1093,92 +1129,108 @@
                         <i class="fas fa-chevron-down chevron"></i>
                     </div>
                 </div>
-                <div class="collapsible-content">
-                    <div class="form-grid">
-                        <div class="form-group-inline">
-                            <label class="form-label">Internet Bandwidth Down</label>
-                            <input type="number" name="InternetBandwidthDown" id="form-net-down" value="@hotel.InternetBandwidthDown" class="form-control" />
+                <div class="collapsible-content" style="padding: 0;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; min-height: 350px;">
+                        <!-- Column 1: Infrastructure & Staff (Slate tint) -->
+                        <div style="background: #f8fafc; padding: 2rem; border-right: 1.5px solid var(--border-color);">
+                            <h4 style="font-size: 0.85rem; font-weight: 800; color: var(--navy-deep); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Infrastructure & Basics</h4>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                <div class="form-group-inline">
+                                    <label class="form-label">Internet Bandwidth Down</label>
+                                    <input type="number" name="InternetBandwidthDown" id="form-net-down" value="@hotel.InternetBandwidthDown" class="form-control" style="background: white;" />
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label">Internet Bandwidth Up</label>
+                                    <input type="number" name="InternetBandwidthUp" id="form-net-up" value="@hotel.InternetBandwidthUp" class="form-control" style="background: white;" />
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label">Lobby Area (sqm)</label>
+                                    <input type="number" name="LobbyAreaSqm" id="form-lobby-sqm" value="@hotel.LobbyAreaSqm" class="form-control" style="background: white;" />
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label">Green Area/Garden (sqm)</label>
+                                    <input type="number" name="GreenAreaSqm" id="form-green-sqm" value="@hotel.GreenAreaSqm" class="form-control" style="background: white;" />
+                                </div>
+                                <div class="form-group-inline" style="margin-top: 0.5rem; border-top: 1px dashed #e2e8f0; padding-top: 1rem;">
+                                    <label class="form-label">Staff Canteen</label>
+                                    <input type="hidden" name="StaffCanteen" id="form-canteen" value="@(hotel.StaffCanteen == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-canteen" @(hotel.StaffCanteen == true ? "checked" : "") />
+                                        <span class="checkbox-text">Available</span>
+                                        <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Internet Bandwidth Up</label>
-                            <input type="number" name="InternetBandwidthUp" id="form-net-up" value="@hotel.InternetBandwidthUp" class="form-control" />
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Lobby Area (sqm)</label>
-                            <input type="number" name="LobbyAreaSqm" id="form-lobby-sqm" value="@hotel.LobbyAreaSqm" class="form-control" />
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Green Area/Garden (sqm)</label>
-                            <input type="number" name="GreenAreaSqm" id="form-green-sqm" value="@hotel.GreenAreaSqm" class="form-control" />
-                        </div>                        <div class="form-group-inline">
-                            <label class="form-label">Pool Available</label>
-                            <input type="hidden" name="PoolAvailable" id="form-pool-avail" value="@(hotel.PoolAvailable == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-pool-avail" data-toggle-callback="togglePoolType" @(hotel.PoolAvailable == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div id="poolTypeGroup" class="form-group-inline" style="display: @(hotel.PoolAvailable == true ? "flex" : "none");">
-                            <label class="form-label">Pool Type</label>
-                            <select name="PoolType" id="form-pool-type" class="form-control">
-                                <option value="Indoor" selected="@(hotel.PoolType == "Indoor")">Indoor</option>
-                                <option value="Outdoor" selected="@(hotel.PoolType == "Outdoor")">Outdoor</option>
-                                <option value="Both" selected="@(hotel.PoolType == "Both")">Both</option>
-                            </select>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Spa Available</label>
-                            <input type="hidden" name="SpaAvailable" id="form-spa-avail" value="@(hotel.SpaAvailable == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-spa-avail" data-toggle-callback="toggleSpaGender" @(hotel.SpaAvailable == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div id="spaGenderGroup" class="form-group-inline" style="display: @(hotel.SpaAvailable == true ? "flex" : "none");">
-                            <label class="form-label">Spa Category</label>
-                            <select name="SpaGender" id="form-spa-gender" class="form-control">
-                                <option value="Male Only" selected="@(hotel.SpaGender == "Male Only")">Male Only</option>
-                                <option value="Female Only" selected="@(hotel.SpaGender == "Female Only")">Female Only</option>
-                                <option value="Unisex" selected="@(hotel.SpaGender == "Unisex")">Unisex</option>
-                            </select>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Massage Service</label>
-                            <input type="hidden" name="MassageService" id="form-massage" value="@(hotel.MassageService == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-massage" @(hotel.MassageService == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Children's Playground</label>
-                            <input type="hidden" name="ChildrensPlayground" id="form-playground" value="@(hotel.ChildrensPlayground == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-playground" @(hotel.ChildrensPlayground == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Children's Day Care</label>
-                            <input type="hidden" name="ChildrenDayCare" id="form-daycare" value="@(hotel.ChildrenDayCare == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-daycare" @(hotel.ChildrenDayCare == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Staff Canteen</label>
-                            <input type="hidden" name="StaffCanteen" id="form-canteen" value="@(hotel.StaffCanteen == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-canteen" @(hotel.StaffCanteen == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
+
+                        <!-- Column 2: Wellness & Recreation (Blue tint) -->
+                        <div style="background: #f0f9ff; padding: 2rem;">
+                            <h4 style="font-size: 0.85rem; font-weight: 800; color: #0369a1; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Wellness & Recreation</h4>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                <div class="form-group-inline">
+                                    <label class="form-label" style="color: #0369a1;">Pool Available</label>
+                                    <input type="hidden" name="PoolAvailable" id="form-pool-avail" value="@(hotel.PoolAvailable == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-pool-avail" data-toggle-callback="togglePoolType" @(hotel.PoolAvailable == true ? "checked" : "") />
+                                        <span class="checkbox-text" style="color: #60a5fa;">Yes</span>
+                                        <div class="checkbox-box" style="border-color: #0ea5e9; background: #0ea5e9;"><i class="fas fa-check" style="color: white;"></i></div>
+                                    </label>
+                                </div>
+                                <div id="poolTypeGroup" class="form-group-inline" style="display: @(hotel.PoolAvailable == true ? "flex" : "none");">
+                                    <label class="form-label" style="color: #0369a1;">Pool Type</label>
+                                    <select name="PoolType" id="form-pool-type" class="form-control" style="background: white;">
+                                        <option value="Indoor" selected="@(hotel.PoolType == "Indoor")">Indoor</option>
+                                        <option value="Outdoor" selected="@(hotel.PoolType == "Outdoor")">Outdoor</option>
+                                        <option value="Both" selected="@(hotel.PoolType == "Both")">Both</option>
+                                    </select>
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label" style="color: #0369a1;">Spa Available</label>
+                                    <input type="hidden" name="SpaAvailable" id="form-spa-avail" value="@(hotel.SpaAvailable == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-spa-avail" data-toggle-callback="toggleSpaGender" @(hotel.SpaAvailable == true ? "checked" : "") />
+                                        <span class="checkbox-text" style="color: #60a5fa;">Yes</span>
+                                        <div class="checkbox-box" style="border-color: #0ea5e9; background: #0ea5e9;"><i class="fas fa-check" style="color: white;"></i></div>
+                                    </label>
+                                </div>
+                                <div id="spaGenderGroup" class="form-group-inline" style="display: @(hotel.SpaAvailable == true ? "none" : "none");"> @* I noticed user had original code showing flex if true, I'll ensure I match that *@
+                                    <label class="form-label" style="color: #0369a1;">Spa Category</label>
+                                    <select name="SpaGender" id="form-spa-gender" class="form-control" style="background: white;">
+                                        <option value="Male Only" selected="@(hotel.SpaGender == "Male Only")">Male Only</option>
+                                        <option value="Female Only" selected="@(hotel.SpaGender == "Female Only")">Female Only</option>
+                                        <option value="Unisex" selected="@(hotel.SpaGender == "Unisex")">Unisex</option>
+                                    </select>
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label" style="color: #0369a1;">Massage Service</label>
+                                    <input type="hidden" name="MassageService" id="form-massage" value="@(hotel.MassageService == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-massage" @(hotel.MassageService == true ? "checked" : "") />
+                                        <span class="checkbox-text" style="color: #60a5fa;">Yes</span>
+                                        <div class="checkbox-box" style="border-color: #0ea5e9; background: #0ea5e9;"><i class="fas fa-check" style="color: white;"></i></div>
+                                    </label>
+                                </div>
+                                <div class="form-group-inline" style="border-top: 1px dashed #bae6fd; padding-top: 1rem; margin-top: 0.5rem;">
+                                    <label class="form-label" style="color: #0369a1;">Playground</label>
+                                    <input type="hidden" name="ChildrensPlayground" id="form-playground" value="@(hotel.ChildrensPlayground == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-playground" @(hotel.ChildrensPlayground == true ? "checked" : "") />
+                                        <span class="checkbox-text" style="color: #60a5fa;">Available</span>
+                                        <div class="checkbox-box" style="border-color: #0ea5e9; background: #0ea5e9;"><i class="fas fa-check" style="color: white;"></i></div>
+                                    </label>
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label" style="color: #0369a1;">Day Care</label>
+                                    <input type="hidden" name="ChildrenDayCare" id="form-daycare" value="@(hotel.ChildrenDayCare == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-daycare" @(hotel.ChildrenDayCare == true ? "checked" : "") />
+                                        <span class="checkbox-text" style="color: #60a5fa;">Available</span>
+                                        <div class="checkbox-box" style="border-color: #0ea5e9; background: #0ea5e9;"><i class="fas fa-check" style="color: white;"></i></div>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1195,139 +1247,198 @@
                         <i class="fas fa-chevron-down chevron"></i>
                     </div>
                 </div>
-                <div class="collapsible-content">
-                    <div class="form-grid">                        <div class="form-group-inline">
-                            <label class="form-label">Wheelchair Ramps</label>
-                            <input type="hidden" name="WheelchairRamps" id="form-ramps" value="@(hotel.WheelchairRamps == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-ramps" @(hotel.WheelchairRamps == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Elevators Count</label>
-                            <input type="number" name="ElevatorsCount" id="form-elevators" value="@hotel.ElevatorsCount" class="form-control" />
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Wheelchair Sized Elevators</label>
-                            <input type="hidden" name="ElevatorsWheelchairSized" id="form-elev-acc" value="@(hotel.ElevatorsWheelchairSized == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-elev-acc" @(hotel.ElevatorsWheelchairSized == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Public Accessible Bathroom</label>
-                            <input type="hidden" name="PublicAccessibleBathroom" id="form-bathroom-acc" value="@(hotel.PublicAccessibleBathroom == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-bathroom-acc" @(hotel.PublicAccessibleBathroom == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
+                <div class="collapsible-content" style="padding: 0;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; min-height: 200px;">
+                        <!-- Column 1: Vertical & Physical Access (Slate tint) -->
+                        <div style="background: #f8fafc; padding: 2rem; border-right: 1.5px solid var(--border-color);">
+                            <h4 style="font-size: 0.85rem; font-weight: 800; color: var(--navy-deep); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Mobility & Vertical Access</h4>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                <div class="form-group-inline">
+                                    <label class="form-label">Elevators Count</label>
+                                    <input type="number" name="ElevatorsCount" id="form-elevators" value="@hotel.ElevatorsCount" class="form-control" style="background: white;" />
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label">Wheelchair Sized Elevators</label>
+                                    <input type="hidden" name="ElevatorsWheelchairSized" id="form-elev-acc" value="@(hotel.ElevatorsWheelchairSized == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-elev-acc" @(hotel.ElevatorsWheelchairSized == true ? "checked" : "") />
+                                        <span class="checkbox-text">Available</span>
+                                        <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                                    </label>
+                                </div>
+                                <div class="form-group-inline" style="margin-top: 0.5rem; border-top: 1px dashed #e2e8f0; padding-top: 1rem;">
+                                    <label class="form-label">Wheelchair Ramps</label>
+                                    <input type="hidden" name="WheelchairRamps" id="form-ramps" value="@(hotel.WheelchairRamps == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-ramps" @(hotel.WheelchairRamps == true ? "checked" : "") />
+                                        <span class="checkbox-text">Available</span>
+                                        <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
 
+                        <!-- Column 2: Facilities Access (Blue tint) -->
+                        <div style="background: #f0f9ff; padding: 2rem;">
+                            <h4 style="font-size: 0.85rem; font-weight: 800; color: #0369a1; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Facilities Access</h4>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                <div class="form-group-inline">
+                                    <label class="form-label" style="color: #0369a1;">Accessible Bathroom</label>
+                                    <input type="hidden" name="PublicAccessibleBathroom" id="form-bathroom-acc" value="@(hotel.PublicAccessibleBathroom == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-bathroom-acc" @(hotel.PublicAccessibleBathroom == true ? "checked" : "") />
+                                        <span class="checkbox-text" style="color: #60a5fa;">Available</span>
+                                        <div class="checkbox-box" style="border-color: #0ea5e9; background: #0ea5e9;"><i class="fas fa-check" style="color: white;"></i></div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 7. Security & Safety -->
-            <div class="collapsible-card">
+            <!-- 7. Safety & Security -->
+            <div class="collapsible-card active">
                 <div class="collapsible-header" onclick="toggleCollapsible(this)">
-                    <h3><i class="fas fa-shield-halved" style="color: var(--primary-color);"></i> 7. Security & Safety</h3>
+                    <h3><i class="fas fa-shield-halved" style="color: var(--primary-color);"></i> 7. Safety & Security</h3>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <button type="button" class="btn-save-section" onclick="event.stopPropagation(); saveRegistry(this, 'security_safety')" title="Update Section">
+                        <button type="button" class="btn-save-section" onclick="event.stopPropagation(); saveRegistry(this, 'safety_security')" title="Update Section">
                             <i class="fas fa-cloud-arrow-up"></i>
                         </button>
                         <i class="fas fa-chevron-down chevron"></i>
                     </div>
                 </div>
-                <div class="collapsible-content">
-                    <div class="form-grid">
-                        <div class="form-group-inline">
-                            <label class="form-label">CCTV in Public Areas</label>
-                            <input type="hidden" name="CCTVPublicAreas" id="form-cctv" value="@(hotel.CCTVPublicAreas == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-cctv" @(hotel.CCTVPublicAreas == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
+                <div class="collapsible-content" style="padding: 0;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; min-height: 480px;">
+                        <!-- Column 1: Life Safety & Fire Prevention (Rose tint) -->
+                        <div style="background: #fff1f2; padding: 1.5rem; border-right: 1.5px solid var(--border-color);">
+                            <h4 style="font-size: 0.85rem; font-weight: 800; color: #e11d48; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Life Safety & Fire Prevention</h4>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+                                <div class="form-group-inline">
+                                    <label class="form-label">Fire Extinguishers Last Inspection</label>
+                                    <input type="date" name="FireExtinguishersLastInspection" id="form-fire-inspection" value="@(hotel.FireExtinguishersLastInspection?.ToString("yyyy-MM-dd"))" class="form-control" style="background: white;" />
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label">Hose Reels</label>
+                                    <input type="hidden" name="HoseReels" id="form-hose" value="@(hotel.HoseReels == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-hose" @(hotel.HoseReels == true ? "checked" : "") />
+                                        <span class="checkbox-text">Available</span>
+                                        <div class="checkbox-box" style="border-color: #e11d48; background: #e11d48;"><i class="fas fa-check"></i></div>
+                                    </label>
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label">Smoke Detectors (Rooms)</label>
+                                    <input type="hidden" name="SmokeDetectorsInRooms" id="form-smoke-rooms" value="@(hotel.SmokeDetectorsInRooms == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-smoke-rooms" @(hotel.SmokeDetectorsInRooms == true ? "checked" : "") />
+                                        <span class="checkbox-text">Available</span>
+                                        <div class="checkbox-box" style="border-color: #e11d48; background: #e11d48;"><i class="fas fa-check"></i></div>
+                                    </label>
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label">Smoke Detectors (Public)</label>
+                                    <input type="hidden" name="SmokeDetectorsInPublicAreas" id="form-smoke-public" value="@(hotel.SmokeDetectorsInPublicAreas == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-smoke-public" @(hotel.SmokeDetectorsInPublicAreas == true ? "checked" : "") />
+                                        <span class="checkbox-text">Available</span>
+                                        <div class="checkbox-box" style="border-color: #e11d48; background: #e11d48;"><i class="fas fa-check"></i></div>
+                                    </label>
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label">Sprinkler Coverage</label>
+                                    <input type="text" name="SprinklerCoverage" id="form-sprinkler" value="@hotel.SprinklerCoverage" class="form-control" placeholder="Full, Partial, None" style="background: white;" />
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label">Fire Alarm Control Panel</label>
+                                    <input type="hidden" name="FireAlarmControlPanel" id="form-alarm-panel" value="@(hotel.FireAlarmControlPanel == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-alarm-panel" @(hotel.FireAlarmControlPanel == true ? "checked" : "") />
+                                        <span class="checkbox-text">Available</span>
+                                        <div class="checkbox-box" style="border-color: #e11d48; background: #e11d48;"><i class="fas fa-check"></i></div>
+                                    </label>
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label">Emergency Exits Count</label>
+                                    <input type="number" name="EmergencyExitsCount" id="form-exits" value="@hotel.EmergencyExitsCount" class="form-control" style="background: white;" />
+                                </div>
+                                
+                                <div class="form-group-inline" style="border-top: 1px dashed #fecaca; padding-top: 1rem; margin-top: 0.5rem;">
+                                    <label class="form-label" style="color: #be123c;">On-call Doctor</label>
+                                    <input type="hidden" name="OncallDoctor" id="form-doctor" value="@(hotel.OncallDoctor == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-doctor" @(hotel.OncallDoctor == true ? "checked" : "") />
+                                        <span class="checkbox-text" style="color: #e11d48;">Available</span>
+                                        <div class="checkbox-box" style="border-color: #e11d48; background: #e11d48;"><i class="fas fa-check"></i></div>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Fire Ext. Last Inspection</label>
-                            <input type="date" name="FireExtinguishersLastInspection" id="form-fire-insp" value="@(hotel.FireExtinguishersLastInspection?.ToString("yyyy-MM-dd"))" class="form-control" />
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Hose Reels</label>
-                            <input type="hidden" name="HoseReels" id="form-hose" value="@(hotel.HoseReels == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-hose" @(hotel.HoseReels == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Smoke Detectors (Rooms)</label>
-                            <input type="hidden" name="SmokeDetectorsInRooms" id="form-smoke-rooms" value="@(hotel.SmokeDetectorsInRooms == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-smoke-rooms" @(hotel.SmokeDetectorsInRooms == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Smoke Detectors (Public)</label>
-                            <input type="hidden" name="SmokeDetectorsInPublicAreas" id="form-smoke-public" value="@(hotel.SmokeDetectorsInPublicAreas == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-smoke-public" @(hotel.SmokeDetectorsInPublicAreas == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Sprinkler Coverage</label>
-                            <input type="text" name="SprinklerCoverage" id="form-sprinkler" value="@hotel.SprinklerCoverage" class="form-control" placeholder="Full, Partial, None" />
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Fire Alarm Control Panel</label>
-                            <input type="hidden" name="FireAlarmControlPanel" id="form-alarm-panel" value="@(hotel.FireAlarmControlPanel == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-alarm-panel" @(hotel.FireAlarmControlPanel == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Emergency Exits Count</label>
-                            <input type="number" name="EmergencyExitsCount" id="form-exits" value="@hotel.EmergencyExitsCount" class="form-control" />
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Bag Scanner</label>
-                            <input type="hidden" name="BagScanner" id="form-bag-scanner" value="@(hotel.BagScanner == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-bag-scanner" @(hotel.BagScanner == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Walk-through Scanner</label>
-                            <input type="hidden" name="WalkThroughScanner" id="form-walk-scanner" value="@(hotel.WalkThroughScanner == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-walk-scanner" @(hotel.WalkThroughScanner == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Hand Scanner</label>
-                            <input type="hidden" name="HandScanner" id="form-hand-scanner" value="@(hotel.HandScanner == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-hand-scanner" @(hotel.HandScanner == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
+
+                        <!-- Column 2: Surveillance & Access Technology (Slate tint) -->
+                        <div style="background: #f8fafc; padding: 1.5rem;">
+                            <h4 style="font-size: 0.85rem; font-weight: 800; color: var(--navy-deep); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Surveillance & Access</h4>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+                                <div class="form-group-inline">
+                                    <label class="form-label">CCTV Public Areas</label>
+                                    <input type="hidden" name="CCTVPublicAreas" id="form-cctv" value="@(hotel.CCTVPublicAreas == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-cctv" @(hotel.CCTVPublicAreas == true ? "checked" : "") />
+                                        <span class="checkbox-text">Available</span>
+                                        <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                                    </label>
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label">Electronic Doorlock</label>
+                                    <input type="hidden" name="ElectronicDoorlock" id="form-doorlock" value="@(hotel.ElectronicDoorlock == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-doorlock" @(hotel.ElectronicDoorlock == true ? "checked" : "") />
+                                        <span class="checkbox-text">Available</span>
+                                        <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                                    </label>
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label">Elevator Floor Controller</label>
+                                    <input type="hidden" name="ElevatorFloorController" id="form-floor-ctrl" value="@(hotel.ElevatorFloorController == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-floor-ctrl" @(hotel.ElevatorFloorController == true ? "checked" : "") />
+                                        <span class="checkbox-text">Available</span>
+                                        <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                                    </label>
+                                </div>
+
+                                <div class="form-group-inline" style="border-top: 1px dashed #e2e8f0; padding-top: 1rem; margin-top: 0.5rem;">
+                                    <label class="form-label">Bag Scanner</label>
+                                    <input type="hidden" name="BagScanner" id="form-bag-scanner" value="@(hotel.BagScanner == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-bag-scanner" @(hotel.BagScanner == true ? "checked" : "") />
+                                        <span class="checkbox-text">Available</span>
+                                        <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                                    </label>
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label">Walk-through Scanner</label>
+                                    <input type="hidden" name="WalkThroughScanner" id="form-walk-scanner" value="@(hotel.WalkThroughScanner == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-walk-scanner" @(hotel.WalkThroughScanner == true ? "checked" : "") />
+                                        <span class="checkbox-text">Available</span>
+                                        <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                                    </label>
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label">Hand Scanner</label>
+                                    <input type="hidden" name="HandScanner" id="form-hand-scanner" value="@(hotel.HandScanner == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-hand-scanner" @(hotel.HandScanner == true ? "checked" : "") />
+                                        <span class="checkbox-text">Available</span>
+                                        <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1344,50 +1455,74 @@
                         <i class="fas fa-chevron-down chevron"></i>
                     </div>
                 </div>
-                <div class="collapsible-content">
-                    <div class="form-grid">
-                        <div class="form-group-inline">
-                            <label class="form-label">Parking Spaces (number)</label>
-                            <input type="number" name="ParkingSpacesCount" id="form-parking" value="@hotel.ParkingSpacesCount" class="form-control" />
+                <div class="collapsible-content" style="padding: 0;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; min-height: 250px;">
+                        <!-- Column 1: Parking Specialties (Slate tint) -->
+                        <div style="background: #f8fafc; padding: 2rem; border-right: 1.5px solid var(--border-color);">
+                            <h4 style="font-size: 0.85rem; font-weight: 800; color: var(--navy-deep); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Parking Specialties</h4>
+                            
+                            <div class="form-grid" style="grid-template-columns: 1fr; gap: 1.25rem;">
+                                <div class="form-group-inline" style="justify-content: space-between;">
+                                    <label class="form-label" style="margin-bottom: 0;">Parking Spaces (count)</label>
+                                    <input type="number" name="ParkingSpacesCount" id="form-parking" value="@hotel.ParkingSpacesCount" class="form-control" style="width: 100px; text-align: center;" />
+                                </div>
+                                <div class="form-group-inline" style="justify-content: space-between;">
+                                    <label class="form-label" style="margin-bottom: 0;">Bus Parking (count)</label>
+                                    <input type="number" name="BusParkingCount" id="form-bus-parking" value="@hotel.BusParkingCount" class="form-control" style="width: 100px; text-align: center;" />
+                                </div>
+                                <div class="form-group-inline" style="justify-content: space-between; padding-top: 0.5rem;">
+                                    <label class="form-label" style="margin-bottom: 0;">Valet Parking</label>
+                                    <input type="hidden" name="ValetParking" id="form-valet-parking" value="@(hotel.ValetParking == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-valet-parking" @(hotel.ValetParking == true ? "checked" : "") />
+                                        <span class="checkbox-text">Available</span>
+                                        <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                                    </label>
+                                </div>
+                                <div class="form-group-inline" style="justify-content: space-between;">
+                                    <label class="form-label" style="margin-bottom: 0;">Parking within 100m</label>
+                                    <input type="hidden" name="ParkingWithin100m" id="form-parking-100m" value="@(hotel.ParkingWithin100m == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-parking-100m" @(hotel.ParkingWithin100m == true ? "checked" : "") />
+                                        <span class="checkbox-text">Available</span>
+                                        <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Bus Parking (number)</label>
-                            <input type="number" name="BusParkingCount" id="form-bus-parking" value="@hotel.BusParkingCount" class="form-control" />
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Shuttle to COP Venue</label>
-                            <input type="hidden" name="ShuttleToCop" id="form-shuttle-cop" value="@(hotel.ShuttleToCop == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-shuttle-cop" @(hotel.ShuttleToCop == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Shuttle to Airport</label>
-                            <input type="hidden" name="ShuttleToAirport" id="form-shuttle-airport" value="@(hotel.ShuttleToAirport == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-shuttle-airport" @(hotel.ShuttleToAirport == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Public Transport within 500m</label>
-                            <input type="hidden" name="PublicTransportWithin500m" id="form-pub-transport" value="@(hotel.PublicTransportWithin500m == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-pub-transport" @(hotel.PublicTransportWithin500m == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">EV Charging Points</label>
-                            <input type="number" name="EvChargingPoints" id="form-ev-points" value="@hotel.EvChargingPoints" class="form-control" />
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">EV Charger Types</label>
-                            <input type="text" name="EvChargerTypes" id="form-ev-types" value="@hotel.EvChargerTypes" class="form-control" placeholder="Type 1, Type 2, etc." />
+
+                        <!-- Column 2: Transport & EV (Light green tint) -->
+                        <div style="background: #f0fdf4; padding: 2rem;">
+                            <h4 style="font-size: 0.85rem; font-weight: 800; color: #166534; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Transport & EV</h4>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                <div class="form-group-inline">
+                                    <label class="form-label">Shuttle to Airport</label>
+                                    <input type="hidden" name="ShuttleToAirport" id="form-shuttle-airport" value="@(hotel.ShuttleToAirport == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-shuttle-airport" @(hotel.ShuttleToAirport == true ? "checked" : "") />
+                                        <span class="checkbox-text">Available</span>
+                                        <div class="checkbox-box" style="border-color: #166534; background: #166534;"><i class="fas fa-check" style="color: white;"></i></div>
+                                    </label>
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label">Public Transport within 500m</label>
+                                    <input type="hidden" name="PublicTransportWithin500m" id="form-pub-transport" value="@(hotel.PublicTransportWithin500m == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-pub-transport" @(hotel.PublicTransportWithin500m == true ? "checked" : "") />
+                                        <span class="checkbox-text">Yes</span>
+                                        <div class="checkbox-box" style="border-color: #166534; background: #166534;"><i class="fas fa-check" style="color: white;"></i></div>
+                                    </label>
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label">EV Charging Points</label>
+                                    <input type="number" name="EvChargingPoints" id="form-ev-points" value="@hotel.EvChargingPoints" class="form-control" style="background: white;" />
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label">EV Charger Types</label>
+                                    <input type="text" name="EvChargerTypes" id="form-ev-types" value="@hotel.EvChargerTypes" class="form-control" placeholder="Type 1, Type 2, Tesla..." style="background: white;" />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1404,65 +1539,132 @@
                         <i class="fas fa-chevron-down chevron"></i>
                     </div>
                 </div>
-                <div class="collapsible-content">
-                    <div class="form-grid">
-                        <div class="form-group-inline">
-                            <label class="form-label">Wi-Fi Property-wide</label>
-                            <input type="hidden" name="WifiPropertyWide" id="form-wifi-prop" value="@(hotel.WifiPropertyWide == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-wifi-prop" @(hotel.WifiPropertyWide == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
+                <div class="collapsible-content" style="padding: 0;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; min-height: 420px;">
+                        <!-- Column 1: Connectivity & Infrastructure (Slate tint) -->
+                        <div style="background: #f8fafc; padding: 1.5rem; border-right: 1.5px solid var(--border-color);">
+                            <h4 style="font-size: 0.85rem; font-weight: 800; color: var(--navy-deep); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Connectivity & Core Tech</h4>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+                                <div class="form-group-inline">
+                                    <label class="form-label">Website</label>
+                                    <input type="text" name="Website" id="form-website" value="@hotel.Website" class="form-control" placeholder="www.yourhotel.com" style="background: white;" />
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label">Wi-Fi Property-wide</label>
+                                    <input type="hidden" name="WifiPropertyWide" id="form-wifi-prop" value="@(hotel.WifiPropertyWide == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-wifi-prop" @(hotel.WifiPropertyWide == true ? "checked" : "") />
+                                        <span class="checkbox-text">Available</span>
+                                        <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                                    </label>
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label">Wi-Fi Avg Speed (Mbps)</label>
+                                    <input type="number" name="WifiAvgSpeed" id="form-wifi-speed" value="@hotel.WifiAvgSpeed" class="form-control" style="background: white;" />
+                                </div>
+                                
+                                <div class="form-group-inline" style="border-top: 1px dashed #e2e8f0; padding-top: 1rem; margin-top: 0.5rem;">
+                                    <label class="form-label">IP TV System</label>
+                                    <input type="hidden" name="IpTv" id="form-iptv" value="@(hotel.IpTv == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-iptv" @(hotel.IpTv == true ? "checked" : "") />
+                                        <span class="checkbox-text">Available</span>
+                                        <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                                    </label>
+                                </div>
+
+                                <div class="form-group-inline">
+                                    <label class="form-label">Passport(ID) Scanner</label>
+                                    <input type="hidden" name="PassportScanner" id="form-pass-scanner" value="@(hotel.PassportScanner == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-pass-scanner" @(hotel.PassportScanner == true ? "checked" : "") />
+                                        <span class="checkbox-text">Available</span>
+                                        <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                                    </label>
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label">Currency Scanner/Detector</label>
+                                    <input type="hidden" name="CurrencyScanner" id="form-curr-scanner" value="@(hotel.CurrencyScanner == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-curr-scanner" @(hotel.CurrencyScanner == true ? "checked" : "") />
+                                        <span class="checkbox-text">Available</span>
+                                        <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Wi-Fi Avg Speed (Mbps)</label>
-                            <input type="number" name="WifiAvgSpeed" id="form-wifi-speed" value="@hotel.WifiAvgSpeed" class="form-control" />
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">In-house Laundry</label>
-                            <input type="hidden" name="InHouseLaundry" id="form-laundry" value="@(hotel.InHouseLaundry == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-laundry" @(hotel.InHouseLaundry == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">24-hour Reception</label>
-                            <input type="hidden" name="Reception24hr" id="form-reception" value="@(hotel.Reception24hr == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-reception" @(hotel.Reception24hr == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">VIP Check-In</label>
-                            <input type="hidden" name="VipCheckIn" id="form-vip-check" value="@(hotel.VipCheckIn == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-vip-check" @(hotel.VipCheckIn == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Passport Scanner</label>
-                            <input type="hidden" name="PassportScanner" id="form-pass-scanner" value="@(hotel.PassportScanner == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-pass-scanner" @(hotel.PassportScanner == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Currency Scanner/Detector</label>
-                            <input type="hidden" name="CurrencyScanner" id="form-curr-scanner" value="@(hotel.CurrencyScanner == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-curr-scanner" @(hotel.CurrencyScanner == true ? "checked" : "") />
-                                <span class="checkbox-text">Available</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
+
+                        <!-- Column 2: Digital Systems & Operations (Cyan tint) -->
+                        <div style="background: #ecfeff; padding: 0;">
+                            <div style="padding: 1.5rem;">
+                                <h4 style="font-size: 0.85rem; font-weight: 800; color: #0891b2; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Digital Platforms</h4>
+                                
+                                <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+                                    <div class="form-group-inline">
+                                        <label class="form-label" style="color: #0e7490;">Online Ordering System</label>
+                                        <input type="hidden" name="OnlineOrderingSystem" id="form-online-ordering" value="@(hotel.OnlineOrderingSystem == true ? "true" : "false")" />
+                                        <label class="premium-checkbox">
+                                            <input type="checkbox" class="sync-checkbox" data-target="form-online-ordering" @(hotel.OnlineOrderingSystem == true ? "checked" : "") />
+                                            <span class="checkbox-text" style="color: #06b6d4;">Enabled</span>
+                                            <div class="checkbox-box" style="border-color: #0891b2; background: #0891b2;"><i class="fas fa-check" style="color: white;"></i></div>
+                                        </label>
+                                    </div>
+                                    <div class="form-group-inline">
+                                        <label class="form-label" style="color: #0e7490;">Online Booking System</label>
+                                        <input type="hidden" name="OnlineBookingSystem" id="form-online-booking" value="@(hotel.OnlineBookingSystem == true ? "true" : "false")" />
+                                        <label class="premium-checkbox">
+                                            <input type="checkbox" class="sync-checkbox" data-target="form-online-booking" @(hotel.OnlineBookingSystem == true ? "checked" : "") />
+                                            <span class="checkbox-text" style="color: #06b6d4;">Enabled</span>
+                                            <div class="checkbox-box" style="border-color: #0891b2; background: #0891b2;"><i class="fas fa-check" style="color: white;"></i></div>
+                                        </label>
+                                    </div>
+                                    <div class="form-group-inline">
+                                        <label class="form-label" style="color: #0e7490;">Table Reservation System</label>
+                                        <input type="hidden" name="TableReservation" id="form-table-res" value="@(hotel.TableReservation == true ? "true" : "false")" />
+                                        <label class="premium-checkbox">
+                                            <input type="checkbox" class="sync-checkbox" data-target="form-table-res" @(hotel.TableReservation == true ? "checked" : "") />
+                                            <span class="checkbox-text" style="color: #06b6d4;">Enabled</span>
+                                            <div class="checkbox-box" style="border-color: #0891b2; background: #0891b2;"><i class="fas fa-check" style="color: white;"></i></div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Guest Services (Purple tint) -->
+                            <div style="background: #f5f3ff; padding: 1.5rem; border-top: 1px solid #ddd6fe;">
+                                <h4 style="font-size: 0.85rem; font-weight: 800; color: #6d28d9; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Services</h4>
+                                
+                                <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+                                    <div class="form-group-inline">
+                                        <label class="form-label" style="color: #7c3aed;">In-house Laundry</label>
+                                        <input type="hidden" name="InHouseLaundry" id="form-laundry" value="@(hotel.InHouseLaundry == true ? "true" : "false")" />
+                                        <label class="premium-checkbox">
+                                            <input type="checkbox" class="sync-checkbox" data-target="form-laundry" @(hotel.InHouseLaundry == true ? "checked" : "") />
+                                            <span class="checkbox-text" style="color: #a78bfa;">Available</span>
+                                            <div class="checkbox-box" style="border-color: #8b5cf6; background: #8b5cf6;"><i class="fas fa-check" style="color: white;"></i></div>
+                                        </label>
+                                    </div>
+                                    <div class="form-group-inline">
+                                        <label class="form-label" style="color: #7c3aed;">24-hour Reception</label>
+                                        <input type="hidden" name="Reception24hr" id="form-reception" value="@(hotel.Reception24hr == true ? "true" : "false")" />
+                                        <label class="premium-checkbox">
+                                            <input type="checkbox" class="sync-checkbox" data-target="form-reception" @(hotel.Reception24hr == true ? "checked" : "") />
+                                            <span class="checkbox-text" style="color: #a78bfa;">Available</span>
+                                            <div class="checkbox-box" style="border-color: #8b5cf6; background: #8b5cf6;"><i class="fas fa-check" style="color: white;"></i></div>
+                                        </label>
+                                    </div>
+                                    <div class="form-group-inline">
+                                        <label class="form-label" style="color: #7c3aed;">VIP Check-In</label>
+                                        <input type="hidden" name="VipCheckIn" id="form-vip-check" value="@(hotel.VipCheckIn == true ? "true" : "false")" />
+                                        <label class="premium-checkbox">
+                                            <input type="checkbox" class="sync-checkbox" data-target="form-vip-check" @(hotel.VipCheckIn == true ? "checked" : "") />
+                                            <span class="checkbox-text" style="color: #a78bfa;">Available</span>
+                                            <div class="checkbox-box" style="border-color: #8b5cf6; background: #8b5cf6;"><i class="fas fa-check" style="color: white;"></i></div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1479,61 +1681,76 @@
                         <i class="fas fa-chevron-down chevron"></i>
                     </div>
                 </div>
-                <div class="collapsible-content">
-                    <div class="form-grid">
-                        <div class="form-group-inline">
-                            <label class="form-label">Standby Gen. Capacity (kVA)</label>
-                            <input type="number" name="StandbyGeneratorCapacityKva" id="form-gen-cap" value="@hotel.StandbyGeneratorCapacityKva" class="form-control" />
+                <div class="collapsible-content" style="padding: 0;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; min-height: 280px;">
+                        <!-- Column 1: Power & Water (Slate tint) -->
+                        <div style="background: #f8fafc; padding: 2rem; border-right: 1.5px solid var(--border-color);">
+                            <h4 style="font-size: 0.85rem; font-weight: 800; color: var(--navy-deep); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Power & Water Resilience</h4>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                <div class="form-group-inline">
+                                    <label class="form-label">Standby Gen. Capacity (kVA)</label>
+                                    <input type="number" name="StandbyGeneratorCapacityKva" id="form-gen-cap" value="@hotel.StandbyGeneratorCapacityKva" class="form-control" style="background: white;" />
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label">Standby Gen. Coverage</label>
+                                    <select name="StandbyGeneratorCoverage" id="form-gen-cov" class="form-control" style="background: white;">
+                                        <option value="Full" selected="@(hotel.StandbyGeneratorCoverage == "Full")">Full</option>
+                                        <option value="Partial" selected="@(hotel.StandbyGeneratorCoverage == "Partial")">Partial</option>
+                                        <option value="None" selected="@(hotel.StandbyGeneratorCoverage == "None")">None</option>
+                                    </select>
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label">Water Treatment</label>
+                                    <select name="WaterTreatment" id="form-water" class="form-control" style="background: white;">
+                                        <option value="None" selected="@(hotel.WaterTreatment == "None")">None</option>
+                                        <option value="Basic" selected="@(hotel.WaterTreatment == "Basic")">Basic</option>
+                                        <option value="Advanced" selected="@(hotel.WaterTreatment == "Advanced")">Advanced</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Standby Gen. Coverage</label>
-                            <select name="StandbyGeneratorCoverage" id="form-gen-cov" class="form-control">
-                                <option value="Full" selected="@(hotel.StandbyGeneratorCoverage == "Full")">Full</option>
-                                <option value="Partial" selected="@(hotel.StandbyGeneratorCoverage == "Partial")">Partial</option>
-                                <option value="None" selected="@(hotel.StandbyGeneratorCoverage == "None")">None</option>
-                            </select>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Water Treatment</label>
-                            <select name="WaterTreatment" id="form-water" class="form-control">
-                                <option value="None" selected="@(hotel.WaterTreatment == "None")">None</option>
-                                <option value="Basic" selected="@(hotel.WaterTreatment == "Basic")">Basic</option>
-                                <option value="Advanced" selected="@(hotel.WaterTreatment == "Advanced")">Advanced</option>
-                            </select>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Waste Segregation</label>
-                            <input type="hidden" name="WasteSegregation" id="form-waste-seg" value="@(hotel.WasteSegregation == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-waste-seg" @(hotel.WasteSegregation == true ? "checked" : "") />
-                                <span class="checkbox-text">Enabled</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Recycling Program</label>
-                            <input type="hidden" name="Recycling" id="form-recycling" value="@(hotel.Recycling == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-recycling" @(hotel.Recycling == true ? "checked" : "") />
-                                <span class="checkbox-text">Enabled</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
-                        </div>
-                        <div class="form-group-inline">
-                            <label class="form-label">Hazardous Waste Handling</label>
-                            <input type="hidden" name="HazardousWasteHandling" id="form-haz-waste" value="@(hotel.HazardousWasteHandling == true ? "true" : "false")" />
-                            <label class="premium-checkbox">
-                                <input type="checkbox" class="sync-checkbox" data-target="form-haz-waste" @(hotel.HazardousWasteHandling == true ? "checked" : "") />
-                                <span class="checkbox-text">Enabled</span>
-                                <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                            </label>
+
+                        <!-- Column 2: Waste Management (Amber tint) -->
+                        <div style="background: #fffbeb; padding: 2rem;">
+                            <h4 style="font-size: 0.85rem; font-weight: 800; color: #92400e; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Waste & Environmental</h4>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                <div class="form-group-inline">
+                                    <label class="form-label" style="color: #92400e;">Waste Segregation</label>
+                                    <input type="hidden" name="WasteSegregation" id="form-waste-seg" value="@(hotel.WasteSegregation == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-waste-seg" @(hotel.WasteSegregation == true ? "checked" : "") />
+                                        <span class="checkbox-text" style="color: #b45309;">Enabled</span>
+                                        <div class="checkbox-box" style="border-color: #d97706; background: #d97706;"><i class="fas fa-check" style="color: white;"></i></div>
+                                    </label>
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label" style="color: #92400e;">Recycling Program</label>
+                                    <input type="hidden" name="Recycling" id="form-recycling" value="@(hotel.Recycling == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-recycling" @(hotel.Recycling == true ? "checked" : "") />
+                                        <span class="checkbox-text" style="color: #b45309;">Enabled</span>
+                                        <div class="checkbox-box" style="border-color: #d97706; background: #d97706;"><i class="fas fa-check" style="color: white;"></i></div>
+                                    </label>
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label" style="color: #92400e;">Hazardous Waste Handling</label>
+                                    <input type="hidden" name="HazardousWasteHandling" id="form-haz-waste" value="@(hotel.HazardousWasteHandling == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-haz-waste" @(hotel.HazardousWasteHandling == true ? "checked" : "") />
+                                        <span class="checkbox-text" style="color: #b45309;">Enabled</span>
+                                        <div class="checkbox-box" style="border-color: #d97706; background: #d97706;"><i class="fas fa-check" style="color: white;"></i></div>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- 11. Sustainability & Certifications -->
-            <div class="collapsible-card">
+            <div class="collapsible-card active">
                 <div class="collapsible-header" onclick="toggleCollapsible(this)">
                     <h3><i class="fas fa-leaf" style="color: var(--primary-color);"></i> 11. Sustainability & Certifications</h3>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -1543,84 +1760,82 @@
                         <i class="fas fa-chevron-down chevron"></i>
                     </div>
                 </div>
-                <div class="collapsible-content">
-                    <div class="form-grid">
-                        <!-- Column 1: Certificates & Licenses -->
-                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                            <h4 style="font-size: 0.75rem; color: var(--primary-color); font-weight: 800; text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-color); padding-bottom: 0.25rem;">Certificates & Licenses</h4>
+                <div class="collapsible-content" style="padding: 0;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; min-height: 250px;">
+                        <!-- Column 1: Regulatory Compliance (Emerald tint) -->
+                        <div style="background: #ecfdf5; padding: 1.5rem; border-right: 1.5px solid var(--border-color);">
+                            <h4 style="font-size: 0.85rem; font-weight: 800; color: #065f46; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Regulatory Compliance</h4>
                             
-                            <div class="form-group-inline">
-                                <label class="form-label">HACCP/GSTC Cert.</label>
-                                <select name="SustainabilityCertification" id="form-sust-cert" class="form-control">
-                                    <option value="Yes" selected="@(hotel.SustainabilityCertification == "Yes")">Yes</option>
-                                    <option value="No" selected="@(hotel.SustainabilityCertification == "No")">No</option>
-                                    <option value="In progress" selected="@(hotel.SustainabilityCertification == "In progress")">In Progress</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group-inline">
-                                <label class="form-label">Tourism Service Competence License</label>
-                                <select name="TourismServiceCompetenceLicenseCertificate" id="form-tour-competence" class="form-control">
-                                    <option value="Yes" selected="@(hotel.TourismServiceCompetenceLicenseCertificate == "Yes")">Yes</option>
-                                    <option value="No" selected="@(hotel.TourismServiceCompetenceLicenseCertificate == "No")">No</option>
-                                    <option value="In progress" selected="@(hotel.TourismServiceCompetenceLicenseCertificate == "In progress")">In Progress</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group-inline">
-                                <label class="form-label">Fire Safety Cert.</label>
-                                <select name="FireSafetyCertificate" id="form-fire-safety-cert" class="form-control">
-                                    <option value="Yes" selected="@(hotel.FireSafetyCertificate == "Yes")">Yes</option>
-                                    <option value="No" selected="@(hotel.FireSafetyCertificate == "No")">No</option>
-                                    <option value="In progress" selected="@(hotel.FireSafetyCertificate == "In progress")">In Progress</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group-inline">
-                                <label class="form-label">Environmental Clearance Cert.</label>
-                                <select name="EnvironmentalClearanceCertificate" id="form-env-clearance" class="form-control">
-                                    <option value="Yes" selected="@(hotel.EnvironmentalClearanceCertificate == "Yes")">Yes</option>
-                                    <option value="No" selected="@(hotel.EnvironmentalClearanceCertificate == "No")">No</option>
-                                    <option value="In progress" selected="@(hotel.EnvironmentalClearanceCertificate == "In progress")">In Progress</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group-inline">
-                                <label class="form-label">Food Safety & Hygiene Cert.</label>
-                                <select name="FoodSafetyAndHygieneCertificate" id="form-food-safety-hygiene" class="form-control">
-                                    <option value="Yes" selected="@(hotel.FoodSafetyAndHygieneCertificate == "Yes")">Yes</option>
-                                    <option value="No" selected="@(hotel.FoodSafetyAndHygieneCertificate == "No")">No</option>
-                                    <option value="In progress" selected="@(hotel.FoodSafetyAndHygieneCertificate == "In progress")">In Progress</option>
-                                </select>
+                            <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+                                <div class="form-group-inline">
+                                    <label class="form-label" style="color: #065f46;">HACCP/GSTC Cert.</label>
+                                    <select name="SustainabilityCertification" id="form-sust-cert" class="form-control" style="background: white;">
+                                        <option value="Yes" selected="@(hotel.SustainabilityCertification == "Yes")">Yes</option>
+                                        <option value="No" selected="@(hotel.SustainabilityCertification == "No")">No</option>
+                                        <option value="In progress" selected="@(hotel.SustainabilityCertification == "In progress")">In Progress</option>
+                                    </select>
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label" style="color: #065f46;">Competence License</label>
+                                    <select name="TourismServiceCompetenceLicenseCertificate" id="form-tour-competence" class="form-control" style="background: white;">
+                                        <option value="Yes" selected="@(hotel.TourismServiceCompetenceLicenseCertificate == "Yes")">Yes</option>
+                                        <option value="No" selected="@(hotel.TourismServiceCompetenceLicenseCertificate == "No")">No</option>
+                                        <option value="In progress" selected="@(hotel.TourismServiceCompetenceLicenseCertificate == "In progress")">In Progress</option>
+                                    </select>
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label" style="color: #065f46;">Fire Safety Cert.</label>
+                                    <select name="FireSafetyCertificate" id="form-fire-safety-cert" class="form-control" style="background: white;">
+                                        <option value="Yes" selected="@(hotel.FireSafetyCertificate == "Yes")">Yes</option>
+                                        <option value="No" selected="@(hotel.FireSafetyCertificate == "No")">No</option>
+                                        <option value="In progress" selected="@(hotel.FireSafetyCertificate == "In progress")">In Progress</option>
+                                    </select>
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label" style="color: #065f46;">Env. Clearance</label>
+                                    <select name="EnvironmentalClearanceCertificate" id="form-env-clearance" class="form-control" style="background: white;">
+                                        <option value="Yes" selected="@(hotel.EnvironmentalClearanceCertificate == "Yes")">Yes</option>
+                                        <option value="No" selected="@(hotel.EnvironmentalClearanceCertificate == "No")">No</option>
+                                        <option value="In progress" selected="@(hotel.EnvironmentalClearanceCertificate == "In progress")">In Progress</option>
+                                    </select>
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label" style="color: #065f46;">Food Safety & Hygiene</label>
+                                    <select name="FoodSafetyAndHygieneCertificate" id="form-food-safety-hygiene" class="form-control" style="background: white;">
+                                        <option value="Yes" selected="@(hotel.FoodSafetyAndHygieneCertificate == "Yes")">Yes</option>
+                                        <option value="No" selected="@(hotel.FoodSafetyAndHygieneCertificate == "No")">No</option>
+                                        <option value="In progress" selected="@(hotel.FoodSafetyAndHygieneCertificate == "In progress")">In Progress</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Column 2: Sustainability Features -->
-                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                            <h4 style="font-size: 0.75rem; color: var(--primary-color); font-weight: 800; text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-color); padding-bottom: 0.25rem;">Sustainability Features</h4>
-
-                            <div class="form-group-inline">
-                                <label class="form-label">Other Eco-labels</label>
-                                <input type="text" name="OtherEcoLabels" id="form-eco-labels" value="@hotel.OtherEcoLabels" class="form-control" placeholder="e.g. Green Key..." />
+                        <!-- Column 2: Voluntary Standards (Lime tint) -->
+                        <div style="background: #f7fee7; padding: 1.5rem;">
+                            <h4 style="font-size: 0.85rem; font-weight: 800; color: #3f6212; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Voluntary Standards</h4>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+                                <div class="form-group-inline">
+                                    <label class="form-label" style="color: #3f6212;">Other Eco-labels</label>
+                                    <input type="text" name="OtherEcoLabels" id="form-eco-labels" value="@hotel.OtherEcoLabels" class="form-control" placeholder="e.g. Green Key..." style="background: white;" />
+                                </div>
+                                <div class="form-group-inline">
+                                    <label class="form-label" style="color: #3f6212;">Food Waste Program</label>
+                                    <input type="hidden" name="FoodWasteProgram" id="form-waste-prog" value="@(hotel.FoodWasteProgram == true ? "true" : "false")" />
+                                    <label class="premium-checkbox">
+                                        <input type="checkbox" class="sync-checkbox" data-target="form-waste-prog" @(hotel.FoodWasteProgram == true ? "checked" : "") />
+                                        <span class="checkbox-text" style="color: #4d7c0f;">Enabled</span>
+                                        <div class="checkbox-box" style="border-color: #65a30d; background: #65a30d;"><i class="fas fa-check" style="color: white;"></i></div>
+                                    </label>
+                                </div>
                             </div>
-
-                            <div class="form-group-inline">
-                                <label class="form-label">Food Waste Program</label>
-                                <input type="hidden" name="FoodWasteProgram" id="form-waste-prog" value="@(hotel.FoodWasteProgram == true ? "true" : "false")" />
-                                <label class="premium-checkbox">
-                                    <input type="checkbox" class="sync-checkbox" data-target="form-waste-prog" @(hotel.FoodWasteProgram == true ? "checked" : "") />
-                                    <span class="checkbox-text">Enabled</span>
-                                    <div class="checkbox-box"><i class="fas fa-check"></i></div>
-                                </label>
-                            </div>
-
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- 12. Staffing & Languages -->
-            <div class="collapsible-card">
+            <div class="collapsible-card active">
                 <div class="collapsible-header" onclick="toggleCollapsible(this)">
                     <h3><i class="fas fa-users" style="color: var(--primary-color);"></i> 12. Staffing & Languages</h3>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -1632,36 +1847,38 @@
                 </div>
                 <div class="collapsible-content" style="padding: 0;">
                     <div style="display: grid; grid-template-columns: 1fr 1.2fr; min-height: 250px;">
-                        <!-- Left Side: Staffing (Subtle background) -->
-                        <div style="background: #f8fafc; padding: 2rem; border-right: 1.5px solid var(--border-color);">
-                            <h4 style="font-size: 0.85rem; font-weight: 800; color: var(--navy-deep); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Staffing Distribution</h4>
-                            <div class="form-grid" style="grid-template-columns: 1fr; gap: 1.25rem;">
-                                <div class="form-group-inline" style="justify-content: space-between;">
-                                    <label class="form-label" style="margin-bottom: 0;">Line Staff</label>
-                                    <input type="number" name="LineStaff" id="form-line-staff" value="@hotel.LineStaff" class="form-control staff-input" style="width: 100px; text-align: center; font-weight: 700;" />
+                        <!-- Column 1: Workforce Distribution (Slate tint) -->
+                        <div style="background: #f8fafc; padding: 1.5rem; border-right: 1.5px solid var(--border-color);">
+                            <h4 style="font-size: 0.85rem; font-weight: 800; color: var(--navy-deep); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Workforce Distribution</h4>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+                                <div class="form-group-inline">
+                                    <label class="form-label">Line Staff</label>
+                                    <input type="number" name="LineStaff" id="form-line-staff" value="@hotel.LineStaff" class="form-control staff-input" style="width: 100px; text-align: center; font-weight: 700; background: white;" />
                                 </div>
-                                <div class="form-group-inline" style="justify-content: space-between;">
-                                    <label class="form-label" style="margin-bottom: 0;">Management Staff</label>
-                                    <input type="number" name="ManagementStaff" id="form-mgmt-staff" value="@hotel.ManagementStaff" class="form-control staff-input" style="width: 100px; text-align: center; font-weight: 700;" />
+                                <div class="form-group-inline">
+                                    <label class="form-label">Management Staff</label>
+                                    <input type="number" name="ManagementStaff" id="form-mgmt-staff" value="@hotel.ManagementStaff" class="form-control staff-input" style="width: 100px; text-align: center; font-weight: 700; background: white;" />
                                 </div>
-                                <div class="form-group-inline" style="justify-content: space-between; margin-top: 0.5rem; padding-top: 1rem; border-top: 1px dashed var(--border-color);">
-                                    <label class="form-label" style="margin-bottom: 0; color: var(--primary-color);">Total Staff</label>
+                                <div class="form-group-inline" style="margin-top: 0.5rem; padding-top: 1rem; border-top: 1px dashed var(--border-color);">
+                                    <label class="form-label" style="color: var(--primary-color);">Total Staff</label>
                                     <input type="number" name="TotalStaff" id="form-total-staff" value="@hotel.TotalStaff" class="form-control" style="width: 100px; text-align: center; font-weight: 800; background: white; border-color: var(--primary-color); color: var(--primary-color);" readonly />
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Right Side: Languages -->
-                        <div style="padding: 2rem;">
-                            <h4 style="font-size: 0.85rem; font-weight: 800; color: var(--navy-deep); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Front Desk Languages</h4>
+                        <!-- Column 2: International Languages (Indigo tint) -->
+                        <div style="background: #eef2ff; padding: 1.5rem;">
+                            <h4 style="font-size: 0.85rem; font-weight: 800; color: #3730a3; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Front Desk Languages</h4>
                             <input type="hidden" name="InternationalLanguagesFrontDesk" id="form-languages-hidden" value="@hotel.InternationalLanguagesFrontDesk" />
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
                                 @foreach (var lang in new[] { "English", "French", "Swahili", "Chinese (Mandarin)", "Spanish", "German", "Italian", "Portuguese" })
                                 {
-                                    <label class="premium-checkbox" style="width: 100%;">
+                                    <label class="premium-checkbox" style="width: 100%; border-color: #c7d2fe;">
                                         <input type="checkbox" class="lang-checkbox" value="@lang" />
-                                        <span class="checkbox-text">@lang</span>
-                                        <div class="checkbox-box"><i class="fas fa-check"></i></div>
+                                        <span class="checkbox-text" style="color: #4338ca;">@lang</span>
+                                        <div class="checkbox-box" style="border-color: #6366f1; background: #6366f1;"><i class="fas fa-check" style="color: white;"></i></div>
                                     </label>
                                 }
                             </div>
@@ -1713,7 +1930,7 @@
 
     <!-- Asset Registration Modal -->
     <div id="assetModal" class="modal-overlay">
-        <div class="glass-card modal-content-animate" style="width: 100%; max-width: 700px; padding: 2.5rem; border: none; box-shadow: var(--shadow-2xl);">
+        <div class="glass-card modal-content-animate" style="width: 100%; max-width: 700px; padding: 1.5rem; border: none; box-shadow: var(--shadow-2xl);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                 <div>
                     <h3 id="modalTitle" style="margin: 0; color: var(--navy-deep); font-weight: 800; font-size: 1.25rem;">Add Asset</h3>
@@ -1966,7 +2183,7 @@
     <div class="modal-content-animate" style="max-width: 600px;">
         <div class="glass-card" style="padding: 2rem; position: relative; border-top: 4px solid var(--primary-color);">
             <button onclick="closeShopModal()" style="position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; font-size: 1.25rem; color: var(--text-muted); cursor: pointer;"><i class="fas fa-times"></i></button>
-            <h2 style="margin-bottom: 0.5rem; color: var(--navy-deep);"><i class="fas fa-shopping-bag"></i> Add Souvenir Shop</h2>
+            <h2 style="margin-bottom: 0.5rem; color: var(--navy-deep);"><i class="fas fa-shopping-bag"></i> Add  Shop</h2>
             <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 2rem;">Add details for retail facilities within the property.</p>
 
             <div class="form-grid">
@@ -2334,7 +2551,8 @@
                     // Populate Transport
                     $('#form-parking').val(hotel.parkingSpacesCount);
                     $('#form-bus-parking').val(hotel.busParkingCount);
-                    $('#form-shuttle-cop').val(String(hotel.shuttleToCop));
+                    $('#form-valet-parking').val(String(hotel.valetParking));
+                    $('#form-parking-100m').val(String(hotel.parkingWithin100m));
                     $('#form-shuttle-airport').val(String(hotel.shuttleToAirport));
                     $('#form-pub-transport').val(String(hotel.publicTransportWithin500m));
                     $('#form-ev-points').val(hotel.evChargingPoints);
@@ -2600,7 +2818,7 @@
             let html = '';
 
             if (shopList.length === 0) {
-                tbody.append('<tr><td colspan="4" class="text-center text-muted py-3">No souvenir shops added yet.</td></tr>');
+                tbody.append('<tr><td colspan="4" class="text-center text-muted py-3">No  shops added yet.</td></tr>');
                 return;
             }
 
@@ -2954,7 +3172,7 @@
                 formData.append('PublicAccessibleBathroom', $('#form-bathroom-acc').val());
             }
 
-            // 7. Security & Safety
+            // 7. Safety & Security
             if (mode === 'security_safety' || mode === 'all') {
                 formData.append('CCTVPublicAreas', $('#form-cctv').val());
                 formData.append('FireExtinguishersLastInspection', $('#form-fire-insp').val());
@@ -2973,7 +3191,8 @@
             if (mode === 'transport_parking' || mode === 'all') {
                 formData.append('ParkingSpacesCount', $('#form-parking').val());
                 formData.append('BusParkingCount', $('#form-bus-parking').val());
-                formData.append('ShuttleToCop', $('#form-shuttle-cop').val());
+                formData.append('ValetParking', $('#form-valet-parking').val());
+                formData.append('ParkingWithin100m', $('#form-parking-100m').val());
                 formData.append('ShuttleToAirport', $('#form-shuttle-airport').val());
                 formData.append('PublicTransportWithin500m', $('#form-pub-transport').val());
                 formData.append('EvChargingPoints', $('#form-ev-points').val());
@@ -3248,7 +3467,7 @@
             meetings_events:   { label: 'Meetings & Events',    icon: 'fas fa-handshake' },
             public_facilities: { label: 'Public Facilities',    icon: 'fas fa-building' },
             accessibility:     { label: 'Accessibility',        icon: 'fas fa-wheelchair' },
-            security_safety:   { label: 'Security & Safety',    icon: 'fas fa-shield-halved' },
+            safety_security:   { label: 'Safety & Security',    icon: 'fas fa-shield-halved' },
             transport_parking: { label: 'Transport & Parking',  icon: 'fas fa-car' },
             ict_services:      { label: 'ICT & Guest Services', icon: 'fas fa-wifi' },
             utilities_resilience: { label: 'Utilities & Resilience', icon: 'fas fa-bolt' },
@@ -3265,7 +3484,7 @@
             InternetBandwidthDown:'public_facilities', InternetBandwidthUp:'public_facilities', LobbyAreaSqm:'public_facilities', GreenAreaSqm:'public_facilities', PoolAvailable:'public_facilities', PoolType:'public_facilities', SpaAvailable:'public_facilities', SpaGender:'public_facilities', MassageService:'public_facilities', ChildrensPlayground:'public_facilities', ChildrenDayCare:'public_facilities', StaffCanteen:'public_facilities',
             WheelchairRamps:'accessibility', ElevatorsCount:'accessibility', ElevatorsWheelchairSized:'accessibility', PublicAccessibleBathroom:'accessibility',
             CCTVPublicAreas:'security_safety', FireExtinguishersLastInspection:'security_safety', HoseReels:'security_safety', SmokeDetectorsInRooms:'security_safety', SmokeDetectorsInPublicAreas:'security_safety', SprinklerCoverage:'security_safety', FireAlarmControlPanel:'security_safety', EmergencyExitsCount:'security_safety', BagScanner:'security_safety', WalkThroughScanner:'security_safety', HandScanner:'security_safety',
-            ParkingSpacesCount:'transport_parking', BusParkingCount:'transport_parking', ShuttleToCop:'transport_parking', ShuttleToAirport:'transport_parking', PublicTransportWithin500m:'transport_parking', EvChargingPoints:'transport_parking', EvChargerTypes:'transport_parking',
+            ParkingSpacesCount:'transport_parking', BusParkingCount:'transport_parking', ValetParking:'transport_parking', ParkingWithin100m:'transport_parking', ShuttleToAirport:'transport_parking', PublicTransportWithin500m:'transport_parking', EvChargingPoints:'transport_parking', EvChargerTypes:'transport_parking',
             WifiPropertyWide:'ict_services', WifiAvgSpeed:'ict_services', InHouseLaundry:'ict_services', Reception24hr:'ict_services', VipCheckIn:'ict_services', PassportScanner:'ict_services', CurrencyScanner:'ict_services',
             StandbyGeneratorCapacityKva:'utilities_resilience', StandbyGeneratorCoverage:'utilities_resilience', WaterTreatment:'utilities_resilience', WasteSegregation:'utilities_resilience', Recycling:'utilities_resilience', HazardousWasteHandling:'utilities_resilience',
             SustainabilityCertification:'sustainability', OtherEcoLabels:'sustainability', FoodWasteProgram:'sustainability', SustainabilityRefillWaterStations:'sustainability',

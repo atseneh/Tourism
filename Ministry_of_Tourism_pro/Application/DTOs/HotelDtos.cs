@@ -108,7 +108,7 @@ namespace Ministry_of_Tourism_pro.Application.DTOs
         public bool? ElevatorsWheelchairSized { get; set; }
         public bool? PublicAccessibleBathroom { get; set; }
 
-        // Security & Safety
+        // Safety & Security
         public bool? CCTVPublicAreas { get; set; }
         public DateTime? FireExtinguishersLastInspection { get; set; }
         public bool? HoseReels { get; set; }
@@ -120,13 +120,17 @@ namespace Ministry_of_Tourism_pro.Application.DTOs
         public bool? BagScanner { get; set; }
         public bool? WalkThroughScanner { get; set; }
         public bool? HandScanner { get; set; }
+        public bool? ElectronicDoorlock { get; set; }
+        public bool? ElevatorFloorController { get; set; }
+        public bool? OncallDoctor { get; set; }
 
         // Transport & Parking
         public int? ParkingSpacesCount { get; set; }
         public int? BusParkingCount { get; set; }
-        public bool? ShuttleToCop { get; set; }
         public bool? ShuttleToAirport { get; set; }
         public bool? PublicTransportWithin500m { get; set; }
+        public bool? ValetParking { get; set; }
+        public bool? ParkingWithin100m { get; set; }
         public int? EvChargingPoints { get; set; }
         public string? EvChargerTypes { get; set; }
 
@@ -138,6 +142,10 @@ namespace Ministry_of_Tourism_pro.Application.DTOs
         public bool? VipCheckIn { get; set; }
         public bool? PassportScanner { get; set; }
         public bool? CurrencyScanner { get; set; }
+        public bool? OnlineOrderingSystem { get; set; }
+        public bool? OnlineBookingSystem { get; set; }
+        public bool? TableReservation { get; set; }
+        public bool? IpTv { get; set; }
 
         // Utilities & Resilience
         public double? StandbyGeneratorCapacityKva { get; set; }

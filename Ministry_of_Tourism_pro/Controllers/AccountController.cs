@@ -5,6 +5,7 @@ using Ministry_of_Tourism_pro.Common;
 using Ministry_of_Tourism_pro.Domain.Entities;
 using Ministry_of_Tourism_pro.Models;
 using Ministry_of_Tourism_pro.WebConstants;
+using Newtonsoft.Json;
 using System.Data;
 using System.Security.Claims;
 
@@ -14,12 +15,14 @@ namespace Ministry_of_Tourism_pro.Controllers
     {
         private readonly AuthenticationManager _authManager;
         private readonly SharedHelpers _sharedHelpers;
+        private readonly IConfiguration _configuration;
 
 
-        public AccountController(AuthenticationManager authManager, SharedHelpers sharedHelpers)
+        public AccountController(AuthenticationManager authManager, SharedHelpers sharedHelpers, IConfiguration configuration)
         {
             _authManager = authManager;
             _sharedHelpers = sharedHelpers;
+            _configuration = configuration;
         }
 
         [HttpGet]
@@ -306,6 +309,63 @@ namespace Ministry_of_Tourism_pro.Controllers
         {
             await _authManager.SignOut();
             return RedirectToAction("Login", "Account");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SendOTP(string phoneNumber)
+        {
+            try
+            {
+                var baseUrl = _configuration["CnetOtpSettings:BaseUrl"];
+                var apiKey = _configuration["CnetOtpSettings:ApiKey"];
+
+                using (var client = new HttpClient())
+                {
+                    client.DefaultRequestHeaders.Add("x-api-key", apiKey);
+                    var response = await client.GetAsync($"{baseUrl}messaging/sendotp?to={phoneNumber}");
+                    var content = await response.Content.ReadAsStringAsync();
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var result = JsonConvert.DeserializeObject<MessageResponse>(content);
+                        return Json(new { success = true, data = result });
+                    }
+                    return Json(new { success = false, message = "Failed to send OTP", error = content });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> VerifyOTP([FromBody] OtpVerificationRequest request)
+        {
+            try
+            {
+                var baseUrl = _configuration["CnetOtpSettings:BaseUrl"];
+                var apiKey = _configuration["CnetOtpSettings:ApiKey"];
+
+                using (var client = new HttpClient())
+                {
+                    client.DefaultRequestHeaders.Add("x-api-key", apiKey);
+                    // messaging/verifyotp?to={to}&vc={vc}&code={trimmedCode}&messageId={messageId}
+                    var url = $"{baseUrl}messaging/verifyotp?to={request.PhoneNumber}&vc={request.Vc}&code={request.Code}&messageId={request.MessageId}";
+                    var response = await client.GetAsync(url);
+                    var content = await response.Content.ReadAsStringAsync();
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, message = "Successfully verified" });
+                    }
+                    return Json(new { success = false, message = "Verification failed or expired", error = content });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
         public IActionResult NoPrivilege() => View();
