@@ -19,4 +19,10 @@ namespace Ministry_of_Tourism_pro.Models
         public string Code { get; set; }
         public string MessageId { get; set; }
     }
+
+    public class SMSDTO
+    {
+        public string PhoneNo { get; set; }
+        public string Message { get; set; }
+    }
 }

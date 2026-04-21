@@ -21,8 +21,8 @@
     }
     
     h3 {
-        font-size: 1.1rem;
-        font-weight: 800;
+        font-size: 0.95rem;
+        font-weight: 600;
         margin: 0;
     }
     
@@ -30,7 +30,7 @@
         background: white;
         border-radius: 1rem;
         border: 1px solid var(--border-color);
-        margin-bottom: 1rem;
+        margin-bottom: 0.65rem;
         overflow: hidden;
         transition: all 0.3s ease;
     }
@@ -41,7 +41,7 @@
     }
     
     .collapsible-header {
-        padding: 1.25rem 1.5rem;
+        padding: 0.85rem 1.25rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -62,14 +62,14 @@
         color: var(--primary-color);
     }
     
-    .collapsible-content { border-top: 1px solid var(--border-color); padding: 1.25rem 1.5rem; display: none; }
+    .collapsible-content { border-top: 1px solid var(--border-color); padding: 0.85rem 1.25rem; display: none; }
     .collapsible-card.active .collapsible-content { display: block; }
 
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem 1.25rem; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.15rem 1rem; }
     .full-width { grid-column: span 2; }
-    .form-label { font-weight: 700; color: var(--navy-deep); margin-bottom: 0.25rem; display: block; font-size: 0.8rem; }
-    .label-subtitle { font-size: 0.72rem; color: #0066cc; font-weight: 700; display: block; margin-top: 0.1rem; margin-bottom: 0.2rem; opacity: 1; }
-    .form-control { border-radius: 0.6rem; padding: 0.45rem 0.85rem; border: 1.5px solid var(--border-color); width: 100%; transition: border-color 0.2s; font-size: 0.9rem; }
+    .form-label { font-weight: 500; color: var(--navy-deep); margin-bottom: 0.15rem; display: block; font-size: 0.78rem; }
+    .label-subtitle { font-size: 0.7rem; color: #0066cc; font-weight: 500; display: block; margin-top: 0.1rem; margin-bottom: 0.2rem; opacity: 1; }
+    .form-control { border-radius: 0.5rem; padding: 0.35rem 0.75rem; border: 1.5px solid var(--border-color); width: 100%; transition: border-color 0.2s; font-size: 0.85rem; }
     .form-control:focus { border-color: var(--primary-color); outline: none; }
 
     .glass-card {
@@ -119,8 +119,8 @@
 
     /* Branch specific styles */
     .btn-branch-long {
-        width: 100%; background: white; border: 1.5px solid var(--border-color); border-radius: 1.25rem; padding: 1.25rem 1.75rem;
-        display: flex; align-items: center; gap: 1.5rem; cursor: pointer; transition: all 0.2s ease; margin-bottom: 1rem;
+        width: 100%; background: white; border: 1.5px solid var(--border-color); border-radius: 1rem; padding: 0.85rem 1.25rem;
+        display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: all 0.2s ease; margin-bottom: 0.75rem;
         text-align: left; position: relative; overflow: hidden;
     }
     .btn-branch-long:hover {
@@ -128,13 +128,13 @@
     }
     .btn-branch-long .branch-icon {
         width: 54px; height: 54px; background: var(--bg-muted); border-radius: 50%; display: flex; align-items: center; 
-        justify-content: center; font-size: 1.25rem; color: var(--primary-color); font-weight: 800; border: 1.5px solid var(--border-color);
+        justify-content: center; font-size: 1.15rem; color: var(--primary-color); font-weight: 600; border: 1.5px solid var(--border-color);
     }
     .btn-branch-long:hover .branch-icon { background: var(--primary-color); color: white; border-color: var(--primary-color); }
 
     .btn-create-branch {
         width: 100%; background: transparent; border: 2px dashed var(--border-color); border-radius: 1.25rem; padding: 1.5rem;
-        color: var(--text-muted); font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.75rem;
+        color: var(--text-muted); font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.75rem;
     }
     .btn-create-branch:hover { background: var(--bg-muted); border-color: var(--primary-color); color: var(--primary-color); }
 
@@ -207,9 +207,9 @@
     .asset-card:hover::before { opacity: 1; }
     
     .asset-info { display: flex; flex-direction: column; gap: 0.25rem; }
-    .asset-name { font-weight: 800; color: var(--navy-deep); font-size: 0.95rem; }
-    .asset-value { font-size: 1.25rem; font-weight: 900; color: var(--primary-color); display: flex; align-items: baseline; gap: 0.35rem; }
-    .asset-value span { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
+    .asset-name { font-weight: 700; color: var(--navy-deep); font-size: 0.9rem; }
+    .asset-value { font-size: 1.15rem; font-weight: 700; color: var(--primary-color); display: flex; align-items: baseline; gap: 0.35rem; }
+    .asset-value span { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
     
     .btn-remove-asset { 
         width: 32px; height: 32px; 
@@ -225,8 +225,8 @@
         border: 1px solid var(--border-color);
         padding: 0.4rem 0.8rem;
         border-radius: 0.5rem;
-        font-size: 0.75rem;
-        font-weight: 700;
+        font-size: 0.72rem;
+        font-weight: 600;
         cursor: pointer;
         display: flex;
         align-items: center;
@@ -242,8 +242,8 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 1rem;
-        padding: 0.45rem 0;
+        gap: 0.75rem;
+        padding: 0.22rem 0;
         border-bottom: 1px solid #f1f5f9;
     }
     .form-group-inline .form-label {
@@ -325,7 +325,7 @@
     }
     .premium-checkbox .checkbox-text {
         font-size: 0.85rem;
-        font-weight: 700;
+        font-weight: 600;
         color: var(--text-muted);
         transition: color 0.2s;
     }
@@ -348,7 +348,7 @@
         text-align: center;
         border-radius: 0.5rem;
         font-size: 0.75rem;
-        font-weight: 700;
+        font-weight: 600;
         cursor: pointer;
         transition: all 0.2s;
         color: var(--text-muted);
@@ -379,12 +379,12 @@
     .registry-nav-item {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
-        padding: 0.5rem 0.75rem;
+        gap: 0.65rem;
+        padding: 0.4rem 0.65rem;
         border-radius: 0.5rem;
         color: var(--text-muted);
         font-weight: 600;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         cursor: pointer;
         transition: all 0.2s;
     }
@@ -395,7 +395,7 @@
     .registry-nav-item.active {
         background: #eef2ff;
         color: var(--primary-color);
-        font-weight: 700;
+        font-weight: 600;
     }
     .registry-nav-item i {
         width: 14px;
@@ -444,7 +444,7 @@
         padding: 0.25rem 0.7rem;
         border-radius: 999px;
         font-size: 0.72rem;
-        font-weight: 700;
+        font-weight: 600;
         border: 1.5px solid var(--border-color);
         background: white;
         color: var(--text-muted);
@@ -475,8 +475,8 @@
     }
     .detail-cat-header:hover { background: #e8f5f5; }
     .detail-cat-title {
-        font-size: 0.75rem;
-        font-weight: 800;
+        font-size: 0.72rem;
+        font-weight: 700;
         color: var(--navy-deep);
         text-transform: uppercase;
         letter-spacing: 0.04em;
@@ -532,8 +532,8 @@
         padding: 0.75rem 0;
         border-bottom: 1px solid #f8fafc;
     }
-    .detail-label { color: #64748b; font-size: 0.9rem; font-weight: 600; }
-    .detail-value { color: var(--navy-deep); font-weight: 800; font-size: 0.9rem; text-align: right; }
+    .detail-label { color: #64748b; font-size: 0.9rem; font-weight: 500; }
+    .detail-value { color: var(--navy-deep); font-weight: 700; font-size: 0.9rem; text-align: right; }
     
     .update-btn-top {
         background: var(--primary-color);
@@ -616,21 +616,21 @@
 <div class="animate-fade-in">
 
     <!-- Compact Header Section -->
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; position: relative; z-index: 1;">
-        <div style="display: flex; align-items: center; gap: 1.25rem;">
-            <div style="width: 50px; height: 50px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); padding: 8px;">
+    <div style="background: #f1f5f9; margin: -1.5rem -1.5rem 1.25rem -1.5rem; padding: 0.75rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 1;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div style="width: 32px; height: 32px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); padding: 4px;">
                 <img src="~/logo/logo.svg" alt="Logo" style="width: 100%; height: 100%; object-fit: contain;" />
             </div>
             <div>
-                <h1 style="color: var(--navy-deep); font-weight: 800; margin: 0; font-size: 1.75rem; letter-spacing: -0.5px;">@hotel.Name</h1>
-                <p id="dynamicSubTitle" style="color: var(--text-muted); margin: 0.25rem 0 0; font-size: 0.95rem; font-weight: 600;">Manage your property branches and registry information</p>
+                <h1 style="color: var(--navy-deep); font-weight: 600; margin: 0; font-size: 1.15rem; letter-spacing: -0.3px;">@hotel.Name</h1>
+                <p id="dynamicSubTitle" style="color: var(--text-muted); margin: 0; font-size: 0.75rem; font-weight: 500;">Registry Dashboard</p>
             </div>
         </div>
         
         <!-- Compact Navigation Tabs -->
-        <div class="dashboard-tabs" style="margin-bottom: -1rem; border: none; padding: 0; gap: 2rem;">
-            <button class="tab-link active" data-tab="overview" style="padding: 1rem 0; font-size: 0.9rem; font-weight: 700;">
-                <i class="fas fa-id-card-clip" style="margin-right: 0.5rem;"></i>Overview
+        <div class="dashboard-tabs" style="border: none; padding: 0; gap: 1.5rem; display: flex; align-items: center;">
+            <button class="tab-link active" data-tab="overview" style="padding: 0.4rem 0.75rem; font-size: 0.8rem; font-weight: 600; background: white; border: 1px solid var(--border-color); border-radius: 0.5rem; color: var(--primary-color); display: flex; align-items: center; gap: 0.4rem;">
+                <i class="fas fa-id-card-clip"></i> Overview
             </button>
         </div>
     </div>
@@ -640,9 +640,9 @@
         <div style="display: grid; grid-template-columns: 1fr 350px; gap: 2.5rem;">
             <div>
                 <!-- Branch Registry Section (Replaces Narrative as requested) -->
-                <div class="glass-card" style="padding: 1.5rem; margin-bottom: 2rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                        <h3 style="color: var(--navy-deep); font-weight: 800; margin: 0;"> Portfolio</h3>
+                <div class="glass-card" style="padding: 1.25rem; margin-bottom: 1.25rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                        <h3 style="color: var(--navy-deep); font-weight: 800; margin: 0;">Portfolio</h3>
                         <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">ACTIVE BRANCHES: 2</div>
                     </div>
                     
@@ -678,21 +678,21 @@
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                    <div class="card" style="padding: 1.5rem; border: 1px solid var(--border-color);">
-                        <div style="color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Total Portfolio Rooms</div>
-                        <div style="font-size: 1.5rem; font-weight: 800; color: var(--navy-deep);">@(hotel.NumberOfRooms * 2) Units</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="card" style="padding: 1.25rem; border: 1px solid var(--border-color);">
+                        <div style="color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Total Portfolio Rooms</div>
+                        <div style="font-size: 1.35rem; font-weight: 800; color: var(--navy-deep);">@(hotel.NumberOfRooms * 2) Units</div>
                     </div>
-                    <div class="card" style="padding: 1.5rem; border: 1px solid var(--border-color);">
-                        <div style="color: var(--text-muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">Global Category</div>
-                        <div style="font-size: 1.5rem; font-weight: 800; color: var(--navy-deep);">@hotel.Category</div>
+                    <div class="card" style="padding: 1.25rem; border: 1px solid var(--border-color);">
+                        <div style="color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Global Category</div>
+                        <div style="font-size: 1.35rem; font-weight: 800; color: var(--navy-deep);">@hotel.Category</div>
                     </div>
                 </div>
             </div>
             
             <div style="display: grid; gap: 2.5rem; align-content: start;">
                  <div class="glass-card" style="padding:1.5rem;">
-                    <h4 style="font-weight: 800; color: var(--navy-deep); margin-bottom: 1.5rem;">Registry Contacts</h4>
+                    <h4 style="font-weight: 700; color: var(--navy-deep); margin-bottom: 1.5rem;">Registry Contacts</h4>
                     <div style="display: grid; gap: 1rem;">
                         <div style="display: flex; align-items: center; gap: 1rem;">
                             <i class="fas fa-envelope" style="color: var(--primary-color);"></i>
@@ -710,11 +710,6 @@
 
     <!-- Registry Editor Tab -->
     <div id="editorTab" class="tab-content profile-tab-animate" style="display: none;">
-        <div id="branchEditorHeader" style="display: none; background: #fff3cd; color: #856404; padding: 1rem 1.5rem; border-radius: 1rem; margin-bottom: 1.5rem; border: 1px solid #ffeeba; font-weight: 700; display: flex; align-items: center; gap: 1rem;">
-            <i class="fas fa-code-branch"></i>
-            <span>Editing Branch: <span id="activeBranchName">Main Hub</span></span>
-            <button type="button" class="btn" style="margin-left: auto; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: #856404;" onclick="switchTab('overview'); $('#registrySidebarContainer').hide();">Switch Branch</button>
-        </div>
 
         <form asp-action="CommitRegistry" method="post" id="registryForm">
             <div class="registry-layout" style="grid-template-columns: 1fr;">
@@ -1080,14 +1075,35 @@
                                     <thead style="background: #f8fafc;">
                                         <tr>
                                             <th style="padding: 0.6rem;">Hall Name</th>
+                                            <th style="padding: 0.6rem;">Type</th>
                                             <th style="padding: 0.6rem;">Dimensions</th>
                                             <th style="padding: 0.6rem;">Capacity</th>
                                             <th style="padding: 0.6rem; text-align: center;">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody id="meeting-room-tbody">
-                                        <!-- Dynamically populated -->
-                                        <tr><td colspan="4" class="text-center text-muted py-3">No halls added yet.</td></tr>
+                                        @if (!string.IsNullOrEmpty(hotel.MeetingRooms))
+                                        {
+                                            var rooms = Newtonsoft.Json.JsonConvert.DeserializeObject<List<dynamic>>(hotel.MeetingRooms);
+                                            foreach (var room in rooms)
+                                            {
+                                                <tr>
+                                                    <td style="padding: 0.75rem;"><div style="font-weight: 700; color: var(--navy-deep);">@room.name</div><div style="font-size:0.7rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">@(room.setting ?? "Indoor")</div></td>
+                                                    <td style="padding: 0.75rem;"><span class="badge" style="background: var(--bg-muted); color: var(--navy-deep); font-weight: 700;">@(room.type ?? "")</span></td>
+                                                    <td style="padding: 0.75rem;">@room.width x @room.length x @room.ceilingHeight m</td>
+                                                    <td style="padding: 0.75rem;">@room.capacity Pax</td>
+                                                    <td style="padding: 0.75rem; text-align: center;">
+                                                        <button type="button" class="btn-remove-asset" onclick="removeMeetingRoom(@room.id)">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr><td colspan="5" class="text-center text-muted py-3">No halls added yet.</td></tr>
+                                        }
                                     </tbody>
                                 </table>
                             </div>
@@ -2234,72 +2250,83 @@
 
 <!-- Meeting Room Modal -->
 <div id="meetingRoomModal" class="modal-overlay">
-    <div class="modal-content-animate" style="max-width: 650px;">
-        <div class="glass-card" style="padding: 2rem; position: relative; border-top: 4px solid var(--primary-color);">
+    <div class="modal-content-animate" style="max-width: 600px;">
+        <div class="glass-card" style="padding: 1.5rem; position: relative; border-top: 4px solid var(--primary-color); max-height: 90vh; overflow-y: auto;">
             <button type="button" onclick="closeMeetingRoomModal()" style="position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; font-size: 1.25rem; color: var(--text-muted); cursor: pointer;"><i class="fas fa-times"></i></button>
             <h2 style="margin-bottom: 0.5rem; color: var(--navy-deep);"><i class="fas fa-handshake"></i> Add Meeting Room / Event Hall</h2>
             <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 2rem;">Register technical specifications for your event spaces.</p>
 
-            <div class="form-grid">
+            <div class="form-grid" style="gap: 1rem;">
                 <div class="form-group full-width">
                     <label class="form-label">Hall / Room Name</label>
                     <input type="text" id="meetHallName" placeholder="e.g. Grand Ballroom, Boardroom A" class="form-control" />
                 </div>
 
-                <div class="form-group full-width">
-                    <label class="form-label">Room Setting</label>
-                    <select id="meetSetting" class="form-control">
-                        <option value="Indoor">Indoor</option>
-                        <option value="Open Air">Open Air</option>
-                        <option value="Semi-Outdoor">Semi-Outdoor</option>
-                    </select>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;" class="full-width">
+                    <div class="form-group">
+                        <label class="form-label">Room Setting</label>
+                        <select id="meetSetting" class="form-control">
+                            <option value="Indoor">Indoor</option>
+                            <option value="Open Air">Open Air</option>
+                            <option value="Semi-Outdoor">Semi-Outdoor</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Type</label>
+                        <select id="meetType" class="form-control">
+                            <option value=""></option>
+                            <option value="Theater">Theater</option>
+                            <option value="Banquet">Banquet</option>
+                            <option value="Classroom">Classroom</option>
+                        </select>
+                    </div>
                 </div>
                 
                 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;" class="full-width">
                     <div class="form-group">
-                        <label class="form-label">Width (m)</label>
-                        <input type="number" id="meetWidth" step="0.1" class="form-control room-dim-input" />
+                        <label class="form-label">Width x Length (m)</label>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="number" id="meetWidth" placeholder="W" step="0.1" class="form-control room-dim-input" />
+                            <span style="color: var(--text-muted);">×</span>
+                            <input type="number" id="meetLength" placeholder="L" step="0.1" class="form-control room-dim-input" />
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Length (m)</label>
-                        <input type="number" id="meetLength" step="0.1" class="form-control room-dim-input" />
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Ceiling Height (m)</label>
+                        <label class="form-label">Ceiling (m)</label>
                         <input type="number" id="meetCeiling" step="0.1" class="form-control" />
                     </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Max Capacity (Pax)</label>
-                    <input type="number" id="meetMaxCap" class="form-control" />
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Area Size (sqm)</label>
-                    <input type="number" id="meetAreaSize" class="form-control" readonly />
+                    <div class="form-group">
+                        <label class="form-label">Total Sqm</label>
+                        <input type="number" id="meetAreaSize" class="form-control" style="background: var(--bg-muted); font-weight: 700;" readonly />
+                    </div>
                 </div>
 
                 <div class="form-group full-width">
-                    <label class="form-label">Equipment & Facilities</label>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; background: #f8fafc; padding: 1rem; border-radius: 0.75rem; border: 1.5px solid var(--border-color);">
-                        <label class="premium-checkbox" style="width: 100%;">
+                    <label class="form-label">Max Capacity (Pax)</label>
+                    <input type="number" id="meetMaxCap" class="form-control" placeholder="Total seated capacity" />
+                </div>
+
+                <div class="form-group full-width">
+                    <label class="form-label">Equipment & Features</label>
+                    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 0.75rem; background: #f8fafc; padding: 0.75rem; border-radius: 0.75rem; border: 1.5px solid var(--border-color);">
+                        <label class="premium-checkbox" style="width: 100%; padding: 0.4rem;">
                             <input type="checkbox" id="meetSoundSystem" />
-                            <span class="checkbox-text">Sound System</span>
+                            <span class="checkbox-text" style="font-size: 0.75rem;">Sound System</span>
                             <div class="checkbox-box"><i class="fas fa-check"></i></div>
                         </label>
-                        <label class="premium-checkbox" style="width: 100%;">
+                        <label class="premium-checkbox" style="width: 100%; padding: 0.4rem;">
                             <input type="checkbox" id="meetHVAC" />
-                            <span class="checkbox-text">Air Conditioner (HVAC)</span>
+                            <span class="checkbox-text" style="font-size: 0.75rem;">HVAC (AC)</span>
                             <div class="checkbox-box"><i class="fas fa-check"></i></div>
                         </label>
-                        <label class="premium-checkbox" style="width: 100%;">
+                        <label class="premium-checkbox" style="width: 100%; padding: 0.4rem;">
                             <input type="checkbox" id="meetScreen" />
-                            <span class="checkbox-text">Projector / Screen</span>
+                            <span class="checkbox-text" style="font-size: 0.75rem;">Projector/Screen</span>
                             <div class="checkbox-box"><i class="fas fa-check"></i></div>
                         </label>
-                        <label class="premium-checkbox" style="width: 100%;">
+                        <label class="premium-checkbox" style="width: 100%; padding: 0.4rem;">
                             <input type="checkbox" id="meetInterpreter" />
-                            <span class="checkbox-text">Interpreter Booth</span>
+                            <span class="checkbox-text" style="font-size: 0.75rem;">Interp. Booth</span>
                             <div class="checkbox-box"><i class="fas fa-check"></i></div>
                         </label>
                     </div>
@@ -2846,6 +2873,9 @@
             // Special handling for total counts if needed
             if (fieldName === 'MeetingRooms') {
                 $('#form-meeting-rooms').val(list.length);
+                const totalArea = list.reduce((sum, room) => sum + (parseFloat(room.areaSize) || 0), 0);
+                $('#form-total-meeting-sqm').val(totalArea.toFixed(2));
+                $('#form-meeting-rooms-json').val(json); // Explicitly update hidden field
             } else if (fieldName === 'SpecialtyRestaurants') {
                 $('#form-spec-rest').val(json);
             } else if (fieldName === 'SouvenirShops') {
@@ -2856,6 +2886,7 @@
         // --- Meeting Room Operations ---
         function openMeetingRoomModal() {
             $('#meetHallName, #meetWidth, #meetLength, #meetCeiling, #meetMaxCap, #meetAreaSize').val('');
+            $('#meetType').val('');
             $('#meetSoundSystem, #meetHVAC, #meetScreen, #meetInterpreter').prop('checked', false);
             $('#meetingRoomModal').fadeIn(300).css('display', 'flex');
         }
@@ -2876,6 +2907,7 @@
                 id: Date.now(),
                 name: name,
                 setting: $('#meetSetting').val(),
+                type: $('#meetType').val(),
                 width: parseFloat($('#meetWidth').val()) || 0,
                 length: parseFloat($('#meetLength').val()) || 0,
                 ceilingHeight: parseFloat($('#meetCeiling').val()) || 0,
@@ -2918,6 +2950,7 @@
                 container.append(`
                     <tr>
                         <td style="padding: 0.75rem;"><div style="font-weight: 700; color: var(--navy-deep);">${room.name}</div><div style="font-size:0.7rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">${room.setting || 'Indoor'}</div></td>
+                        <td style="padding: 0.75rem;">${room.type ? `<span class="badge" style="background: var(--bg-muted); color: var(--navy-deep); font-weight: 700;">${room.type}</span>` : ''}</td>
                         <td style="padding: 0.75rem;">${room.width} x ${room.length} x ${room.ceilingHeight} m</td>
                         <td style="padding: 0.75rem;">${room.capacity} Pax</td>
                         <td style="padding: 0.75rem; display: flex; gap: 0.3rem; flex-wrap: wrap;">${equipment.join('')}</td>
@@ -3257,6 +3290,9 @@
 
                     // Update Local State for immediate visibility
                     syncLocalStateOnSave(mode);
+                    if (mode === 'meetings_events' || mode === 'all') {
+                        renderMeetingRooms(); // Re-render editor table
+                    }
                 } else {
                     Swal.fire('Error', result.message || 'Failed to update registry.', 'error');
                 }
@@ -3300,6 +3336,15 @@
                 });
             }
         });
+        
+        // Explicitly sync MeetingRooms JSON string to Identifications for the dynamic summary
+        if (mode === 'meetings_events' || mode === 'all') {
+            const mrJson = JSON.stringify(meetingRoomList);
+            const existing = updatedIds.find(id => id.Description === 'MeetingRooms');
+            if (existing) existing.IdNumber = mrJson;
+            else updatedIds.push({ Description: 'MeetingRooms', IdNumber: mrJson });
+        }
+
         data.Identifications = updatedIds;
 
         // 2. Update Portfolio Card in Overview Tab

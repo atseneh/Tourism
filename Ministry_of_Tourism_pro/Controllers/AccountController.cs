@@ -17,7 +17,7 @@ namespace Ministry_of_Tourism_pro.Controllers
         private readonly SharedHelpers _sharedHelpers;
         private readonly IConfiguration _configuration;
 
-
+        
         public AccountController(AuthenticationManager authManager, SharedHelpers sharedHelpers, IConfiguration configuration)
         {
             _authManager = authManager;
@@ -250,15 +250,35 @@ namespace Ministry_of_Tourism_pro.Controllers
                                 Remark = "Branch"
                             };
                             await _sharedHelpers.CreateUserRoleMapper(roleMapper);
+
+                            // Success Case - We remove the TempData message as credentials are sent via SMS and shown in modal
+                            // TempData["SuccessMessage"] = $"Registration successful! ...";
+
+                            // Send Credentials via SMS using the new endpoint
+                            var smsData = new SMSDTO 
+                            { 
+                                PhoneNo = model.Phone, 
+                                Message = $"Welcome to AATMCDP! Your username is {userName} and password is admin@123. Use these credentials to login and complete your profile." 
+                            };
+                            await Send_SMS(smsData);
+
+                            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                            {
+                                return Json(new { success = true, userName = userName, phone = model.Phone, message = "Credentials sent to your phone." });
+                            }
+
+                            return RedirectToAction("Login");
                         }
                         else
                         {
-                            TempData["ErrorMessage"] = $"Wait! Organization and Admin Person registered, but User Creation failed: {_sharedHelpers.LastResponseContent}";
+                            var errorMsg = $"Wait! Organization and Admin Person registered, but User Creation failed: {_sharedHelpers.LastResponseContent ?? "Internal Error"}";
+                            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                            {
+                                return Json(new { success = false, message = errorMsg });
+                            }
+                            ModelState.AddModelError("", errorMsg);
                         }
                     }
-
-                    TempData["SuccessMessage"] = $"Registration successful! Your default username is {userName}Admin and password is admin@123. Warning: please change your password and user name. You can now wait for approval.";
-                    return RedirectToAction("Login");
                 }
 
                 ModelState.AddModelError("", $"Failed to save registration: {_sharedHelpers.LastResponseContent ?? "Unknown Error"}");
@@ -365,6 +385,20 @@ namespace Ministry_of_Tourism_pro.Controllers
             catch (Exception ex)
             {
                 return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        private async Task<bool> Send_SMS(SMSDTO smsData)
+        {
+            try
+            {
+                var response = await _sharedHelpers.SendReqAsync<SMSDTO, bool>("SMS/Send_SMS", HttpMethod.Post, smsData);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"SMS Error: {ex.Message}");
+                return false;
             }
         }
 

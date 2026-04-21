@@ -65,8 +65,7 @@ namespace Ministry_of_Tourism_pro.Models
         [StringLength(10, MinimumLength = 10, ErrorMessage = "TIN must be 10 digits")]
         public string TIN { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Email is required")]
-        [EmailAddress(ErrorMessage = "Invalid Email Address")]
+     
         public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Phone number is required")]
