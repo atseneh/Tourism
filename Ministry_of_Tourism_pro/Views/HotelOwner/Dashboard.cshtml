@@ -126,6 +126,15 @@
     .btn-branch-long:hover {
         border-color: var(--primary-color); background: var(--bg-muted); transform: translateY(-3px); box-shadow: var(--shadow-md);
     }
+    .btn-action-small {
+        padding: 0.5rem 1rem; border-radius: 0.75rem; font-size: 0.75rem; font-weight: 700; border: none; cursor: pointer;
+        display: flex; align-items: center; gap: 0.4rem; transition: all 0.2s;
+    }
+    .btn-action-small.see { background: var(--bg-muted); color: var(--navy-deep); }
+    .btn-action-small.see:hover { background: #e2e8f0; color: var(--primary-color); }
+    .btn-action-small.update { background: var(--primary-color); color: white; }
+    .btn-action-small.update:hover { background: var(--navy-deep); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+
     .btn-branch-long .branch-icon {
         width: 54px; height: 54px; background: var(--bg-muted); border-radius: 50%; display: flex; align-items: center; 
         justify-content: center; font-size: 1.15rem; color: var(--primary-color); font-weight: 600; border: 1.5px solid var(--border-color);
@@ -654,7 +663,7 @@
                             <div class="btn-branch-long" 
                                  id="branch-card-@b.ConsigneeUnitId"
                                  data-unit-id="@b.ConsigneeUnitId"
-                                 onclick='showBranchSummary("@b.ConsigneeUnitId")'>
+                                 style="cursor: default;">
                                 <div class="branch-icon">@((index + 1).ToString("D2"))</div>
                                 <div style="flex: 1;">
                                     <div class="branch-card-name" style="font-weight: 800; color: var(--navy-deep); font-size: 1.05rem; margin-bottom: 0.25rem;">@b.TradeName - @b.ConsigneeUnitDescription</div>
@@ -664,9 +673,13 @@
                                         <span class="branch-card-city"><i class="fas fa-location-dot"></i> @b.City</span>
                                     </div>
                                 </div>
-                                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                                    <span class="badge" onclick='event.stopPropagation(); loadBranchRegistry("@b.ConsigneeUnitDescription", "@b.Code", "@b.TIN", "@b.ConsigneeUnitId")' style="background: var(--primary-color); color: white; border-radius: 0.75rem; padding: 0.6rem 1.25rem;">See and Update</span>
-                                    <i class="fas fa-chevron-right" style="color: var(--border-color);"></i>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <button type="button" class="btn-action-small see" onclick='showBranchSummary("@b.ConsigneeUnitId")'>
+                                        <i class="fas fa-eye"></i> See
+                                    </button>
+                                    <button type="button" class="btn-action-small update" onclick='loadBranchRegistry("@b.ConsigneeUnitDescription", "@b.Code", "@b.TIN", "@b.ConsigneeUnitId")'>
+                                        <i class="fas fa-edit"></i> Update
+                                    </button>
                                 </div>
                             </div>
                         }
