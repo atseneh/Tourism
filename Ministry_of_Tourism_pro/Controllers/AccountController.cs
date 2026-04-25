@@ -1,3 +1,4 @@
+using CNET_V7_Domain.Domain.TransactionSchema;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,7 @@ using Ministry_of_Tourism_pro.WebConstants;
 using Newtonsoft.Json;
 using System.Data;
 using System.Security.Claims;
+using Microsoft.Extensions.Logging;
 
 namespace Ministry_of_Tourism_pro.Controllers
 {
@@ -16,13 +18,14 @@ namespace Ministry_of_Tourism_pro.Controllers
         private readonly AuthenticationManager _authManager;
         private readonly SharedHelpers _sharedHelpers;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<AccountController> _logger;
 
-        
-        public AccountController(AuthenticationManager authManager, SharedHelpers sharedHelpers, IConfiguration configuration)
+        public AccountController(AuthenticationManager authManager, SharedHelpers sharedHelpers, IConfiguration configuration, ILogger<AccountController> logger)
         {
             _authManager = authManager;
             _sharedHelpers = sharedHelpers;
             _configuration = configuration;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -330,31 +333,54 @@ namespace Ministry_of_Tourism_pro.Controllers
             await _authManager.SignOut();
             return RedirectToAction("Login", "Account");
         }
-
+        
         [HttpPost]
         public async Task<IActionResult> SendOTP(string phoneNumber)
         {
+            _logger.LogInformation("SendOTP requested for phone: {PhoneNumber}", phoneNumber);
+            _sharedHelpers.WriteLog($"--- SendOTP Start for {phoneNumber} ---");
             try
             {
                 var baseUrl = _configuration["CnetOtpSettings:BaseUrl"];
                 var apiKey = _configuration["CnetOtpSettings:ApiKey"];
 
+                _sharedHelpers.WriteLog($"Config - BaseUrl: {baseUrl}, ApiKey present: {!string.IsNullOrEmpty(apiKey)}");
+
+                if (string.IsNullOrEmpty(baseUrl) || string.IsNullOrEmpty(apiKey))
+                {
+                    _logger.LogError("OTP Configuration missing.");
+                    _sharedHelpers.WriteLog("Error: OTP Configuration missing from appsettings/env.");
+                    return Json(new { success = false, message = "OTP service configuration is incomplete." });
+                }
+
                 using (var client = new HttpClient())
                 {
                     client.DefaultRequestHeaders.Add("x-api-key", apiKey);
-                    var response = await client.GetAsync($"{baseUrl}messaging/sendotp?to={phoneNumber}");
-                    var content = await response.Content.ReadAsStringAsync();
+                    var url = $"{baseUrl}messaging/sendotp?to={phoneNumber}";
+                    _logger.LogInformation("Calling OTP API: {Url}", url);
+                    _sharedHelpers.WriteLog($"Request URL: {url}");
 
+                    var response = await client.GetAsync(url);
+                    var content = await response.Content.ReadAsStringAsync();
+                    
+                    _logger.LogInformation("OTP API Response Status: {StatusCode}, Content: {Content}", response.StatusCode, content);
+                    _sharedHelpers.WriteLog($"Response Status: {response.StatusCode}");
+                    _sharedHelpers.WriteLog($"Response Content: {content}");
+                 
                     if (response.IsSuccessStatusCode)
                     {
                         var result = JsonConvert.DeserializeObject<MessageResponse>(content);
                         return Json(new { success = true, data = result });
                     }
+                    
+                    _logger.LogWarning("OTP API failed with status {StatusCode}. Response: {Content}", response.StatusCode, content);
                     return Json(new { success = false, message = "Failed to send OTP", error = content });
                 }
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Exception in SendOTP for {PhoneNumber}", phoneNumber);
+                _sharedHelpers.WriteLog($"Exception: {ex.Message} | StackTrace: {ex.StackTrace}");
                 return Json(new { success = false, message = ex.Message });
             }
         }
@@ -362,28 +388,49 @@ namespace Ministry_of_Tourism_pro.Controllers
         [HttpPost]
         public async Task<IActionResult> VerifyOTP([FromBody] OtpVerificationRequest request)
         {
+            _logger.LogInformation("VerifyOTP requested for phone: {PhoneNumber}, messageId: {MessageId}", request.PhoneNumber, request.MessageId);
+            _sharedHelpers.WriteLog($"--- VerifyOTP Start for {request.PhoneNumber} ---");
             try
             {
                 var baseUrl = _configuration["CnetOtpSettings:BaseUrl"];
                 var apiKey = _configuration["CnetOtpSettings:ApiKey"];
 
+                _sharedHelpers.WriteLog($"Config - BaseUrl: {baseUrl}, ApiKey present: {!string.IsNullOrEmpty(apiKey)}");
+
+                if (string.IsNullOrEmpty(baseUrl) || string.IsNullOrEmpty(apiKey))
+                {
+                    _logger.LogError("OTP Configuration missing during verification.");
+                    _sharedHelpers.WriteLog("Error: OTP Configuration missing.");
+                    return Json(new { success = false, message = "OTP service configuration is incomplete." });
+                }
+
                 using (var client = new HttpClient())
                 {
                     client.DefaultRequestHeaders.Add("x-api-key", apiKey);
-                    // messaging/verifyotp?to={to}&vc={vc}&code={trimmedCode}&messageId={messageId}
                     var url = $"{baseUrl}messaging/verifyotp?to={request.PhoneNumber}&vc={request.Vc}&code={request.Code}&messageId={request.MessageId}";
+                    _logger.LogInformation("Calling Verify OTP API: {Url}", url);
+                    _sharedHelpers.WriteLog($"Request URL: {url}");
+
                     var response = await client.GetAsync(url);
                     var content = await response.Content.ReadAsStringAsync();
+
+                    _logger.LogInformation("Verify OTP API Response Status: {StatusCode}, Content: {Content}", response.StatusCode, content);
+                    _sharedHelpers.WriteLog($"Response Status: {response.StatusCode}");
+                    _sharedHelpers.WriteLog($"Response Content: {content}");
 
                     if (response.IsSuccessStatusCode)
                     {
                         return Json(new { success = true, message = "Successfully verified" });
                     }
+                    
+                    _logger.LogWarning("Verify OTP API failed with status {StatusCode}. Response: {Content}", response.StatusCode, content);
                     return Json(new { success = false, message = "Verification failed or expired", error = content });
                 }
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Exception in VerifyOTP for {PhoneNumber}", request.PhoneNumber);
+                _sharedHelpers.WriteLog($"Exception: {ex.Message} | StackTrace: {ex.StackTrace}");
                 return Json(new { success = false, message = ex.Message });
             }
         }

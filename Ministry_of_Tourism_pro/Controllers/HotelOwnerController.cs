@@ -7,6 +7,8 @@ using Ministry_of_Tourism_pro.Application.Interfaces;
 using System.Security.Claims;
 using Ministry_of_Tourism_pro.Common;
 using Ministry_of_Tourism_pro.WebConstants;
+using CNET_V7_Domain.Domain.TransactionSchema;
+using Newtonsoft.Json;
 
 namespace Ministry_of_Tourism_pro.Controllers
 {
@@ -217,6 +219,27 @@ namespace Ministry_of_Tourism_pro.Controllers
                                 MapIdentificationsToHotel(h, identifications);
                             }
                         }
+
+                        // Fetch and map Vouchers (Restaurants, Shops, Halls)
+                        if (h.ConsigneeUnitId.HasValue)
+                        {
+                            var vouchers = await _sharedHelpers.GetFilterData<List<VoucherDTO>>("Voucher", new Dictionary<string, string> 
+                            { 
+                                { "definition", "102" },
+                                { "consignee1", h.Id.ToString() },
+                                { "consigneeunit1", h.ConsigneeUnitId.Value.ToString() }
+                            });
+
+                            if (vouchers != null && vouchers.Any())
+                            {
+                                MapVouchersToHotel(h, vouchers);
+                            }
+                            else
+                            {
+                                System.Diagnostics.Debug.WriteLine($"No Vouchers found for Consignee {h.Id} Unit {h.ConsigneeUnitId}");
+                            }
+                        }
+
                         hotels.Add(h);
                     }
 
@@ -270,6 +293,19 @@ namespace Ministry_of_Tourism_pro.Controllers
                 if (identifications != null)
                 {
                     MapIdentificationsToHotel(hotel, identifications);
+                }
+
+                // Fetch and map Vouchers
+                var vouchers = await _sharedHelpers.GetFilterData<List<VoucherDTO>>("Voucher", new Dictionary<string, string> 
+                { 
+                    { "definition", "102" },
+                    { "consignee1", hotel.Id.ToString() },
+                    { "consigneeunit1", hotel.ConsigneeUnitId.Value.ToString() }
+                });
+
+                if (vouchers != null && vouchers.Any())
+                {
+                    MapVouchersToHotel(hotel, vouchers);
                 }
             }
 
@@ -356,36 +392,62 @@ namespace Ministry_of_Tourism_pro.Controllers
         [HttpGet]
         public async Task<IActionResult> GetBranchRegistry(int? consigneeUnitId)
         {
-            if (!consigneeUnitId.HasValue) return BadRequest("ConsigneeUnitId is required.");
-
-            // 1. Fetch the branch view to get core details
-            var parameters = new Dictionary<string, string> { { "consigneeUnitId", consigneeUnitId.Value.ToString() } };
-            var data = await _sharedHelpers.GetFilterDynamic<List<VwConsigneeViewDTO>>("VwConsigneeView", parameters);
-            var branchView = data?.FirstOrDefault();
-            if (branchView == null) return NotFound();
-
-            var branch = new HotelDto
+            try 
             {
-                Id = branchView.Id,
-                TradeName = branchView.FirstName ?? "Unnamed Establishment",
-                RegistrationName = branchView.SecondName ?? "Unnamed Establishment",
-                TIN = branchView.Tin,
-                Code = branchView.Code,
-                Category = branchView.ChildPreferenceDescrption ?? "General Sector",
-                ConsigneeUnitId = branchView.ConsigneeUnitId,
-                Subcity = branchView.Subcity?.ToString() ?? ""
-            };
+                if (!consigneeUnitId.HasValue) return BadRequest("ConsigneeUnitId is required.");
 
-            // 2. Fetch and map all identifications for this specific branch
-            var identifications = await _sharedHelpers.GetFilterData<List<IdentificationDTO>>("Identification", new Dictionary<string, string> 
-            { 
-                { "consignee", branch.Id.ToString() },
-                { "remark", branch.ConsigneeUnitId.Value.ToString() }
-            }) ?? new List<IdentificationDTO>();
+                // 1. Fetch the branch view to get core details
+                var parameters = new Dictionary<string, string> { { "consigneeUnitId", consigneeUnitId.Value.ToString() } };
+                var data = await _sharedHelpers.GetFilterDynamic<List<VwConsigneeViewDTO>>("VwConsigneeView", parameters);
+                var branchView = data?.FirstOrDefault();
+                if (branchView == null) return NotFound();
 
-            MapIdentificationsToHotel(branch, identifications);
+                var branch = new HotelDto
+                {
+                    Id = branchView.Id,
+                    TradeName = branchView.FirstName ?? "Unnamed Establishment",
+                    RegistrationName = branchView.SecondName ?? "Unnamed Establishment",
+                    TIN = branchView.Tin,
+                    Code = branchView.Code,
+                    Category = branchView.ChildPreferenceDescrption ?? "General Sector",
+                    ConsigneeUnitId = branchView.ConsigneeUnitId,
+                    Subcity = branchView.Subcity?.ToString() ?? ""
+                };
 
-            return Json(branch);
+                // 2. Fetch and map all identifications for this specific branch
+                var identifications = await _sharedHelpers.GetFilterData<List<IdentificationDTO>>("Identification", new Dictionary<string, string> 
+                { 
+                    { "consignee", branch.Id.ToString() },
+                    { "remark", branch.ConsigneeUnitId.Value.ToString() }
+                }) ?? new List<IdentificationDTO>();
+
+                MapIdentificationsToHotel(branch, identifications);
+                
+                // 3. Fetch and map Vouchers
+                var vouchers = await _sharedHelpers.GetFilterData<List<VoucherDTO>>("Voucher", new Dictionary<string, string> 
+                { 
+                    { "definition", "102" },
+                    { "consignee1", branch.Id.ToString() },
+                    { "consigneeunit1", branch.ConsigneeUnitId.Value.ToString() }
+                });
+
+                if (vouchers != null && vouchers.Any())
+                {
+                    System.Diagnostics.Debug.WriteLine($"Retrieved {vouchers.Count} Vouchers for Branch Registry.");
+                    MapVouchersToHotel(branch, vouchers);
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"No Vouchers found for Branch Registry (Consignee {branch.Id} Unit {branch.ConsigneeUnitId}).");
+                }
+
+                return Json(branch);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"GetBranchRegistry Error: {ex.Message}");
+                return StatusCode(500, "Error loading registry data: " + ex.Message);
+            }
         }
 
         private async Task<ConsigneeBuffer?> SaveConsigneeBuffer(ConsigneeBuffer buffer)
@@ -459,6 +521,95 @@ namespace Ministry_of_Tourism_pro.Controllers
                     if (string.IsNullOrEmpty(val)) continue;
 
                     var existing = existingIds.FirstOrDefault(x => x.Description == prop.Name);
+                    
+                    // Special handling for Specialty Restaurants, Shops, and Meeting Rooms using VoucherDTO
+                    if (prop.Name == "SpecialtyRestaurants" || prop.Name == "SouvenirShops" || prop.Name == "MeetingRooms")
+                    {
+                        try
+                        {
+                            var list = JsonConvert.DeserializeObject<List<dynamic>>(val ?? "[]");
+                            if (list != null)
+                            {
+                                int currentType = prop.Name == "SpecialtyRestaurants" ? 1 : (prop.Name == "SouvenirShops" ? 2 : 3);
+                                
+                                // 1. Fetch and Delete previous vouchers to avoid duplicates and ensure synchronization
+                                var existingVouchers = await _sharedHelpers.GetFilterData<List<VoucherDTO>>("Voucher", new Dictionary<string, string> 
+                                { 
+                                    { "definition", "102" },
+                                    { "type", currentType.ToString() },
+                                    { "consignee1", model.Id.ToString() },
+                                    { "consigneeunit1", model.ConsigneeUnitId.Value.ToString() }
+                                });
+
+                                if (existingVouchers != null && existingVouchers.Any())
+                                {
+                                    foreach (var ev in existingVouchers)
+                                    {
+                                        await _sharedHelpers.SendReqAsync<object, object>($"Voucher/{ev.Id}", HttpMethod.Delete);
+                                    }
+                                }
+                                
+                                // 2. Insert the updated list
+                                foreach (var item in list)
+                                {
+                                    var voucher = new VoucherDTO
+                                    {
+                                        Code = Guid.NewGuid().ToString(),
+                                        Type = currentType,
+                                        Definition = 102,
+                                        LastState = 1305,
+                                        Consignee1 = model.Id,
+                                        ConsigneeUnit1 = model.ConsigneeUnitId,
+                                        IssuedDate = DateTime.Now,
+                                        CreatedOn = DateTime.Now,
+                                        LastModified = DateTime.Now,
+                                        LastUser = 1,
+                                        LastActivity = 2
+                                    };
+
+                                    if (prop.Name == "SpecialtyRestaurants")
+                                    {
+                                        voucher.Extension1 = item.name;
+                                        voucher.Extension2 = item.type;
+                                        voucher.Extension3 = item.cuisine;
+                                        voucher.Extension4 = item.capacity?.ToString();
+                                        voucher.Extension5 = $"{(item.halal == true ? "halal" : "")}|{(item.vegan == true ? "vegan" : "")}";
+                                        voucher.Extension6 = item.notes;
+                                        voucher.Remark = "SpecialtyRestaurant";
+                                    }
+                                    else if (prop.Name == "SouvenirShops")
+                                    {
+                                        voucher.Extension1 = item.name;
+                                        voucher.Extension2 = item.category;
+                                        voucher.Extension3 = item.location;
+                                        voucher.Extension4 = item.hours;
+                                        voucher.Extension5 = item.notes;
+                                        voucher.Remark = "SouvenirShop";
+                                    }
+                                    else if (prop.Name == "MeetingRooms")
+                                    {
+                                        voucher.Extension1 = item.name;
+                                        voucher.Extension2 = item.type;
+                                        voucher.Extension3 = $"{item.width}x{item.length}x{item.ceilingHeight}";
+                                        voucher.Extension4 = item.capacity?.ToString();
+                                        voucher.Extension5 = item.setting;
+                                        voucher.Remark = "MeetingRoom";
+                                    }
+
+                                    await _sharedHelpers.SendReqAsync<VoucherDTO, VoucherDTO>("Voucher", HttpMethod.Post, voucher);
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Error Syncing {prop.Name} to Voucher: {ex.Message}");
+                        }
+
+                        // Also keep existing Identification logic for compatibility if needed, 
+                        // or skip if we want to fully transition. The user said "use this namespace... for this fields", 
+                        // implying a transition. But I'll keep the Identification write for now to avoid breaking existing code.
+                    }
+
                     if (existing != null)
                     {
                         existing.IdNumber = val;
@@ -522,6 +673,62 @@ namespace Ministry_of_Tourism_pro.Controllers
                     catch { /* Skip mapping errors */ }
                 }
             }
+        }
+
+        private void MapVouchersToHotel(HotelDto h, List<VoucherDTO> vouchers)
+        {
+            var restaurants = new List<object>();
+            var shops = new List<object>();
+            var meetings = new List<object>();
+
+            foreach (var v in vouchers)
+            {
+                if (v.Type == 1) // Specialty Restaurant
+                {
+                    restaurants.Add(new
+                    {
+                        id = v.Id,
+                        name = v.Extension1,
+                        type = v.Extension2,
+                        cuisine = v.Extension3,
+                        capacity = int.TryParse(v.Extension4, out int c) ? (int?)c : null,
+                        halal = v.Extension5?.Contains("halal") ?? false,
+                        vegan = v.Extension5?.Contains("vegan") ?? false,
+                        notes = v.Extension6
+                    });
+                }
+                else if (v.Type == 2) // Souvenir Shop
+                {
+                    shops.Add(new
+                    {
+                        id = v.Id,
+                        name = v.Extension1,
+                        category = v.Extension2,
+                        location = v.Extension3,
+                        hours = v.Extension4,
+                        notes = v.Extension5
+                    });
+                }
+                else if (v.Type == 3) // Meeting Room
+                {
+                    string[] dims = (v.Extension3 ?? "0x0x0").Split('x');
+                    meetings.Add(new
+                    {
+                        id = v.Id,
+                        name = v.Extension1,
+                        type = v.Extension2,
+                        width = dims.Length > 0 ? dims[0] : "0",
+                        length = dims.Length > 1 ? dims[1] : "0",
+                        ceilingHeight = dims.Length > 2 ? dims[2] : "0",
+                        capacity = int.TryParse(v.Extension4, out int cp) ? (int?)cp : null,
+                        setting = v.Extension5
+                    });
+                }
+            }
+
+            if (restaurants.Any()) h.SpecialtyRestaurants = JsonConvert.SerializeObject(restaurants);
+            if (shops.Any()) h.SouvenirShops = JsonConvert.SerializeObject(shops);
+            if (meetings.Any()) h.MeetingRooms = JsonConvert.SerializeObject(meetings);
         }
     }
 }

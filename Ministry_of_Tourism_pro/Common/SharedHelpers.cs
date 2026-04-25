@@ -12,16 +12,38 @@ using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
 
 namespace Ministry_of_Tourism_pro.Common
 {
     public class SharedHelpers
     {
         private readonly HttpClient _httpClient;
+        private readonly IWebHostEnvironment _env;
 
-        public SharedHelpers(IHttpClientFactory httpClientFactory)
+        public SharedHelpers(IHttpClientFactory httpClientFactory, IWebHostEnvironment env)
         {
             _httpClient = httpClientFactory.CreateClient("mainclient");
+            _env = env;
+        }
+
+        public void WriteLog(string message)
+        {
+            try
+            {
+                var logDir = Path.Combine(_env.ContentRootPath, "Logs");
+                if (!Directory.Exists(logDir)) Directory.CreateDirectory(logDir);
+                
+                var logPath = Path.Combine(logDir, "otp_debug.txt");
+                var logMessage = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {message}{Environment.NewLine}";
+                
+                File.AppendAllText(logPath, logMessage);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Failed to write log to file: {ex.Message}");
+            }
         }
 
         public string? LastResponseContent { get; private set; }

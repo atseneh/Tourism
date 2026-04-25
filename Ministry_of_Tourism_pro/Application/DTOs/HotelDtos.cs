@@ -25,6 +25,7 @@ namespace Ministry_of_Tourism_pro.Application.DTOs
         public string? Zone { get; set; }
         public string City { get; set; } = string.Empty;
         public string Subcity { get; set; } = string.Empty;
+        [System.Text.Json.Serialization.JsonIgnore]
         public string SubCity { get => Subcity; set => Subcity = value; }
         public string? Woreda { get; set; }
         public string Email { get; set; } = string.Empty;
