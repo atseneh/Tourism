@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 @{
     var prefParentIdClaim = User.FindFirst("PreferenceParentId")?.Value;
@@ -81,8 +81,14 @@
                             <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Reports" ? "active" : "")"
                                asp-controller="Commissioner"
                                asp-action="Reports">
-                                <i class="fas fa-chart-pie"></i> Reports
+                                <i class="fas fa-chart-pie"></i> Reports Center
                             </a>
+                            <ul class="sub-nav" style="list-style: none; padding-left: 1.5rem; margin-top: 0.5rem; display: @(ViewContext.RouteData.Values["action"]?.ToString() == "Reports" ? "block" : "none")">
+                                <li style="margin-bottom: 0.5rem;"><a href="/Commissioner/Reports?cat=registry" style="font-size: 0.7rem; color: var(--text-muted); text-decoration: none; font-weight: 600;"><i class="fas fa-hotel" style="width: 20px;"></i> Registry & Infra</a></li>
+                                <li style="margin-bottom: 0.5rem;"><a href="/Commissioner/Reports?cat=mice" style="font-size: 0.7rem; color: var(--text-muted); text-decoration: none; font-weight: 600;"><i class="fas fa-handshake" style="width: 20px;"></i> MICE & Events</a></li>
+                                <li style="margin-bottom: 0.5rem;"><a href="/Commissioner/Reports?cat=tech" style="font-size: 0.7rem; color: var(--text-muted); text-decoration: none; font-weight: 600;"><i class="fas fa-microchip" style="width: 20px;"></i> Hospitality Tech</a></li>
+                                <li style="margin-bottom: 0.5rem;"><a href="/Commissioner/Reports?cat=compliance" style="font-size: 0.7rem; color: var(--text-muted); text-decoration: none; font-weight: 600;"><i class="fas fa-shield-halved" style="width: 20px;"></i> Compliance</a></li>
+                            </ul>
                         </li>
 
                       @*   <li class="nav-item">

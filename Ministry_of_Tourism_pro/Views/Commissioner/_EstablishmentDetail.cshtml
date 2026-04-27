@@ -3,7 +3,7 @@
 @using Newtonsoft.Json
 @using Newtonsoft.Json.Linq
 @{
-    var categories = new List<(int Id, string Name, string Icon, List<string> Props)>
+    var allCategories = new List<(int Id, string Name, string Icon, List<string> Props)>
     {
         (CNET_WebConstantes.CAT_PROPERTY_PROFILE, "Basic Information", "fa-id-card", new List<string> { "City", "RegistrationName", "SubCity", "StarCategory", "SpecificAddress", "ContactInformation", "SustainabilityFocalPoint", "ReservationsContact" }),
         (CNET_WebConstantes.CAT_ROOM_INVENTORY, "Accommodation Infrastructure", "fa-bed", new List<string> { "KingSizeRooms", "TwinBedRooms", "JuniorSuites", "Suites", "PresidentialSuites", "AccessibleRooms", "TotalRooms", "TotalBeds" }),
@@ -18,6 +18,15 @@
         (CNET_WebConstantes.CAT_SUSTAINABILITY_CERTIFICATIONS, "Sustainability", "fa-leaf", new List<string> { "SustainabilityCertification", "OtherEcoLabels", "FoodWasteProgram", "TourismServiceCompetenceLicenseCertificate", "FireSafetyCertificate", "EnvironmentalClearanceCertificate", "FoodSafetyAndHygieneCertificate" }),
         (CNET_WebConstantes.CAT_STAFFING_LANGUAGES, "Staffing & Languages", "fa-users-gears", new List<string> { "TotalStaff", "InternationalLanguagesFrontDesk" })
     };
+
+    bool isRestaurant = Model.Category?.Contains("Restaurant", StringComparison.OrdinalIgnoreCase) ?? false;
+    bool isHotel = Model.Category?.Contains("Hotel", StringComparison.OrdinalIgnoreCase) ?? false;
+
+    var categories = allCategories.Where(c => {
+        if (c.Id == CNET_WebConstantes.CAT_ROOM_INVENTORY) return !isRestaurant;
+        if (c.Id == CNET_WebConstantes.CAT_MEETINGS_EVENTS) return !isRestaurant;
+        return true;
+    }).ToList();
 
     var labelMapping = new Dictionary<string, string>
     {

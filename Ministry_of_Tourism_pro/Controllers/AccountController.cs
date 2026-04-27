@@ -102,8 +102,8 @@ namespace Ministry_of_Tourism_pro.Controllers
                             var consignee = await _sharedHelpers.GetConsigneeById(user.Person);
                             if (consignee != null && !string.IsNullOrEmpty(consignee.Tin))
                             {
-                                var org = await _sharedHelpers.GetLoggedInCopany(consignee.Tin);
-                                if (org != null && org.Preference > 0)
+                                 var org = await _sharedHelpers.GetLoggedInCopany(consignee.Tin);
+                                if (org != null && org.Preference != 0)
                                 {
                                     prefParentId = await _sharedHelpers.GetPreferenceParentId(org.Preference);
                                 }
@@ -275,7 +275,7 @@ namespace Ministry_of_Tourism_pro.Controllers
                             var smsData = new SMSDTO 
                             { 
                                 PhoneNo = model.Phone, 
-                                Message = $"Welcome to AATMCDP! Your username is {userName} and password is admin@123. Use these credentials to login and complete your profile." 
+                                Message = $"Welcome to Addis Ababa Tourism & MICE ! Your username is {userName} and password is admin@123. Use these credentials to login and complete your profile." 
                             };
                             await Send_SMS(smsData);
 

@@ -2412,13 +2412,15 @@
             const val = parseInt($(this).val()) || 0;
             totals.rooms += val;
             
-            // Bed logic: Twin = val * 2, Others = val * 1 for this calculation
-            // Unless the user specifies beds per room elsewhere.
             const id = $(this).attr('id');
             if (id.includes('twin')) {
                 totals.beds += (val * 2);
-            } else if (id.includes('suite') || id.includes('pres')) {
-                totals.beds += (val * 2); // Suites usually have at least 2 beds
+            } else if (id.includes('form-suites')) {
+                totals.beds += (val * 3);
+            } else if (id.includes('pres-suites')) {
+                totals.beds += (val * 3);
+            } else if (id.includes('junior-suites')) {
+                totals.beds += val;
             } else {
                 totals.beds += val;
             }
