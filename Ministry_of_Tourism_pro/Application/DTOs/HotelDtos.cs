@@ -31,6 +31,7 @@ namespace Ministry_of_Tourism_pro.Application.DTOs
         public string Email { get; set; } = string.Empty;
         public string Phone1 { get; set; } = string.Empty;
         public string? Phone2 { get; set; }
+        public string? Email2 { get; set; }
         public string? Website { get; set; }
         public string? Kebele { get; set; }
         public string? HouseNumber { get; set; }
@@ -198,6 +199,7 @@ namespace Ministry_of_Tourism_pro.Application.DTOs
         public string Phone1 { get; set; } = string.Empty;
         public string? Phone2 { get; set; }
         public string Email { get; set; } = string.Empty;
+        public string? Email2 { get; set; }
         public string? Website { get; set; }
 
         // Address Details

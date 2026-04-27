@@ -11,7 +11,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
-<body>
+@{
+    var prefParentIdClaim = User.FindFirst("PreferenceParentId")?.Value;
+    string themeClass = "";
+    if (prefParentIdClaim != null)
+    {
+        if (prefParentIdClaim == "14") themeClass = "theme-hotels";
+        else if (prefParentIdClaim == "15") themeClass = "theme-restaurants";
+        else if (prefParentIdClaim == "16") themeClass = "theme-mice";
+    }
+}
+<body class="@themeClass">
     <aside class="sidebar">
         <div class="sidebar-header">
             <a class="sidebar-brand" asp-controller="Home" asp-action="Index">

@@ -91,7 +91,7 @@ namespace Ministry_of_Tourism_pro.Common
             return userValidation ?? _s;
         }
 
-        public virtual async Task SignIn(UserDTO user, bool isPersistent, string role)
+        public virtual async Task SignIn(UserDTO user, bool isPersistent, string role, int? preferenceParentId = null)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
@@ -106,6 +106,9 @@ namespace Ministry_of_Tourism_pro.Common
 
             if (!string.IsNullOrEmpty(role))
                 claims.Add(new Claim(ClaimTypes.Role, role, ClaimValueTypes.String, CNET_WebConstantes.ClaimsIssuer));
+
+            if (preferenceParentId.HasValue)
+                claims.Add(new Claim("PreferenceParentId", preferenceParentId.Value.ToString(), ClaimValueTypes.Integer, CNET_WebConstantes.ClaimsIssuer));
 
             var userIdentity = new ClaimsIdentity(claims, CNET_WebConstantes.CookieScheme);
             var userPrincipal = new ClaimsPrincipal(userIdentity);

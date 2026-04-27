@@ -3,9 +3,14 @@
 @{
     ViewData["Title"] = Model.Name + " - Property Management";
 
-    var categories = new List<(int Id, string Name, string Icon, List<string> Props)>
+    var categoryId = User.FindFirst("PreferenceParentId")?.Value;
+    bool isHotel = categoryId == "14";
+    bool isRestaurant = categoryId == "15";
+    bool isMice = categoryId == "16";
+
+    var allCategories = new List<(int Id, string Name, string Icon, List<string> Props)>
     {
-        (CNET_WebConstantes.CAT_PROPERTY_PROFILE, "Property Profile", "fa-id-card", new List<string> { "RegistrationName", "SubCity", "SpecificAddress", "DistanceFromAirport", "StarCategory", "TotalRooms", "TotalBeds", "ContactInformation", "ReservationsContact", "SustainabilityFocalPoint" }),
+        (CNET_WebConstantes.CAT_PROPERTY_PROFILE, "Property Profile", "fa-id-card", new List<string> { "RegistrationName", "SubCity", "SpecificAddress", "DistanceFromAirport", "StarCategory", "TotalRooms", "TotalBeds", "Phone1", "Phone2", "Email", "Email2", "ContactInformation", "ReservationsContact", "SustainabilityFocalPoint" }),
         (CNET_WebConstantes.CAT_ROOM_INVENTORY, "Room Inventory", "fa-bed", new List<string> { "KingSizeRooms", "TwinBedRooms", "JuniorSuites", "Suites", "PresidentialSuites", "AccessibleRooms" }),
         (CNET_WebConstantes.CAT_FOOD_BEVERAGE_RETAIL, "Food & Beverage", "fa-utensils", new List<string> { "AllDayDining", "AllDayDiningSeats", "SpecialtyRestaurants", "CoffeeShop", "BarsCount", "NightClub", "SouvenirShops", "DelegationCatering", "DelegationCateringMaxPax", "RefillWaterStations", "VegVeganOptions", "NoSingleUsePlastics" }),
         (CNET_WebConstantes.CAT_MEETINGS_EVENTS, "Meetings & Events", "fa-calendar-check", new List<string> { "MeetingRoomsCount", "MeetingRooms", "LargestRoomCapacityTheatre", "LargestRoomCapacityClassroom", "LargestRoomCapacityBanquet", "TotalMeetingSpaceSqm" }),
@@ -18,6 +23,13 @@
         (CNET_WebConstantes.CAT_SUSTAINABILITY_CERTIFICATIONS, "Sustainability", "fa-leaf", new List<string> { "SustainabilityCertification", "OtherEcoLabels", "FoodWasteProgram", "SustainabilityRefillWaterStations", "TourismServiceCompetenceLicenseCertificate", "FireSafetyCertificate", "EnvironmentalClearanceCertificate", "FoodSafetyAndHygieneCertificate" }),
         (CNET_WebConstantes.CAT_STAFFING_LANGUAGES, "Staffing & Languages", "fa-users-gears", new List<string> { "TotalStaff", "InternationalLanguagesFrontDesk" })
     };
+
+    // Filter categories based on organization type
+    var categories = allCategories.Where(c => {
+        if (c.Id == CNET_WebConstantes.CAT_ROOM_INVENTORY) return isHotel;
+        if (c.Id == CNET_WebConstantes.CAT_MEETINGS_EVENTS || c.Id == CNET_WebConstantes.CAT_PUBLIC_FACILITIES) return !isRestaurant;
+        return true;
+    }).ToList();
 }
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
@@ -25,7 +37,7 @@
 <style>
     /* Premium Management Aesthetic */
     .management-header {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        background: linear-gradient(135deg, var(--navy-deep) 0%, var(--primary-color) 100%);
         padding: 1.75rem 2.5rem; border-radius: 1.5rem; margin-bottom: 2rem; color: white; box-shadow: var(--shadow-xl);
     }
     .dashboard-tabs { display: flex; gap: 2.5rem; border-bottom: 2px solid var(--border-color); margin-bottom: 2.5rem; }
@@ -149,6 +161,10 @@
                                         var prop = Model.GetType().GetProperty(propName);
                                         var value = prop?.GetValue(Model);
                                         var label = System.Text.RegularExpressions.Regex.Replace(propName, "([A-Z])", " $1").Trim();
+                                        if (propName == "Phone1") label = "Main Contact Number";
+                                        else if (propName == "Phone2") label = "Alternative Phone";
+                                        else if (propName == "Email") label = "Official Email";
+                                        else if (propName == "Email2") label = "Alternative Email";
                                         
                                         <div class="detail-row">
                                             <span class="detail-label">@label</span>
@@ -328,8 +344,10 @@
                 <div class="collapsible-content">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem;">
                         <div class="form-grid">
-                            <div class="form-group"><label class="form-label">Phone 1</label><input type="text" name="consigneeUnits[0].Phone1" value="@Model.Phone1" class="form-control" data-type="@CNET_WebConstantes.CAT_PROPERTY_PROFILE" /></div>
-                            <div class="form-group"><label class="form-label">Email</label><input type="text" name="consigneeUnits[0].Email" value="@Model.Email" class="form-control" data-type="@CNET_WebConstantes.CAT_PROPERTY_PROFILE" /></div>
+                            <div class="form-group"><label class="form-label">Main Contact Number</label><input type="text" name="consigneeUnits[0].Phone1" value="@Model.Phone1" class="form-control" data-type="@CNET_WebConstantes.CAT_PROPERTY_PROFILE" /></div>
+                            <div class="form-group"><label class="form-label">Alternative Phone</label><input type="text" name="consigneeUnits[0].Phone2" value="@Model.Phone2" class="form-control" data-type="@CNET_WebConstantes.CAT_PROPERTY_PROFILE" /></div>
+                            <div class="form-group"><label class="form-label">Official Email</label><input type="text" name="consigneeUnits[0].Email" value="@Model.Email" class="form-control" data-type="@CNET_WebConstantes.CAT_PROPERTY_PROFILE" /></div>
+                            <div class="form-group"><label class="form-label">Alternative Email</label><input type="text" name="consigneeUnits[0].Email2" value="@Model.Email2" class="form-control" data-type="@CNET_WebConstantes.CAT_PROPERTY_PROFILE" /></div>
                             <div class="form-group"><label class="form-label">Region</label><input type="text" name="consigneeUnits[0].Region" value="@Model.Region" class="form-control" data-type="@CNET_WebConstantes.CAT_PROPERTY_PROFILE" /></div>
                             <div class="form-group"><label class="form-label">City/Town</label><input type="text" name="consigneeUnits[0].City" value="@Model.City" class="form-control" data-type="@CNET_WebConstantes.CAT_PROPERTY_PROFILE" /></div>
                             <div class="form-group"><label class="form-label">Subcity</label><input type="text" name="consigneeUnits[0].SubCity" value="@Model.SubCity" class="form-control" data-type="@CNET_WebConstantes.CAT_PROPERTY_PROFILE" /></div>

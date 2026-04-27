@@ -96,7 +96,21 @@ namespace Ministry_of_Tourism_pro.Controllers
                             role = "HotelOwner";
                         }
 
-                        await _authManager.SignIn(user, model.RememberMe, role);
+                        int? prefParentId = null;
+                        if (role == "HotelOwner" && user.Person != 0)
+                        {
+                            var consignee = await _sharedHelpers.GetConsigneeById(user.Person);
+                            if (consignee != null && !string.IsNullOrEmpty(consignee.Tin))
+                            {
+                                var org = await _sharedHelpers.GetLoggedInCopany(consignee.Tin);
+                                if (org != null && org.Preference > 0)
+                                {
+                                    prefParentId = await _sharedHelpers.GetPreferenceParentId(org.Preference);
+                                }
+                            }
+                        }
+
+                        await _authManager.SignIn(user, model.RememberMe, role, prefParentId);
 
                         if (role == "SystemAdmin")
                             return RedirectToAction("Index", "SystemAdmin");

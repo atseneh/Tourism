@@ -15,6 +15,28 @@
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
+/* Category Themes */
+.theme-hotels {
+    --primary-color: #1e3a8a; /* Deep Blue */
+    --primary-dark: #1e1b4b;
+    --navy-deep: #1e3a8a;
+    --accent-color: #fbbf24; /* Gold */
+}
+
+.theme-restaurants {
+    --primary-color: #c2410c; /* Deep Orange/Terracotta */
+    --primary-dark: #7c2d12;
+    --navy-deep: #7c2d12;
+    --accent-color: #15803d; /* Sage Green */
+}
+
+.theme-mice {
+    --primary-color: #4338ca; /* Indigo */
+    --primary-dark: #312e81;
+    --navy-deep: #312e81;
+    --accent-color: #06b6d4; /* Cyan */
+}
+
 body {
     background-color: #f1f5f9;
     color: var(--text-dark);

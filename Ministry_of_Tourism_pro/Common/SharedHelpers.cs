@@ -294,6 +294,13 @@ namespace Ministry_of_Tourism_pro.Common
             }
             return default;
         }
+
+        public async Task<int?> GetPreferenceParentId(int preferenceId)
+        {
+            var parameters = new Dictionary<string, string> { { "id", preferenceId.ToString() } };
+            var prefs = await GetFilterData<List<PreferenceDTO>>("Preference", parameters);
+            return prefs?.FirstOrDefault()?.ParentId;
+        }
     }
 
     public static class HttpClientExtensions

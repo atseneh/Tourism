@@ -40,6 +40,10 @@ namespace Ministry_of_Tourism_pro.WebConstants
         public const int SUPERVISOR = 7;
         public const int GENERAL_MANAGER = 8;
 
+        public const int HOTELS_OR_RESORTS = 14;
+        public const int RESTAURANTS_OR_BARS = 15;
+        public const int MICE_DESTINATIONS = 16;
+
         /// <summary>Tourism establishment business types used in HotelOwner registry forms.</summary>
         public static readonly List<string> BusinessTypes = new()
         {
