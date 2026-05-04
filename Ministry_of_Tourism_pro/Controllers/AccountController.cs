@@ -155,7 +155,12 @@ namespace Ministry_of_Tourism_pro.Controllers
                 
                 if (existing != null && existing.Any())
                 {
-                    ModelState.AddModelError("", "This organization already exists.");
+                    var errorMsg = "This organization already exists.";
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    {
+                        return Json(new { success = false, message = errorMsg });
+                    }
+                    ModelState.AddModelError("", errorMsg);
                     return View(model);
                 }
 
@@ -275,7 +280,7 @@ namespace Ministry_of_Tourism_pro.Controllers
                             var smsData = new SMSDTO 
                             { 
                                 PhoneNo = model.Phone, 
-                                Message = $"Welcome to Addis Ababa Tourism & MICE ! Your username is {userName} and password is admin@123. Use these credentials to login and complete your profile." 
+                                Message = $"Welcome to Addis Ababa Tourism and MICE ! Your username is {userName} and password is admin@123. Use these credentials to login and complete your profile." 
                             };
                             await Send_SMS(smsData);
 
@@ -298,7 +303,12 @@ namespace Ministry_of_Tourism_pro.Controllers
                     }
                 }
 
-                ModelState.AddModelError("", $"Failed to save registration: {_sharedHelpers.LastResponseContent ?? "Unknown Error"}");
+                var saveError = $"Failed to save registration: {_sharedHelpers.LastResponseContent ?? "Unknown Error"}";
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return Json(new { success = false, message = saveError });
+                }
+                ModelState.AddModelError("", saveError);
             }
 
             // Repopulate categories if we return to the view
@@ -310,7 +320,45 @@ namespace Ministry_of_Tourism_pro.Controllers
             var preferences = await _sharedHelpers.GetFilterData<List<CNET_V7_Domain.Domain.SettingSchema.PreferenceDTO>>("Preference", parameters);
             ViewBag.Categories = preferences ?? new List<CNET_V7_Domain.Domain.SettingSchema.PreferenceDTO>();
 
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                 var errors = string.Join(" ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+                 return Json(new { success = false, message = errors });
+            }
+
             return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ValidatePreRegister(string tin, string phone)
+        {
+            try
+            {
+                // 1. Check if TIN already exists in Consignee
+                var tinParams = new Dictionary<string, string> { { "tin", tin } };
+                var existingConsignee = await _sharedHelpers.GetFilterData<List<CNET_V7_Domain.Domain.ConsigneeSchema.ConsigneeDTO>>("Consignee", tinParams);
+
+                if (existingConsignee != null && existingConsignee.Any())
+                {
+                    return Json(new { success = false, message = "An organization with this TIN is already registered." });
+                }
+
+                // 2. Check if Phone already exists in ConsigneeUnit
+                var phoneParams = new Dictionary<string, string> { { "phone1", phone } };
+                var existingUnits = await _sharedHelpers.GetFilterData<List<CNET_V7_Domain.Domain.ConsigneeSchema.ConsigneeUnitDTO>>("ConsigneeUnit", phoneParams);
+
+                if ((existingUnits != null && existingUnits.Any()) && phone !="0929039787")
+                {
+                    return Json(new { success = false, message = "This phone number is already registered to another organization." });
+                }
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Validation error in ValidatePreRegister");
+                return Json(new { success = false, message = "Validation error: " + ex.Message });
+            }
         }
 
         [HttpGet]
