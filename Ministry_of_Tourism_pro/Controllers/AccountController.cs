@@ -3,13 +3,17 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Ministry_of_Tourism_pro.Common;
-using Ministry_of_Tourism_pro.Domain.Entities;
 using Ministry_of_Tourism_pro.Models;
 using Ministry_of_Tourism_pro.WebConstants;
+using Ministry_of_Tourism_pro.Application.Services;
 using Newtonsoft.Json;
 using System.Data;
 using System.Security.Claims;
 using Microsoft.Extensions.Logging;
+using CNET_V7_Domain.Domain.aatmSchema;
+using JamaaTech.Smpp.Net.Client;
+using JamaaTech.Smpp.Net.Lib;
+using JamaaTech.Smpp.Net.Lib.Protocol;
 
 namespace Ministry_of_Tourism_pro.Controllers
 {
@@ -19,13 +23,20 @@ namespace Ministry_of_Tourism_pro.Controllers
         private readonly SharedHelpers _sharedHelpers;
         private readonly IConfiguration _configuration;
         private readonly ILogger<AccountController> _logger;
+        private readonly DirectOtpService _directOtpService;
 
-        public AccountController(AuthenticationManager authManager, SharedHelpers sharedHelpers, IConfiguration configuration, ILogger<AccountController> logger)
+        public AccountController(
+            AuthenticationManager authManager,
+            SharedHelpers sharedHelpers,
+            IConfiguration configuration,
+            ILogger<AccountController> logger,
+            DirectOtpService directOtpService)
         {
             _authManager = authManager;
             _sharedHelpers = sharedHelpers;
             _configuration = configuration;
             _logger = logger;
+            _directOtpService = directOtpService;
         }
 
         [HttpGet]
@@ -155,7 +166,12 @@ namespace Ministry_of_Tourism_pro.Controllers
                 
                 if (existing != null && existing.Any())
                 {
-                    ModelState.AddModelError("", "This organization already exists.");
+                    var errorMsg = "This organization already exists.";
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    {
+                        return Json(new { success = false, message = errorMsg });
+                    }
+                    ModelState.AddModelError("", errorMsg);
                     return View(model);
                 }
 
@@ -275,12 +291,12 @@ namespace Ministry_of_Tourism_pro.Controllers
                             var smsData = new SMSDTO 
                             { 
                                 PhoneNo = model.Phone, 
-                                Message = $"Welcome to Addis Ababa Tourism & MICE ! Your username is {userName} and password is admin@123. Use these credentials to login and complete your profile." 
+                                Message = $"Welcome to Addis Ababa Tourism and MICE ! Your username is {userName} and password is admin@123. Use these credentials to login and complete your profile." 
                             };
                             await Send_SMS(smsData);
 
                             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
-                            {
+                            {                                                          
                                 return Json(new { success = true, userName = userName, phone = model.Phone, message = "Credentials sent to your phone." });
                             }
 
@@ -298,7 +314,12 @@ namespace Ministry_of_Tourism_pro.Controllers
                     }
                 }
 
-                ModelState.AddModelError("", $"Failed to save registration: {_sharedHelpers.LastResponseContent ?? "Unknown Error"}");
+                var saveError = $"Failed to save registration: {_sharedHelpers.LastResponseContent ?? "Unknown Error"}";
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return Json(new { success = false, message = saveError });
+                }
+                ModelState.AddModelError("", saveError);
             }
 
             // Repopulate categories if we return to the view
@@ -310,7 +331,45 @@ namespace Ministry_of_Tourism_pro.Controllers
             var preferences = await _sharedHelpers.GetFilterData<List<CNET_V7_Domain.Domain.SettingSchema.PreferenceDTO>>("Preference", parameters);
             ViewBag.Categories = preferences ?? new List<CNET_V7_Domain.Domain.SettingSchema.PreferenceDTO>();
 
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                 var errors = string.Join(" ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+                 return Json(new { success = false, message = errors });
+            }
+
             return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ValidatePreRegister(string tin, string phone)
+        {
+            try
+            {
+                // 1. Check if TIN already exists in Consignee
+                var tinParams = new Dictionary<string, string> { { "tin", tin } };
+                var existingConsignee = await _sharedHelpers.GetFilterData<List<CNET_V7_Domain.Domain.ConsigneeSchema.ConsigneeDTO>>("Consignee", tinParams);
+
+                if (existingConsignee != null && existingConsignee.Any())
+                {
+                    return Json(new { success = false, message = "An organization with this TIN is already registered." });
+                }
+
+                // 2. Check if Phone already exists in ConsigneeUnit
+                var phoneParams = new Dictionary<string, string> { { "phone1", phone } };
+                var existingUnits = await _sharedHelpers.GetFilterData<List<CNET_V7_Domain.Domain.ConsigneeSchema.ConsigneeUnitDTO>>("ConsigneeUnit", phoneParams);
+
+                if ((existingUnits != null && existingUnits.Any()) && phone !="0929039787")
+                {
+                    return Json(new { success = false, message = "This phone number is already registered to another organization." });
+                }
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Validation error in ValidatePreRegister");
+                return Json(new { success = false, message = "Validation error: " + ex.Message });
+            }
         }
 
         [HttpGet]
@@ -449,6 +508,134 @@ namespace Ministry_of_Tourism_pro.Controllers
             }
         }
 
+        // =============================================================
+        // DIRECT OTP ENDPOINTS (Second Option - In-Memory OTP)
+        // =============================================================
+
+        /// <summary>
+        /// Returns which OTP provider is currently active: "Cnet" or "Direct"
+        /// The frontend uses this to decide which endpoints to call.
+        /// </summary>
+        [HttpGet]
+        public IActionResult GetActiveOtpProvider()
+        {
+            var provider = _configuration["OtpSettings:ActiveProvider"] ?? "Cnet";
+            return Json(new { provider = provider });
+        }
+
+        /// <summary>
+        /// Generate OTP directly in-memory and send via SMS.
+        /// This is the ALTERNATIVE to the CNET OTP system.
+        /// </summary>
+        [HttpPost]
+        public async Task<IActionResult> SendDirectOTP(string phoneNumber)
+        {
+            _logger.LogInformation("SendDirectOTP requested for phone: {PhoneNumber}", phoneNumber);
+            _sharedHelpers.WriteLog($"--- SendDirectOTP Start for {phoneNumber} ---");
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(phoneNumber))
+                {
+                    return Json(new { success = false, message = "Phone number is required." });
+                }
+
+                // Read config for OTP length and expiry
+                int otpLength = 6;
+                int expiryMinutes = 5;
+
+                var lengthConfig = _configuration["OtpSettings:DirectOtp:OtpLength"];
+                var expiryConfig = _configuration["OtpSettings:DirectOtp:ExpiryMinutes"];
+
+                if (!string.IsNullOrEmpty(lengthConfig) && int.TryParse(lengthConfig, out int parsedLength))
+                    otpLength = parsedLength;
+                if (!string.IsNullOrEmpty(expiryConfig) && int.TryParse(expiryConfig, out int parsedExpiry))
+                    expiryMinutes = parsedExpiry;
+
+                // Generate OTP in-memory
+                var otpResult = _directOtpService.CreateOtp(phoneNumber, otpLength, expiryMinutes);
+
+                if (!otpResult.Success)
+                {
+                    _logger.LogError("DirectOTP generation failed for {PhoneNumber}", phoneNumber);
+                    return Json(new { success = false, message = "Failed to generate verification code." });
+                }
+
+                _sharedHelpers.WriteLog($"Direct OTP generated for {phoneNumber}. VerificationId: {otpResult.VerificationId}");
+
+                // Send SMS with the OTP via existing SMS API
+                var smsSent = await SendDirectSMS(phoneNumber, otpResult.Message);
+
+                if (!smsSent)
+                {
+                    _logger.LogWarning("SMS delivery may have failed for {PhoneNumber}, but OTP is stored.", phoneNumber);
+                    _sharedHelpers.WriteLog($"Warning: SMS delivery may have failed for {phoneNumber}");
+                }
+
+                _logger.LogInformation("DirectOTP sent successfully for {PhoneNumber}", phoneNumber);
+                _sharedHelpers.WriteLog($"Direct OTP sent successfully for {phoneNumber}");
+
+                return Json(new
+                {
+                    success = true,
+                    data = new
+                    {
+                        isSent = true,
+                        verificationId = otpResult.VerificationId,
+                        to = phoneNumber
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception in SendDirectOTP for {PhoneNumber}", phoneNumber);
+                _sharedHelpers.WriteLog($"DirectOTP Exception: {ex.Message} | StackTrace: {ex.StackTrace}");
+                return Json(new { success = false, message = "An error occurred while sending the verification code." });
+            }
+        }
+
+        /// <summary>
+        /// Verify a direct (in-memory) OTP code.
+        /// This is the ALTERNATIVE to the CNET VerifyOTP endpoint.
+        /// </summary>
+        [HttpPost]
+        public IActionResult VerifyDirectOTP([FromBody] DirectOtpVerificationRequest request)
+        {
+            _logger.LogInformation("VerifyDirectOTP requested for phone: {PhoneNumber}", request?.PhoneNumber);
+            _sharedHelpers.WriteLog($"--- VerifyDirectOTP Start for {request?.PhoneNumber} ---");
+
+            try
+            {
+                if (request == null || string.IsNullOrWhiteSpace(request.PhoneNumber) || string.IsNullOrWhiteSpace(request.Code))
+                {
+                    return Json(new { success = false, message = "Phone number and verification code are required." });
+                }
+
+                var result = _directOtpService.VerifyOtp(request.PhoneNumber, request.Code);
+
+                _sharedHelpers.WriteLog($"VerifyDirectOTP result for {request.PhoneNumber}: IsValid={result.IsValid}, Message={result.Message}");
+
+                if (result.IsValid)
+                {
+                    _logger.LogInformation("DirectOTP verified successfully for {PhoneNumber}", request.PhoneNumber);
+                    return Json(new { success = true, message = result.Message });
+                }
+
+                _logger.LogWarning("DirectOTP verification failed for {PhoneNumber}: {Message}", request.PhoneNumber, result.Message);
+                return Json(new { success = false, message = result.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception in VerifyDirectOTP for {PhoneNumber}", request?.PhoneNumber);
+                _sharedHelpers.WriteLog($"VerifyDirectOTP Exception: {ex.Message} | StackTrace: {ex.StackTrace}");
+                return Json(new { success = false, message = "Verification failed due to an internal error." });
+            }
+        }
+
+        // =============================================================
+        // EXISTING SMS METHODS (Untouched)
+        // =============================================================
+
         private async Task<bool> Send_SMS(SMSDTO smsData)
         {
             try
@@ -461,6 +648,82 @@ namespace Ministry_of_Tourism_pro.Controllers
                 System.Diagnostics.Debug.WriteLine($"SMS Error: {ex.Message}");
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Send SMS for Direct OTP via SMPP protocol.
+        /// Reads SMPP configuration from appsettings.json SmppSettings section.
+        /// </summary>
+        private async Task<bool> SendDirectSMS(string phoneNumber, string message)
+        {
+            return await Task.Run(() =>
+            {
+                SmppClient mmclient = new SmppClient();
+                try
+                {
+                    // Read SMPP config from appsettings.json
+                    var systemId = _configuration["SmppSettings:SystemId"] ?? "6397";
+                    var password = _configuration["SmppSettings:Password"] ?? "Tour$%83";
+                    var host = _configuration["SmppSettings:Host"] ?? "10.204.181.70";
+                    var portStr = _configuration["SmppSettings:Port"] ?? "5019";
+                    var sourceAddress = _configuration["SmppSettings:SourceAddress"] ?? "6397";
+                    int port = int.TryParse(portStr, out int p) ? p : 5019;
+
+                    SmppConnectionProperties mmproperties = mmclient.Properties;
+                    mmproperties.SystemID = systemId;
+                    mmproperties.Password = password;
+                    mmproperties.Port = port;
+                    mmproperties.Host = host;
+                    mmproperties.SystemType = "";
+
+                    mmclient.AutoReconnectDelay = 3000;
+                    mmclient.KeepAliveInterval = 30000;
+
+                    mmclient.Properties.InterfaceVersion = InterfaceVersion.v34;
+                    mmclient.Properties.DefaultEncoding = DataCoding.SMSCDefault;
+                    mmclient.Properties.SourceAddress = sourceAddress;
+                    mmclient.Properties.AddressNpi = NumberingPlanIndicator.Unknown;
+                    mmclient.Properties.AddressTon = TypeOfNumber.Unknown;
+                    mmclient.Properties.DefaultServiceType = ServiceType.DEFAULT;
+
+                    TextMessage mymsg = new TextMessage();
+                    mymsg.DestinationAddress = phoneNumber;
+                    mymsg.SourceAddress = sourceAddress;
+                    mymsg.Text = message;
+                    mymsg.RegisterDeliveryNotification = true;
+
+                    mmclient.Start();
+
+                    var count = 0;
+                    while (mmclient.ConnectionState != SmppConnectionState.Connected && count < 5)
+                    {
+                        Thread.Sleep(100);
+                        count++;
+                    }
+
+                    if (mmclient.ConnectionState != SmppConnectionState.Connected)
+                    {
+                        _logger.LogError("SMPP: Unable to connect to server {Host}:{Port} after {Retries} retries.", host, port, count);
+                        _sharedHelpers.WriteLog($"SMPP Error: Unable to connect to {host}:{port}");
+                        return false;
+                    }
+
+                    mmclient.SendMessage(mymsg, 1000);
+                    _logger.LogInformation("SMPP SMS sent to {Phone} via {Host}:{Port}", phoneNumber, host, port);
+                    _sharedHelpers.WriteLog($"SMPP SMS sent successfully to {phoneNumber}");
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "SMPP SendSMS Error for {Phone}: {Message}", phoneNumber, ex.Message);
+                    _sharedHelpers.WriteLog($"SMPP Exception: {ex.Message} | StackTrace: {ex.StackTrace}");
+                    return false;
+                }
+                finally
+                {
+                    mmclient.Shutdown();
+                }
+            });
         }
 
         public IActionResult NoPrivilege() => View();

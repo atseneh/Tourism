@@ -424,11 +424,11 @@
                                     <div class="q-actions">
                                         <div class="compliance-toggle">
                                             <label class="toggle-option">
-                                                <input type="radio" name="Categories[@i].Questions[@j].Status" value="yes" @(q.Status == "yes" ? "checked" : "") />
+                                                <input type="radio" name="Categories[@i].Questions[@j].Status" value="yes" checked="@(q.Status == "yes")" />
                                                 <span class="toggle-btn yes">Yes</span>
                                             </label>
                                             <label class="toggle-option">
-                                                <input type="radio" name="Categories[@i].Questions[@j].Status" value="no" @(q.Status == "no" ? "checked" : "") />
+                                                <input type="radio" name="Categories[@i].Questions[@j].Status" value="no" checked="@(q.Status == "no")" />
                                                 <span class="toggle-btn no">No</span>
                                             </label>
                                         </div>

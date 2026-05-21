@@ -9,75 +9,303 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Register - Ministry of Tourism</title>
+    <title>Create Account - Addis Ababa Tourism & MICE</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-teal: #10383A;
+            --primary-dark: #0a2425;
+            --accent-gold: #DAA112;
+            --accent-hover: #b9840c;
+            --bg-light: #f4f5f6;
+            --card-bg: #ffffff;
+            --text-dark: #1E293B;
+            --text-muted: #64748B;
+            --input-bg: #F3F4F6;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', 'Inter', sans-serif;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-wrapper {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1rem;
+            box-sizing: border-box;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 500px;
+            padding: 2.5rem 3rem;
+            background: var(--card-bg);
+            border-radius: 28px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+        }
+
+        .brand-logo-circle {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.25rem;
+            background: white;
+            border-radius: 50%;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border: 2px solid var(--accent-gold);
+            overflow: hidden;
+        }
+
+        .brand-logo-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .form-title {
+            color: var(--primary-teal);
+            margin: 0;
+            font-weight: 800;
+            font-size: 1.8rem;
+            letter-spacing: -0.5px;
+            text-align: center;
+        }
+
+        .form-subtitle {
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            font-size: 0.95rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            transition: color 0.2s;
+        }
+        .back-link:hover { 
+            color: var(--primary-teal); 
+        }
+
+        .form-group-custom {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label-custom {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--primary-teal);
+            margin-bottom: 0.45rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .form-input-custom {
+            width: 100%;
+            padding: 0.85rem 1.15rem;
+            border-radius: 14px;
+            border: 1px solid transparent;
+            background-color: var(--input-bg);
+            color: var(--text-dark);
+            font-family: inherit;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .form-input-custom:focus {
+            outline: none;
+            background-color: white;
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 4px rgba(218, 161, 18, 0.12);
+        }
+
+        .btn-submit-gold {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent-gold) 0%, #c4900f 100%);
+            color: white;
+            border: none;
+            padding: 0.95rem;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 1.05rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-family: inherit;
+            box-shadow: 0 6px 15px rgba(218, 161, 18, 0.25);
+            margin-top: 1.5rem;
+        }
+
+        .btn-submit-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px rgba(218, 161, 18, 0.4);
+            background: linear-gradient(135deg, #e4aa1a 0%, var(--accent-gold) 100%);
+        }
+
+        .field-validation-error {
+            color: #ef4444;
+            font-size: 0.78rem;
+            margin-top: 0.25rem;
+            font-weight: 600;
+            display: block;
+        }
+
+        .validation-summary-errors {
+            background: #fef2f2;
+            border: 1px solid #fee2e2;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            color: #b91c1c;
+            font-size: 0.88rem;
+        }
+
+        .validation-summary-errors ul {
+            margin: 0;
+            padding-left: 1.25rem;
+        }
+
+        .form-links {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .form-links p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .form-links a {
+            color: var(--primary-teal);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .form-links a:hover {
+            color: var(--accent-gold);
+            text-decoration: underline;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @@media (max-width: 480px) {
+            .auth-card {
+                padding: 1.5rem 1.75rem;
+                border-radius: 20px;
+            }
+            .form-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="auth-wrapper" style="padding: 3rem 1rem;">
-        <div class="glass-card auth-card animate-fade-in" style="max-width: 500px;">
-            <div style="text-align: center; margin-bottom: 2.5rem;">
-                <div class="brand-icon" style="margin: 0 auto 1.5rem; width: 48px; height: 48px; font-size: 1.5rem;">
-                    <i class="fas fa-landmark"></i>
+    <div class="auth-wrapper">
+        <div class="auth-card animate-fade-in">
+            <a asp-action="Login" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                Back to Login
+            </a>
+
+            <div style="text-align: center;">
+                <div class="brand-logo-circle">
+                    <img src="/logo/logo.svg" alt="AATC Logo" />
                 </div>
-                <h1 style="color: var(--navy-deep); margin: 0; font-weight: 800; letter-spacing: -1px;">Create Account</h1>
-                <p style="color: var(--text-muted); margin-top: 0.5rem;">Join the Ethiopia Tourism Network</p>
+                <h1 class="form-title">Create Account</h1>
+                <p class="form-subtitle">Register to join the Addis Ababa Tourism & MICE registry.</p>
             </div>
 
             <form asp-action="Register" method="post">
                 <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
                 
-                <div class="form-group">
-                    <label asp-for="FullName" class="form-label">Full Name</label>
-                    <input asp-for="FullName" class="form-control" placeholder="Abebe Bikila" />
+                <div class="form-group-custom">
+                    <label asp-for="FullName" class="form-label-custom">Full Name</label>
+                    <input asp-for="FullName" class="form-input-custom" placeholder="e.g. Abebe Bikila" />
                     <span asp-validation-for="FullName" class="field-validation-error"></span>
                 </div>
 
-                <div class="form-group">
-                    <label asp-for="Email" class="form-label">Email Address</label>
-                    <input asp-for="Email" class="form-control" placeholder="name@example.com" />
+                <div class="form-group-custom">
+                    <label asp-for="Email" class="form-label-custom">Email Address</label>
+                    <input asp-for="Email" class="form-input-custom" placeholder="name@example.com" />
                     <span asp-validation-for="Email" class="field-validation-error"></span>
                 </div>
 
-                <div class="form-group">
-                    <label asp-for="Role" class="form-label">Account Type</label>
-                    <select asp-for="Role" class="form-control">
+                <div class="form-group-custom">
+                    <label asp-for="Role" class="form-label-custom">Account Type</label>
+                    <select asp-for="Role" class="form-input-custom" style="appearance: none; background-image: url('data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;%2364748b&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><polyline points=&quot;6 9 12 15 18 9&quot;></polyline></svg>'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.25rem;">
                         <option value="HotelOwner">Hotel Owner</option>
                         <option value="Commissioner">Ministry Official</option>
                     </select>
                 </div>
 
-                <div class="form-group" id="tin-group">
-                    <label asp-for="TIN" class="form-label">TIN Number</label>
-                    <input asp-for="TIN" class="form-control" placeholder="123456789" />
+                <div class="form-group-custom" id="tin-group">
+                    <label asp-for="TIN" class="form-label-custom">TIN Number</label>
+                    <input asp-for="TIN" class="form-input-custom" placeholder="Enter TIN Number" />
                     <span asp-validation-for="TIN" class="field-validation-error"></span>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                    <div class="form-group">
-                        <label asp-for="Password" class="form-label">Password</label>
-                        <input asp-for="Password" class="form-control" type="password" placeholder="••••••••" />
+                    <div class="form-group-custom">
+                        <label asp-for="Password" class="form-label-custom">Password</label>
+                        <input asp-for="Password" class="form-input-custom" type="password" placeholder="••••••••" />
                         <span asp-validation-for="Password" class="field-validation-error"></span>
                     </div>
 
-                    <div class="form-group">
-                        <label asp-for="ConfirmPassword" class="form-label">Confirm</label>
-                        <input asp-for="ConfirmPassword" class="form-control" type="password" placeholder="••••••••" />
+                    <div class="form-group-custom">
+                        <label asp-for="ConfirmPassword" class="form-label-custom">Confirm</label>
+                        <input asp-for="ConfirmPassword" class="form-input-custom" type="password" placeholder="••••••••" />
                         <span asp-validation-for="ConfirmPassword" class="field-validation-error"></span>
                     </div>
                 </div>
 
-                <button type="submit" class="btn-premium" style="margin-top: 1rem;">
+                <button type="submit" class="btn-submit-gold">
                     <span>Create Account</span>
-                    <i class="fas fa-user-plus" style="margin-left: 0.75rem; font-size: 0.9rem;"></i>
+                    <i class="fas fa-user-plus"></i>
                 </button>
             </form>
 
-            <div style="text-align: center; margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
-                <p style="color: var(--text-muted); font-size: 0.95rem;">Already have an account? <a asp-action="Login" style="color: var(--primary-color); font-weight: 700; text-decoration: none;">Login here</a></p>
+            <div class="form-links">
+                <p>Already have an account? <a asp-action="Login">Login here</a></p>
             </div>
         </div>
     </div>

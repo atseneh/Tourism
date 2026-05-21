@@ -45,6 +45,9 @@ builder.Services.AddSession(options =>
 // Register application services
 builder.Services.AddScoped<IHotelService, HotelService>();
 
+// Register Direct OTP Service as Singleton (in-memory OTP store must be shared)
+builder.Services.AddSingleton<Ministry_of_Tourism_pro.Application.Services.DirectOtpService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

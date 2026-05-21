@@ -20,6 +20,16 @@ namespace Ministry_of_Tourism_pro.Models
         public string MessageId { get; set; }
     }
 
+    /// <summary>
+    /// Request model for direct (in-memory) OTP verification.
+    /// Only requires phone number and code — no messageId/vc needed.
+    /// </summary>
+    public class DirectOtpVerificationRequest
+    {
+        public string PhoneNumber { get; set; }
+        public string Code { get; set; }
+    }
+
     public class SMSDTO
     {
         public string PhoneNo { get; set; }

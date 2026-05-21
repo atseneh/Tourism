@@ -9,38 +9,61 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - AATMCDP</title>
+    <title>Login - Addis Ababa Tourism & MICE</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --navy-deep: #0f172a;
-            --primary-color: #10383a;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
+            --primary-teal: #10383A;
+            --primary-dark: #0a2425;
+            --accent-gold: #DAA112;
+            --accent-hover: #b9840c;
+            --bg-light: #F4F5F6;
+            --text-dark: #1E293B;
+            --text-muted: #64748B;
+            --input-bg: #F5F5F5;
         }
 
         body {
-            font-family: 'Outfit', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: var(--navy-deep);
+            font-family: 'Outfit', 'Inter', sans-serif;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+            height: 100vh;
             overflow: hidden;
         }
 
-        .auth-wrapper {
-            min-height: 100vh;
+        ::selection {
+            background-color: rgba(218, 161, 18, 0.25) !important;
+            color: var(--primary-teal) !important;
+        }
+        
+        ::-moz-selection {
+            background-color: rgba(218, 161, 18, 0.25) !important;
+            color: var(--primary-teal) !important;
+        }
+
+        .login-container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+
+        /* Left Pane: Gallery Showcase */
+        .login-left-pane {
+            position: relative;
+            width: 58%;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
             overflow: hidden;
         }
 
-        /* Background Slider */
         .bg-slider {
             position: absolute;
             inset: 0;
@@ -53,66 +76,59 @@
             background-size: cover;
             background-position: center;
             opacity: 0;
-            transition: opacity 2s ease-in-out;
-            transform: scale(1.1);
-            animation: panSlow 30s linear infinite;
+            transition: opacity 1.5s ease-in-out;
+            transform: scale(1.05);
+            animation: panSlow 25s linear infinite;
         }
 
         .slide.active {
             opacity: 1;
         }
 
-            .slide:nth-child(1) {
-                background-image: url('/images/backgrounds/adwa5.jpg');}
+        .slide:nth-child(1) { background-image: url('/images/backgrounds/adwa5.jpg'); }
         .slide:nth-child(2) { background-image: url('/images/backgrounds/new_addis_ababa_03.jfif'); }
         .slide:nth-child(3) { background-image: url('/images/backgrounds/Addis_Ababa_02S.jpg'); }
 
         .bg-overlay {
             position: absolute;
             inset: 0;
-            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.3) 0%, rgba(70, 76, 92, 0.8) 100%);
+            background: linear-gradient(135deg, rgba(16, 56, 58, 0.94) 0%, rgba(10, 36, 37, 0.8) 100%);
             z-index: 1;
         }
 
         @@keyframes panSlow {
-            0% { transform: scale(1.1) translateX(0); }
-            50% { transform: scale(1.2) translateX(-2%); }
-            100% { transform: scale(1.1) translateX(0); }
+            0% { transform: scale(1.05) translate(0, 0); }
+            50% { transform: scale(1.12) translate(-1%, -0.5%); }
+            100% { transform: scale(1.05) translate(0, 0); }
         }
 
-        .auth-card {
-            width: 100%;
-            max-width: 440px;
-            padding: 2.25rem 2.75rem;
+        .login-brand-info {
             position: relative;
-            z-index: 10;
-        }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.88);
-            backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 32px;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.3);
+            z-index: 2;
+            color: white;
+            text-align: center;
+            max-width: 520px;
+            padding: 2rem;
         }
 
         .brand-logo-circle {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 1.25rem;
+            width: 100px;
+            height: 100px;
             background: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
             padding: 12px;
+            border: 2px solid var(--accent-gold);
             animation: float 6s ease-in-out infinite;
         }
 
         @@keyframes float {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-8px); }
         }
 
         .brand-logo-circle img {
@@ -121,126 +137,697 @@
             object-fit: contain;
         }
 
-        .portal-title {
-            color: var(--navy-deep);
+        .brand-title {
+            font-size: 2.8rem;
+            font-weight: 800;
             margin: 0;
-            font-weight: 700;
-            font-size: 1.3rem;
-            line-height: 1.25;
-            letter-spacing: -0.6px;
+            letter-spacing: -1px;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .brand-subtitle {
+            font-size: 1.4rem;
+            font-weight: 500;
+            margin: 0.25rem 0 1rem;
+            letter-spacing: 0.5px;
+            color: white;
+        }
+
+        .brand-tagline {
+            font-size: 0.95rem;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.75);
+            margin-bottom: 2.5rem;
+            letter-spacing: 1.2px;
+        }
+
+        .brand-stats {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .stat-pill {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(4px);
+        }
+
+        .stat-pill i {
+            color: var(--accent-gold);
+        }
+
+        /* Right Pane: Login Form */
+        .login-right-pane {
+            width: 42%;
+            height: 100%;
+            background: radial-gradient(circle at 10% 20%, rgba(16, 56, 58, 0.05) 0%, rgba(244, 245, 246, 1) 90%),
+                        radial-gradient(circle at 90% 80%, rgba(218, 161, 18, 0.08) 0%, rgba(244, 245, 246, 1) 90%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2.5rem;
+            box-sizing: border-box;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px rgba(16, 56, 58, 0.05),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .login-card-wrapper {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mobile-logo-header {
+            display: none;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-form-header {
+            margin-bottom: 2rem;
             text-align: center;
         }
 
-        .form-group { margin-bottom: 1.15rem; }
-        .form-label { display: block; font-weight: 600; font-size: 0.78rem; color: var(--navy-deep); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.8px; }
-        
-        .form-control {
+        .form-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin: 0;
+            color: var(--primary-teal);
+            letter-spacing: -1px;
+        }
+
+        .form-title span {
+            color: var(--accent-gold);
+        }
+
+        .form-subtitle {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .form-group-custom {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label-custom {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--primary-teal);
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1.1rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            z-index: 10;
+        }
+
+        .form-input-custom {
             width: 100%;
-            padding: 0.8rem 1.1rem;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            background: rgba(248, 250, 252, 0.8);
-            color: var(--navy-deep);
+            padding: 0.85rem 1.1rem 0.85rem 2.6rem;
+            border-radius: 14px;
+            border: 1px solid rgba(16, 56, 58, 0.15);
+            background-color: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            color: var(--text-dark);
             font-family: inherit;
             font-size: 0.95rem;
             box-sizing: border-box;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .form-control::placeholder { color: #94a3b8; }
-        .form-control:focus { outline: none; border-color: var(--primary-color); background: white; box-shadow: 0 0 0 4px rgba(16, 56, 58, 0.1); }
 
-        .btn-premium {
+        .form-input-custom:focus {
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 4px rgba(218, 161, 18, 0.15);
+        }
+
+        /* Custom Checkbox */
+        .form-options {
+            margin-bottom: 1.5rem;
+        }
+
+        .checkbox-container {
+            display: inline-flex;
+            align-items: center;
+            position: relative;
+            padding-left: 1.75rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .checkbox-container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .checkmark {
+            position: absolute;
+            left: 0;
+            height: 1.1rem;
+            width: 1.1rem;
+            background-color: var(--input-bg);
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .checkbox-container:hover input ~ .checkmark {
+            background-color: #e2e8f0;
+        }
+
+        .checkbox-container input:checked ~ .checkmark {
+            background-color: var(--primary-teal);
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .checkbox-container input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        .checkbox-container .checkmark:after {
+            left: 6px;
+            top: 3px;
+            width: 3px;
+            height: 6px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .checkbox-container .label-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Submit Button */
+        .btn-submit-gold {
             width: 100%;
-            background: linear-gradient(135deg, #10383a 0%, #0b2c2e 100%);
+            background: linear-gradient(135deg, var(--accent-gold) 0%, #c4900f 100%);
             color: white;
             border: none;
-            padding: 0.9rem;
-            border-radius: 14px;
-            font-weight: 700;
+            padding: 0.95rem;
+            border-radius: 999px;
+            font-weight: 800;
             font-size: 1.05rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s;
+            gap: 0.5rem;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             font-family: inherit;
-            box-shadow: 0 10px 25px -5px rgba(16, 56, 58, 0.4);
+            box-shadow: 0 6px 15px rgba(218, 161, 18, 0.25);
         }
-        .btn-premium:hover { transform: translateY(-3px); box-shadow: 0 15px 30px -5px rgba(16, 56, 58, 0.6); }
-        .btn-premium:active { transform: translateY(-1px); }
 
-        .animate-fade-in { animation: fadeIn 1s cubic-bezier(0.16, 1, 0.3, 1); }
-        @@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .btn-submit-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px rgba(218, 161, 18, 0.4);
+            background: linear-gradient(135deg, #e4aa1a 0%, var(--accent-gold) 100%);
+        }
+
+        .btn-submit-gold:active {
+            transform: translateY(0);
+        }
+
+        .icon-arrow {
+            font-size: 0.9rem;
+            transition: transform 0.3s;
+        }
+
+        .btn-submit-gold:hover .icon-arrow {
+            transform: translateX(3px);
+        }
+
+        .form-links {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .form-links p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .form-links a {
+            color: var(--primary-teal);
+            text-decoration: none;
+            font-weight: 700;
+            transition: color 0.2s;
+        }
+
+        .form-links a:hover {
+            color: var(--accent-gold);
+            text-decoration: underline;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .form-footer p {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            margin: 0;
+        }
+
+        /* Alert styling */
+        .alert-custom {
+            padding: 0.85rem 1.1rem;
+            border-radius: 12px;
+            margin-bottom: 1.25rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .alert-success-custom {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+        }
+
+        .alert-error-custom {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+
+        .form-validation-summary {
+            color: #dc2626;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive Overrides */
+        @@media (max-width: 991px) {
+            .login-left-pane {
+                display: none;
+            }
+            .login-right-pane {
+                width: 100%;
+                background-color: var(--bg-light);
+            }
+            .mobile-logo-header {
+                display: block;
+            }
+            .brand-logo-circle-mobile {
+                width: 75px;
+                height: 75px;
+                background: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 0.75rem;
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+                padding: 10px;
+                border: 2px solid var(--accent-gold);
+            }
+            .brand-logo-circle-mobile img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
+            .mobile-logo-header h2 {
+                font-size: 1.3rem;
+                font-weight: 800;
+                color: var(--primary-teal);
+                margin: 0;
+            }
+        }
+
+        /* Mobile or less than 576 width responsive changes */
+        @@media (max-width: 576px) {
+            body {
+                background-color: var(--bg-light) !important; /* Soft premium light background */
+                height: 100vh;
+                overflow: hidden;
+            }
+
+            .login-container {
+                align-items: center;
+                justify-content: center;
+                padding: 1.5rem 1rem;
+                box-sizing: border-box;
+            }
+
+            .login-right-pane {
+                padding: 0;
+                background: transparent;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+            }
+
+            .login-card-wrapper {
+                width: 100%;
+                max-width: 360px;
+            }
+
+            .mobile-logo-header {
+                display: block;
+                margin-bottom: 1.25rem;
+            }
+
+            .mobile-logo-header h2 {
+                display: none !important; /* Remove text title above card */
+            }
+
+            .brand-logo-circle-mobile {
+                width: 80px;
+                height: 80px;
+                background: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto;
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+                padding: 8px;
+                border: 2px solid var(--accent-gold);
+            }
+
+            .login-form-header {
+                display: none !important; /* Remove unnecessary header inside card */
+            }
+
+            /* The Form is the white card */
+            .login-card {
+                background: rgba(255, 255, 255, 0.7) !important;
+                backdrop-filter: blur(20px) !important;
+                -webkit-backdrop-filter: blur(20px) !important;
+                border: 1px solid rgba(255, 255, 255, 0.8) !important;
+                padding: 1.25rem 1rem !important;
+                border-radius: 20px !important;
+                box-shadow: 0 15px 35px rgba(16, 56, 58, 0.06),
+                            inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            .form-group-custom {
+                margin-bottom: 0.85rem;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            .form-label-custom {
+                display: none !important; /* Remove labels */
+            }
+
+            .input-icon {
+                display: none !important; /* Remove icons inside input fields */
+            }
+
+            .form-input-custom {
+                padding: 0 1rem !important; /* Premium spacious padding */
+                border-radius: 8px !important; /* Smooth premium corners */
+                border: 1px solid rgba(16, 56, 58, 0.15) !important; /* Visible crisp border */
+                background-color: rgba(255, 255, 255, 0.5) !important; /* Glassy input bg */
+                backdrop-filter: blur(5px) !important;
+                -webkit-backdrop-filter: blur(5px) !important;
+                height: 40px !important;
+                font-size: 0.95rem !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+                transition: all 0.3s ease !important;
+                color: var(--text-dark) !important;
+            }
+
+            .form-input-custom:focus {
+                background-color: rgba(255, 255, 255, 0.95) !important;
+                border-color: var(--accent-gold) !important;
+                box-shadow: 0 0 0 3px rgba(218, 161, 18, 0.15) !important;
+            }
+
+            .form-options {
+                margin-bottom: 0.85rem;
+            }
+
+            .checkbox-container .checkmark {
+                border: 1px solid #cbd5e1 !important; /* Visible checkbox border */
+                border-radius: 4px !important;
+            }
+
+            .checkbox-container .label-text {
+                font-size: 0.82rem;
+                color: var(--text-muted);
+            }
+
+            /* Submit Button - Restored Gold Gradient and decreased border-radius */
+            .btn-submit-gold {
+                background: linear-gradient(135deg, var(--accent-gold) 0%, #c4900f 100%) !important;
+                border-radius: 8px !important; /* Decreased border-radius to match inputs */
+                height: 40px !important; /* More compact height */
+                font-size: 0.95rem !important;
+                font-weight: 700 !important;
+                box-shadow: 0 4px 12px rgba(218, 161, 18, 0.2) !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 0.5rem !important;
+                margin-top: 1.15rem !important;
+                transition: all 0.3s ease !important;
+                color: white !important;
+                border: none !important;
+                width: 100% !important;
+            }
+
+            .btn-submit-gold:hover {
+                transform: translateY(-1px) !important;
+                box-shadow: 0 6px 16px rgba(218, 161, 18, 0.3) !important;
+                background: linear-gradient(135deg, #e4aa1a 0%, var(--accent-gold) 100%) !important;
+            }
+
+            .btn-submit-gold:active {
+                transform: translateY(0) !important;
+            }
+
+            .form-links {
+                margin-top: 1.15rem;
+            }
+
+            .form-links p {
+                font-size: 0.82rem;
+                color: var(--text-muted) !important;
+                font-weight: 500 !important;
+            }
+
+            .form-links a {
+                color: var(--accent-gold) !important;
+                font-weight: 800 !important;
+                text-decoration: underline !important;
+            }
+
+            /* Footer below card */
+            .form-footer {
+                margin-top: 1.25rem;
+                padding-top: 0;
+                border-top: none;
+                width: 100%;
+                text-align: center;
+            }
+
+            .form-footer .footer-portal-title {
+                display: block !important;
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: var(--primary-teal);
+                margin: 0 0 0.2rem 0;
+                font-family: 'Outfit', sans-serif;
+            }
+
+            .form-footer p {
+                font-size: 0.72rem;
+                color: var(--text-muted);
+                margin: 0;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="auth-wrapper">
-        <div class="bg-slider">
-            <div class="slide active"></div>
-            <div class="slide"></div>
-            <div class="slide"></div>
-        </div>
-        <div class="bg-overlay"></div>
-        
-        <div class="glass-card auth-card animate-fade-in">
-            <div style="text-align: center; margin-bottom: 2rem;">
-                <div class="brand-logo-circle">
-                    <img src="/logo/logo.svg" alt="AATMCDP Logo" />
-                </div>
-                <h1 class="portal-title">Addis Ababa Tourism & MICE Portal</h1>
+    <div class="login-container">
+        <!-- Left Pane: Showcase Images -->
+        <div class="login-left-pane">
+            <div class="bg-slider">
+                <div class="slide active"></div>
+                <div class="slide"></div>
+                <div class="slide"></div>
             </div>
-
-            @if (TempData["SuccessMessage"] != null)
-            {
-                <div style="background: #ecfdf5; border: 1px solid #10b981; color: #065f46; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; font-size: 0.9rem; font-weight: 600; text-align: center;">
-                    <i class="fas fa-check-circle" style="margin-right: 0.5rem;"></i>
-                    @TempData["SuccessMessage"]
+            <div class="bg-overlay"></div>
+            
+            <div class="login-brand-info animate-fade-in">
+                <div class="brand-logo-circle">
+                    <img src="/logo/logo.svg" alt="AATC Logo" />
                 </div>
-            }
-
-            @if (TempData["ErrorMessage"] != null)
-            {
-                <div style="background: #fef2f2; border: 1px solid #ef4444; color: #b91c1c; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; font-size: 0.9rem; font-weight: 600; text-align: center;">
-                    <i class="fas fa-exclamation-circle" style="margin-right: 0.5rem;"></i>
-                    @TempData["ErrorMessage"]
-                </div>
-            }
-
-            <form asp-action="Login" method="post">
-                <div asp-validation-summary="ModelOnly" style="color: #ef4444; font-size: 0.85rem; margin-bottom: 1rem; text-align: center;"></div>
+                <h1 class="brand-title">Addis Ababa</h1>
+                <h2 class="brand-subtitle">Tourism & MICE Commission</h2>
+                <div class="brand-tagline">Land of Origins • Gateway to Africa</div>
                 
-                @* Hidden Branch input - Hardcoded to 3 in Controller *@
-                <input type="hidden" asp-for="Branch" />
-
-                <div class="form-group">
-                    <label asp-for="Email" class="form-label">UserName or Email</label>
-                    <input asp-for="Email" class="form-control" placeholder="username@example.com" autocomplete="off" />
+                <div class="brand-stats">
+                    <div class="stat-pill">
+                        <i class="fas fa-hotel"></i>
+                        <span>Premium Hotels</span>
+                    </div>
+                    <div class="stat-pill">
+                        <i class="fas fa-utensils"></i>
+                        <span>Fine Dining</span>
+                    </div>
+                    <div class="stat-pill">
+                        <i class="fas fa-handshake"></i>
+                        <span>World-class MICE</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Pane: Form -->
+        <div class="login-right-pane">
+            <div class="login-card-wrapper animate-fade-in">
+                <!-- Mobile Logo -->
+                <div class="mobile-logo-header">
+                    <div class="brand-logo-circle-mobile">
+                        <img src="/logo/logo.svg" alt="AATC Logo" />
+                    </div>
+                    <h2>Addis Ababa Tourism & MICE</h2>
                 </div>
 
-                <div class="form-group">
-                    <label asp-for="Password" class="form-label">Password</label>
-                    <input asp-for="Password" class="form-control" type="password" placeholder="••••••••" />
+                <div class="login-form-header">
+                    <h3 class="form-title">Sign <span>In</span></h3>
+                    <p class="form-subtitle">Welcome back! Please enter your details to access the portal.</p>
                 </div>
 
-                <div class="form-group" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
-                    <input asp-for="RememberMe" style="width: 1.1rem; height: 1.1rem; cursor: pointer;" />
-                    <label asp-for="RememberMe" style="font-size: 0.9rem; color: var(--text-muted); cursor: pointer; font-weight: 500;">Remember me on this device</label>
+                <div class="login-card">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert-custom alert-success-custom">
+                            <i class="fas fa-check-circle"></i>
+                            <span>@TempData["SuccessMessage"]</span>
+                        </div>
+                    }
+
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert-custom alert-error-custom">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>@TempData["ErrorMessage"]</span>
+                        </div>
+                    }
+
+                    <form asp-action="Login" method="post">
+                        <div asp-validation-summary="ModelOnly" class="form-validation-summary"></div>
+                        
+                        @* Hidden Branch input - Hardcoded to 3 in Controller *@
+                        <input type="hidden" asp-for="Branch" />
+
+                        <div class="form-group-custom">
+                            <label asp-for="Email" class="form-label-custom">Username or Email</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-user input-icon"></i>
+                                <input asp-for="Email" class="form-input-custom" placeholder="Enter Username or Email" autocomplete="off" />
+                            </div>
+                            <span asp-validation-for="Email" class="validation-error"></span>
+                        </div>
+
+                        <div class="form-group-custom">
+                            <label asp-for="Password" class="form-label-custom">Password</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-lock input-icon"></i>
+                                <input asp-for="Password" class="form-input-custom" type="password" placeholder="Enter Password" />
+                            </div>
+                            <span asp-validation-for="Password" class="validation-error"></span>
+                        </div>
+
+                        <div class="form-options">
+                            <label class="checkbox-container">
+                                <input asp-for="RememberMe" />
+                                <span class="checkmark"></span>
+                                <span class="label-text">Remember me</span>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn-submit-gold">
+                            <span>Sign In</span>
+                            <i class="fas fa-arrow-right icon-arrow"></i>
+                        </button>
+
+                        <div class="form-links">
+                            <p>
+                                 No account? <a asp-action="PreRegister">Pre-register here</a>
+                            </p>
+                        </div>
+                    </form>
                 </div>
 
-                <button type="submit" class="btn-premium">
-                    <span>Sign In</span>
-                    <i class="fas fa-arrow-right" style="margin-left: 0.75rem; font-size: 0.9rem;"></i>
-                </button>
-
-                <div style="text-align: center; margin-top: 1.5rem;">
-                    <p style="color: var(--text-muted); font-size: 0.9rem; font-weight: 500;">
-                        No account? <a asp-action="PreRegister" style="color: var(--primary-color); text-decoration: none; font-weight: 700;">Pre-register here</a>
-                    </p>
+                <div class="form-footer">
+                    <h4 class="footer-portal-title" style="display: none;">Addis Ababa Tourism & MICE Portal</h4>
+                    <p>&copy; @DateTime.Now.Year AATMCDP</p>
                 </div>
-            </form>
-
-            <div style="text-align: center; margin-top: 1.25rem; padding-top: 1.15rem; border-top: 1px solid var(--border-color);">
-                <p style="color: var(--text-muted); font-size: 0.8rem; font-weight: 500;">&copy; @DateTime.Now.Year AATMCDP </p>
             </div>
         </div>
     </div>
@@ -251,9 +838,11 @@
             let currentSlide = 0;
 
             function nextSlide() {
-                slides[currentSlide].classList.remove('active');
-                currentSlide = (currentSlide + 1) % slides.length;
-                slides[currentSlide].classList.add('active');
+                if (slides.length > 0) {
+                    slides[currentSlide].classList.remove('active');
+                    currentSlide = (currentSlide + 1) % slides.length;
+                    slides[currentSlide].classList.add('active');
+                }
             }
 
             // Change slide every 7 seconds

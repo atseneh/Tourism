@@ -1,4 +1,5 @@
 using CNET_V7_Domain.Domain.ConsigneeSchema;
+using CNET_V7_Domain.Domain.aatmSchema;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ministry_of_Tourism_pro.Application.DTOs;

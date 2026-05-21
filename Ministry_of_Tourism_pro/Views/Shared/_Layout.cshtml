@@ -10,6 +10,51 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Mobile Navbar & Sidebar Overrides */
+        .mobile-top-nav { display: none; }
+        
+        @@media (max-width: 425px) {
+            body { flex-direction: column !important; }
+            
+            .sidebar-header { justify-content: space-between !important; }
+            .brand-name { font-size: 1.1rem !important; }
+            
+            .mobile-top-nav {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0.5rem 1rem;
+                background: white;
+                border-bottom: 1px solid var(--border-color);
+                position: sticky;
+                top: 0;
+                z-index: 1100;
+                height: 56px;
+            }
+            .mobile-brand { display: none !important; }
+            
+            .sidebar {
+                left: -290px;
+                width: 290px;
+                box-shadow: 15px 0 30px rgba(0,0,0,0.1);
+            }
+            .sidebar.mobile-active { left: 0; }
+            
+            .wrapper { margin-left: 0 !important; }
+            .top-navbar { display: none !important; } /* Hide desktop top-navbar */
+            
+            .main-content { padding: 0.75rem !important; }
+            
+            /* Global 4px Radius for Mobile */
+            * { border-radius: 4px !important; }
+            .brand-icon, .user-avatar, .sidebar-profile-img { border-radius: 50% !important; } /* Exceptions for circular elements */
+            
+            h1 { font-size: 1.15rem !important; }
+            .btn-premium { padding: 0.6rem 1rem !important; font-size: 0.85rem !important; }
+            .nav-link { font-size: 0.8rem !important; padding: 0.6rem 0.75rem !important; }
+        }
+    </style>
 </head>
 @{
     var prefParentIdClaim = User.FindFirst("PreferenceParentId")?.Value;
@@ -22,14 +67,31 @@
     }
 }
 <body class="@themeClass">
+    <!-- Mobile Top Navigation -->
+    <header class="mobile-top-nav">
+        <button id="mobileHamburger" class="btn-sidebar-toggle" style="background: var(--bg-muted);">
+            <i class="fas fa-bars"></i>
+        </button>
+        <a class="mobile-brand" href="#">
+            <img src="/logo/logo.svg" alt="Logo" />
+            <span>AATMCDP</span>
+        </a>
+        <div class="user-avatar" style="width: 32px; height: 32px; font-size: 0.7rem;">
+            @(User.Identity.Name?.Substring(0, Math.Min(2, User.Identity.Name.Length)).ToUpper() ?? "U")
+        </div>
+    </header>
+
     <aside class="sidebar">
         <div class="sidebar-header">
-            <a class="sidebar-brand" asp-controller="Home" asp-action="Index">
+            <a class="sidebar-brand" href="#">
                 <div class="brand-icon" style="background: white; overflow: hidden; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); padding: 5px;">
-                    <img src="~/logo/logo.svg" alt="Logo" style="width: 100%; height: 100%; object-fit: contain;" />
+                    <img src="/logo/logo.svg" alt="Logo" style="width: 100%; height: 100%; object-fit: contain;" />
                 </div>
                 <span class="brand-name">AATMCDP</span>
             </a>
+            <button id="closeSidebar" class="btn-sidebar-toggle d-md-none">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
 
         <div class="sidebar-content">
@@ -83,21 +145,7 @@
                                asp-action="Reports">
                                 <i class="fas fa-chart-pie"></i> Reports Center
                             </a>
-                            <ul class="sub-nav" style="list-style: none; padding-left: 1.5rem; margin-top: 0.5rem; display: @(ViewContext.RouteData.Values["action"]?.ToString() == "Reports" ? "block" : "none")">
-                                <li style="margin-bottom: 0.5rem;"><a href="/Commissioner/Reports?cat=registry" style="font-size: 0.7rem; color: var(--text-muted); text-decoration: none; font-weight: 600;"><i class="fas fa-hotel" style="width: 20px;"></i> Registry & Infra</a></li>
-                                <li style="margin-bottom: 0.5rem;"><a href="/Commissioner/Reports?cat=mice" style="font-size: 0.7rem; color: var(--text-muted); text-decoration: none; font-weight: 600;"><i class="fas fa-handshake" style="width: 20px;"></i> MICE & Events</a></li>
-                                <li style="margin-bottom: 0.5rem;"><a href="/Commissioner/Reports?cat=tech" style="font-size: 0.7rem; color: var(--text-muted); text-decoration: none; font-weight: 600;"><i class="fas fa-microchip" style="width: 20px;"></i> Hospitality Tech</a></li>
-                                <li style="margin-bottom: 0.5rem;"><a href="/Commissioner/Reports?cat=compliance" style="font-size: 0.7rem; color: var(--text-muted); text-decoration: none; font-weight: 600;"><i class="fas fa-shield-halved" style="width: 20px;"></i> Compliance</a></li>
-                            </ul>
                         </li>
-
-                      @*   <li class="nav-item">
-                            <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Overview" ? "active" : "")"
-                               asp-controller="Commissioner"
-                               asp-action="Overview">
-                                <i class="fas fa-chart-line"></i> Overview
-                            </a>
-                        </li> *@
                     }
                     else
                     {
@@ -109,25 +157,16 @@
                         </li>
                     }
                 }
-                else
-                {
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")" asp-controller="Home" asp-action="Index">
-                            <i class="fas fa-globe"></i>Portal Home
-                        </a>
-                    </li>
-                }
             </ul>
         </div>
 
-        <footer style="padding: 1.5rem; text-align: center; border-top: 1px solid var(--bg-muted); margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
-            <img src="~/logo/RED logo png-08.ico" alt="Ministry Seal" style="height: 60px; filter: grayscale(1) opacity(0.5); transition: var(--transition);" onmouseover="this.style.filter='grayscale(0) opacity(1)'" onmouseout="this.style.filter='grayscale(1) opacity(0.5)'" />
-            <div class="smallest text-muted">&copy; 2026 AATMCDP</div>
+        <footer style="padding: 1rem; text-align: center; border-top: 1px solid var(--bg-muted); margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+            <div class="smallest text-muted" style="font-size: 0.65rem;">&copy; 2026 AATMCDP</div>
         </footer>
     </aside>
 
     <div class="wrapper">
-        <header class="top-navbar">
+        <header class="top-navbar d-none d-md-flex">
             <button id="sidebarToggle" class="btn-sidebar-toggle">
                 <i class="fas fa-bars"></i>
             </button>
@@ -136,24 +175,14 @@
                 {
                     <div class="text-end d-none d-md-block">
                         <div class="fw-bold small" style="color: var(--navy-deep); font-weight: 700;">@User.Identity.Name</div>
-                        <div style="font-size: 0.7rem; color: var(--text-muted);">
-                            @if (User.IsInRole("SystemAdmin")) { @:System Administrator
-                            } else if (User.IsInRole("Commissioner")) { @:Commissioner
-                            } else { @:Hotel Owner
-                            }
-                        </div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted);">Hotel Owner</div>
                     </div>
                     <div class="user-avatar">
                         @(User.Identity.Name?.Substring(0, Math.Min(2, User.Identity.Name.Length)).ToUpper() ?? "U")
                     </div>
                     <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline">
-                        <button type="submit" class="btn-premium" style="padding: 0.4rem 1rem; font-size: 0.75rem; border-radius: 8px;">Logout</button>
+                        <button type="submit" class="btn-premium" style="padding: 0.4rem 1rem; font-size: 0.75rem;">Logout</button>
                     </form>
-                }
-                else
-                {
-                    <a asp-controller="Account" asp-action="Login" class="nav-link" style="color: var(--primary-color) !important;">Staff Login</a>
-                    <a asp-controller="Account" asp-action="Register" class="btn-premium">Register</a>
                 }
             </div>
         </header>
@@ -165,14 +194,35 @@
         </div>
     </div>
 
+    <div id="mobileSidebarBackdrop" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(2px); z-index: 1050;"></div>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script>
         $(document).ready(function () {
+            // Desktop Toggle
             $('#sidebarToggle').on('click', function () {
                 $('.sidebar').toggleClass('collapsed');
                 $('.wrapper').toggleClass('expanded');
-                $(this).find('i').toggleClass('fa-bars fa-times');
+            });
+
+            // Mobile Toggle
+            $('#mobileHamburger').on('click', function() {
+                $('.sidebar').addClass('mobile-active');
+                $('#mobileSidebarBackdrop').fadeIn(200);
+            });
+
+            $('#closeSidebar, #mobileSidebarBackdrop').on('click', function() {
+                $('.sidebar').removeClass('mobile-active');
+                $('#mobileSidebarBackdrop').fadeOut(200);
+            });
+
+            // Handle Nav Clicks on Mobile
+            $('.nav-link').on('click', function() {
+                if ($(window).width() <= 425) {
+                    $('.sidebar').removeClass('mobile-active');
+                    $('#mobileSidebarBackdrop').fadeOut(200);
+                }
             });
         });
     </script>

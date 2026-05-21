@@ -1,4 +1,5 @@
 using CNET_V7_Domain.Domain.ConsigneeSchema;
+using CNET_V7_Domain.Domain.aatmSchema;
 using Ministry_of_Tourism_pro.Domain.Enums;
 using static Ministry_of_Tourism_pro.Application.DTOs.CreateHotelDto;
 
@@ -141,7 +142,7 @@ namespace Ministry_of_Tourism_pro.Application.DTOs
         public double? WifiAvgSpeed { get; set; }
         public bool? InHouseLaundry { get; set; }
         public bool? Reception24hr { get; set; }
-        public bool? VipCheckIn { get; set; }
+        public string? VipCheckIn { get; set; }
         public bool? PassportScanner { get; set; }
         public bool? CurrencyScanner { get; set; }
         public bool? OnlineOrderingSystem { get; set; }
@@ -166,6 +167,7 @@ namespace Ministry_of_Tourism_pro.Application.DTOs
         public string? FireSafetyCertificate { get; set; }
         public string? EnvironmentalClearanceCertificate { get; set; }
         public string? FoodSafetyAndHygieneCertificate { get; set; }
+        public string? IsoCertification { get; set; }
 
         // Staffing & Languages
         public int? TotalStaff { get; set; }
@@ -173,7 +175,14 @@ namespace Ministry_of_Tourism_pro.Application.DTOs
         public int? ManagementStaff { get; set; }
         public string? InternationalLanguagesFrontDesk { get; set; }
 
-        // Internal Data Storage
+        // --- New typed sub-objects (replace IdentificationDTO / VoucherDTO) ---
+        /// <summary>1-to-1 infrastructure profile per consignee/unit (replaces Identification key-value storage).</summary>
+        public HotelInfrastructureProfileDTO? InfrastructureProfile { get; set; }
+
+        /// <summary>1-to-many facility list per consignee/unit (replaces VoucherDTO Extension storage).</summary>
+        public List<HotelFacilityListDTO> Facilities { get; set; } = new();
+
+        // Internal Data Storage (kept for backward compat where needed)
         public List<IdentificationDTO> RawIdentifications { get; set; } = new();
 
         // Legacy/Existing Infrastructure (keeping for compatibility)
@@ -225,6 +234,7 @@ namespace Ministry_of_Tourism_pro.Application.DTOs
         // All Excel specific fields should also be in CreateHotelDto (simplified for brevity here, but usually identical to HotelDto)
         // [Add matching fields from HotelDto here if necessary for creation flow]
         public string? MeetingRooms { get; set; }
+        public string? IsoCertification { get; set; }
 
         // Legacy fields (optional compatibility)
         public string Name { get => TradeName; set => TradeName = value; }
