@@ -145,6 +145,31 @@
                                asp-action="Reports">
                                 <i class="fas fa-chart-pie"></i> Reports Center
                             </a>
+                            @if (ViewContext.RouteData.Values["action"]?.ToString() == "Reports")
+                            {
+                                <ul class="nav-list" style="padding-left: 1.5rem; margin-top: 0.25rem;">
+                                    <li class="nav-item">
+                                        <a class="nav-link" style="font-size: 0.78rem; padding: 0.45rem 0.75rem;" href="/Commissioner/Reports?cat=registry">
+                                            <i class="fas fa-hotel" style="font-size: 0.7rem;"></i> Registry <span style="font-size:0.6rem; opacity:0.5; margin-left:0.25rem;">6</span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" style="font-size: 0.78rem; padding: 0.45rem 0.75rem;" href="/Commissioner/Reports?cat=mice">
+                                            <i class="fas fa-handshake" style="font-size: 0.7rem;"></i> MICE <span style="font-size:0.6rem; opacity:0.5; margin-left:0.25rem;">5</span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" style="font-size: 0.78rem; padding: 0.45rem 0.75rem;" href="/Commissioner/Reports?cat=tech">
+                                            <i class="fas fa-microchip" style="font-size: 0.7rem;"></i> Technology <span style="font-size:0.6rem; opacity:0.5; margin-left:0.25rem;">5</span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" style="font-size: 0.78rem; padding: 0.45rem 0.75rem;" href="/Commissioner/Reports?cat=compliance">
+                                            <i class="fas fa-shield-halved" style="font-size: 0.7rem;"></i> Compliance <span style="font-size:0.6rem; opacity:0.5; margin-left:0.25rem;">4</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            }
                         </li>
                     }
                     else
