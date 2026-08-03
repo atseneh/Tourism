@@ -7,6 +7,7 @@ using CNET_V7_Domain.Domain.ConsigneeSchema;
 using CNET_V7_Domain.Domain.SecuritySchema;
 using System.Security.Claims;
 using CNET_V7_Domain.Domain.ViewSchema;
+using CNET_V7_Domain.Misc.CommonTypes;
 
 namespace Ministry_of_Tourism_pro.Controllers
 {
@@ -45,7 +46,7 @@ namespace Ministry_of_Tourism_pro.Controllers
                 if (model.Id > 0)
                 {
                     // Update User
-                    var userUpdate = new Ministry_of_Tourism_pro.Models.UserUpdateDTO
+                    var userUpdate = new UserUpdateDTO
                     {
                         userId = model.Id,
                         newUserName = model.UserName,

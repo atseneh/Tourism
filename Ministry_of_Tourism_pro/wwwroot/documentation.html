@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Documentation - Addis Ababa Tourism  Portal</title>
+    <!-- FontAwesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- html2pdf for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
+
+    <style>
+        :root {
+            --primary-teal: #10383A;
+            --primary-dark: #0a2425;
+            --accent-gold: #DAA112;
+            --accent-gold-light: #f5cf68;
+            --accent-hover: #b9840c;
+            --bg-light: #F4F5F6;
+            --card-bg: #FFFFFF;
+            --text-dark: #1E293B;
+            --text-muted: #64748B;
+            --border-color: #E2E8F0;
+            --sidebar-width: 280px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Top Navigation Bar */
+        .doc-header {
+            background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 0.8rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            text-decoration: none;
+            color: white;
+        }
+
+        .header-brand img {
+            width: 38px;
+            height: 38px;
+            background: white;
+            border-radius: 50%;
+            padding: 4px;
+            border: 2px solid var(--accent-gold);
+        }
+
+        .header-brand-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header-brand-title span {
+            color: var(--accent-gold);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-portal,
+        .btn-export {
+            padding: 0.4rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-portal {
+            background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-hover) 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(218, 161, 18, 0.3);
+        }
+
+        .btn-portal:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(218, 161, 18, 0.5);
+            color: white;
+        }
+
+        .btn-export {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-export:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .btn-export-pdf {
+            background: #bb2d3b;
+            border-color: #bb2d3b;
+        }
+
+        .btn-export-pdf:hover {
+            background: #a02632;
+        }
+
+        .btn-export-word {
+            background: #2a5699;
+            border-color: #2a5699;
+        }
+
+        .btn-export-word:hover {
+            background: #1d3f73;
+        }
+
+        .search-container {
+            position: relative;
+            flex: 1;
+            max-width: 320px;
+            min-width: 160px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.5rem 1rem 0.5rem 2.2rem;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 0.85rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .search-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 3px rgba(218, 161, 18, 0.3);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+        }
+
+        /* Documentation Layout */
+        .doc-layout {
+            display: flex;
+            flex: 1;
+            max-width: 1440px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Sidebar Navigation */
+        .doc-sidebar {
+            width: var(--sidebar-width);
+            background: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem 1rem;
+            position: sticky;
+            top: 74px;
+            height: calc(100vh - 74px);
+            overflow-y: auto;
+        }
+
+        .nav-group-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin: 1.5rem 0 0.5rem 0.75rem;
+        }
+
+        .nav-group-title:first-child {
+            margin-top: 0;
+        }
+
+        .nav-list {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.15rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.4rem 0.75rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link i {
+            color: var(--primary-teal);
+            font-size: 0.9rem;
+            width: 20px;
+            text-align: center;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(16, 56, 58, 0.05);
+            color: var(--primary-teal);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-teal);
+            color: white;
+        }
+
+        .nav-link.active i {
+            color: var(--accent-gold);
+        }
+
+        .nav-sublink {
+            padding-left: 2.5rem;
+            font-size: 0.8rem;
+        }
+
+        /* Main Content Container */
+        .doc-content {
+            flex: 1;
+            padding: 2rem 2.5rem;
+            max-width: 960px;
+        }
+
+        .doc-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            scroll-margin-top: 90px;
+        }
+
+        .section-header {
+            border-bottom: 2px solid #F1F5F9;
+            padding-bottom: 0.8rem;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(16, 56, 58, 0.08);
+            color: var(--primary-teal);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-teal);
+        }
+
+        .section-subtitle {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-teal);
+            margin: 1.5rem 0 0.5rem 0;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: #334155;
+            font-size: 0.95rem;
+        }
+
+        ul,
+        ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+            color: #334155;
+            font-size: 0.95rem;
+        }
+
+        li {
+            margin-bottom: 0.25rem;
+        }
+
+        /* Tables */
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .custom-table th {
+            background: var(--primary-teal);
+            color: white;
+            text-align: left;
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .custom-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.85rem;
+        }
+
+        .custom-table tr:nth-child(even) {
+            background-color: #F8FAFC;
+        }
+
+        /* Badges & Callouts */
+        .role-badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            font-family: monospace;
+        }
+
+        .badge-admin {
+            background: #E0E7FF;
+            color: #3730A3;
+        }
+
+        .badge-commissioner {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge-hotel {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .callout {
+            padding: 1.25rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-gold);
+            background: #FFFBEB;
+            margin: 1.5rem 0;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .callout-icon {
+            color: var(--accent-gold);
+            font-size: 1.2rem;
+        }
+
+        .callout-content {
+            font-size: 0.9rem;
+            color: #78350F;
+        }
+
+        /* Steps workflow */
+        .step-list {
+            list-style: none;
+            counter-reset: step-counter;
+            margin: 1.5rem 0;
+            padding: 0;
+        }
+
+        .step-item {
+            position: relative;
+            padding-left: 3rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .step-item::before {
+            counter-increment: step-counter;
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--primary-teal);
+            color: white;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .step-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--primary-teal);
+            margin-bottom: 0.2rem;
+        }
+
+        /* Quick Cards grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.25rem;
+            margin: 1.5rem 0;
+        }
+
+        .feature-card {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1.25rem;
+            background: #FAFAFA;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+            border-color: var(--accent-gold);
+        }
+
+        .feature-card i {
+            font-size: 1.6rem;
+            color: var(--primary-teal);
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card h4 {
+            font-size: 0.95rem;
+            color: var(--primary-teal);
+            margin-bottom: 0.3rem;
+        }
+
+        .feature-card p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0;
+        }
+
+        .support-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.25rem;
+            margin: 1.5rem 0;
+        }
+
+        .support-card {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1.25rem;
+            background: #FAFAFA;
+            transition: all 0.3s ease;
+        }
+
+        .support-card:hover {
+            border-color: var(--accent-gold);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .support-card .label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            color: var(--accent-gold);
+        }
+
+        .support-card .name {
+            font-weight: 700;
+            color: var(--primary-teal);
+            margin: 4px 0 2px;
+        }
+
+        .support-card a {
+            color: var(--primary-teal);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .support-card a:hover {
+            text-decoration: underline;
+        }
+
+        .support-card i {
+            margin-right: 6px;
+            color: var(--accent-gold);
+        }
+
+        /* Footer */
+        .doc-footer {
+            background: var(--primary-teal);
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: auto;
+            font-size: 0.85rem;
+        }
+
+        .doc-footer a {
+            color: var(--accent-gold);
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .doc-sidebar {
+                display: none;
+            }
+
+            .doc-content {
+                padding: 1.5rem;
+            }
+
+            .search-container {
+                max-width: 200px;
+            }
+
+            .doc-header {
+                padding: 0.8rem 1rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .header-brand-title {
+                font-size: 0.9rem;
+            }
+
+            .search-container {
+                max-width: 140px;
+                min-width: 100px;
+            }
+
+            .header-actions .btn span {
+                display: none;
+            }
+
+            .doc-content {
+                padding: 1rem;
+            }
+
+            .doc-section {
+                padding: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Print / Export Optimization */
+        @media print {
+
+            .doc-sidebar,
+            .doc-header,
+            .doc-footer,
+            .search-container,
+            .header-actions {
+                display: none !important;
+            }
+
+            .doc-content {
+                padding: 0 !important;
+                max-width: 100% !important;
+            }
+
+            .doc-section {
+                box-shadow: none !important;
+                border: 1px solid #ddd !important;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="doc-header">
+        <a href="/Account/Login" class="header-brand">
+            <img src="/logo/logo.svg" alt="AATC Logo" />
+            <div class="header-brand-title">Addis Ababa <span>Tourism & MICE</span></div>
+        </a>
+
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="docSearch" class="search-input" placeholder="Search..." onkeyup="filterDocs()" />
+        </div>
+
+        <div class="header-actions">
+            <button class="btn-export btn-export-pdf" onclick="exportPDF()">
+                <i class="fas fa-file-pdf"></i> <span>PDF</span>
+            </button>
+       
+            <a href="/Account/Login" class="btn-portal">
+                <i class="fas fa-sign-in-alt"></i> <span>Login</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Layout Container -->
+    <div class="doc-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="doc-sidebar">
+            <div class="nav-group-title">Getting Started</div>
+            <ul class="nav-list">
+                <li class="nav-item"><a href="#getting-started" class="nav-link active"><i
+                            class="fas fa-info-circle"></i> 1. Getting Started</a></li>
+                <li class="nav-item"><a href="#system-overview" class="nav-link"><i class="fas fa-sitemap"></i> 2.
+                        System Overview</a></li>
+                <li class="nav-item"><a href="#login" class="nav-link"><i class="fas fa-key"></i> 3. Login & Account</a>
+                </li>
+                <li class="nav-item"><a href="#pre-registration" class="nav-link"><i class="fas fa-user-plus"></i> 4.
+                        Pre-Registration</a></li>
+                <li class="nav-item"><a href="#dashboard" class="nav-link"><i class="fas fa-gauge-high"></i> 5. Your
+                        Dashboard</a></li>
+            </ul>
+
+            <div class="nav-group-title">Establishment Profile</div>
+            <ul class="nav-list">
+                <li class="nav-item"><a href="#managing-profile" class="nav-link"><i class="fas fa-hotel"></i> 6.
+                        Managing Profile</a></li>
+                <li class="nav-item"><a href="#basic-info" class="nav-link nav-sublink"><i
+                            class="fas fa-chevron-right"></i> 6.1 Basic Info</a></li>
+                <li class="nav-item"><a href="#accommodation" class="nav-link nav-sublink"><i
+                            class="fas fa-chevron-right"></i> 6.2 Accommodation</a></li>
+                <li class="nav-item"><a href="#food-beverage" class="nav-link nav-sublink"><i
+                            class="fas fa-chevron-right"></i> 6.3 Food & Beverage</a></li>
+                <li class="nav-item"><a href="#meetings-events" class="nav-link nav-sublink"><i
+                            class="fas fa-chevron-right"></i> 6.4 Meetings & Events</a></li>
+                <li class="nav-item"><a href="#facilities-amenities" class="nav-link nav-sublink"><i
+                            class="fas fa-chevron-right"></i> 6.5 Facilities</a></li>
+                <li class="nav-item"><a href="#accessibility" class="nav-link nav-sublink"><i
+                            class="fas fa-chevron-right"></i> 6.6 Accessibility</a></li>
+                <li class="nav-item"><a href="#safety-security" class="nav-link nav-sublink"><i
+                            class="fas fa-chevron-right"></i> 6.7 Safety & Security</a></li>
+                <li class="nav-item"><a href="#parking-transport" class="nav-link nav-sublink"><i
+                            class="fas fa-chevron-right"></i> 6.8 Parking & Transport</a></li>
+                <li class="nav-item"><a href="#technology-ict" class="nav-link nav-sublink"><i
+                            class="fas fa-chevron-right"></i> 6.9 Technology & ICT</a></li>
+                <li class="nav-item"><a href="#staffing-sustainability" class="nav-link nav-sublink"><i
+                            class="fas fa-chevron-right"></i> 6.10 Staffing & Sustainability</a></li>
+            </ul>
+
+            <div class="nav-group-title">Resources</div>
+            <ul class="nav-list">
+                <li class="nav-item"><a href="#uploading-documents" class="nav-link"><i
+                            class="fas fa-cloud-upload-alt"></i> 7. Uploading Documents</a></li>
+                <li class="nav-item"><a href="#best-practices" class="nav-link"><i class="fas fa-check-circle"></i> 8.
+                        Best Practices</a></li>
+                <li class="nav-item"><a href="#troubleshooting" class="nav-link"><i class="fas fa-wrench"></i> 9.
+                        Troubleshooting</a></li>
+                <li class="nav-item"><a href="#support" class="nav-link"><i class="fas fa-headset"></i> 10. Support &
+                        Contact</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="doc-content" id="mainContent">
+
+            <!-- Section 1: Getting Started -->
+            <section id="getting-started" class="doc-section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-rocket"></i></div>
+                    <h2 class="section-title">1. Getting Started</h2>
+                </div>
+                <p style="font-weight: 600; color: var(--primary-teal);">Welcome to the Addis Ababa Tourism 
+                    Commission Portal!</p>
+                <p>This guide will help you register your establishment and manage your business profile online.</p>
+
+                <h4 style="margin-top: 1.5rem; color: var(--primary-teal);">What You'll Be Able To Do:</h4>
+                <ul>
+                    <li><strong>Register</strong> your tourism establishment online.</li>
+                    <li><strong>Complete detailed information</strong> about your facilities and services.</li>
+                    <li><strong>Upload</strong> required business documents and certificates.</li>
+                    <li><strong>Track</strong> your registration status in real-time.</li>
+                    <li><strong>Update</strong> your establishment profile anytime.</li>
+                </ul>
+                <div class="callout">
+                    <div class="callout-icon"><i class="fas fa-lightbulb"></i></div>
+                    <div class="callout-content"><strong>Tip:</strong> Bookmark the portal URL for quick access. We
+                        recommend using a desktop or laptop for the best experience when filling out detailed sections.
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: System Overview -->
+            <section id="system-overview" class="doc-section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-sitemap"></i></div>
+                    <h2 class="section-title">2. System Overview</h2>
+                </div>
+                <h4 style="color: var(--primary-teal);">Who Should Use This System?</h4>
+                <p>This portal is designed for establishment owners and managers in the tourism industry, including:</p>
+                <div class="features-grid">
+                    <div class="feature-card"><i class="fas fa-hotel"></i>
+                        <h4>Hotels & Boutique</h4>
+                    </div>
+                    <div class="feature-card"><i class="fas fa-utensils"></i>
+                        <h4>Restaurants & F&B</h4>
+                    </div>
+                    <div class="feature-card"><i class="fas fa-chalkboard"></i>
+                        <h4>Meeting Halls</h4>
+                    </div>
+                    <div class="feature-card"><i class="fas fa-building"></i>
+                        <h4>Conference Centers</h4>
+                    </div>
+                    <div class="feature-card"><i class="fas fa-calendar-check"></i>
+                        <h4>MICE Facilities</h4>
+                    </div>
+                    <div class="feature-card"><i class="fas fa-briefcase"></i>
+                        <h4>Other Tourism Businesses</h4>
+                    </div>
+                </div>
+
+                <h4 style="color: var(--primary-teal);">System Requirements</h4>
+                <p><strong>Supported Browsers:</strong></p>
+                <ul>
+                    <li>Google Chrome (latest version)</li>
+                    <li>Microsoft Edge (latest version)</li>
+                    <li>Mozilla Firefox (latest version)</li>
+                    <li>Safari (latest version)</li>
+                </ul>
+                <p><i class="fas fa-wifi" style="color: var(--accent-gold);"></i> For best results, use the latest
+                    version of your browser and maintain a stable internet connection.</p>
+            </section>
+
+            <!-- Section 3: Login -->
+            <section id="login" class="doc-section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-key"></i></div>
+                    <h2 class="section-title">3. Login & Account Access</h2>
+                </div>
+                <h4 style="color: var(--primary-teal);">Logging In</h4>
+                <ol class="step-list">
+                    <li class="step-item"><span class="step-title">Open your web browser</span> (Chrome, Edge, Firefox,
+                        or Safari).</li>
+                    <li class="step-item"><span class="step-title">Enter the portal URL</span> provided by the
+                        commission office.</li>
+                    <li class="step-item"><span class="step-title">Enter your username and password</span> on the login
+                        page.</li>
+                    <li class="step-item"><span class="step-title">Check "Remember me"</span> only if you are on your
+                        own personal device.</li>
+                    <li class="step-item"><span class="step-title">Click "Sign In"</span> to access your Dashboard.</li>
+                </ol>
+                <div class="callout">
+                    <div class="callout-icon"><i class="fas fa-user-shield"></i></div>
+                    <div class="callout-content"><strong>First-Time Login:</strong> Your username and password will be
+                        sent via SMS. The default password is <code
+                            style="background: #E2E8F0; padding: 0.2rem 0.5rem; border-radius: 4px;">Default Pass</code>.
+                        We recommend changing this password after your first login.</div>
+                </div>
+            </section>
+
+            <!-- Section 4: Pre-Registration -->
+            <section id="pre-registration" class="doc-section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-user-plus"></i></div>
+                    <h2 class="section-title">4. Pre-Registration Process</h2>
+                </div>
+                <p><strong>Not yet registered?</strong> Follow these steps to create your initial account:</p>
+                <ol class="step-list">
+                    <li class="step-item"><span class="step-title">Click "No account? Pre-register here"</span> on the
+                        login page.</li>
+                    <li class="step-item"><span class="step-title">Enter your establishment name</span> (trade name).
+                    </li>
+                    <li class="step-item"><span class="step-title">Provide your Tax Identification Number (TIN)</span>.
+                    </li>
+                    <li class="step-item"><span class="step-title">Enter a valid phone number</span> (this will receive
+                        your login credentials via SMS).</li>
+                    <li class="step-item"><span class="step-title">Provide your email address</span>.</li>
+                    <li class="step-item"><span class="step-title">Select your business category</span> (Hotel,
+                        Restaurant, MICE Venue, etc.).</li>
+                    <li class="step-item"><span class="step-title">Verify with OTP</span> – enter the One-Time Password
+                        sent via SMS.</li>
+                    <li class="step-item"><span class="step-title">Click "Submit"</span> to complete pre-registration.
+                    </li>
+                </ol>
+                <p><strong>What Happens Next?</strong> The system will create your establishment record (pending
+                    status), send login credentials via SMS, and generate an admin account for your business.</p>
+            </section>
+
+            <!-- Section 5: Dashboard -->
+            <section id="dashboard" class="doc-section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-gauge-high"></i></div>
+                    <h2 class="section-title">5. Your Dashboard</h2>
+                </div>
+                <p>Your Dashboard is your command center. Here you will see all establishments linked to your account
+                    and their current status.</p>
+                <h4 style="color: var(--primary-teal);">Dashboard Overview</h4>
+                <p>For each establishment, you will see:</p>
+                <ul>
+                    <li><strong>Trade Name:</strong> The name your customers know you by.</li>
+                    <li><strong>Registration Status:</strong> Pending, Approved, or other status.</li>
+                    <li><strong>Business Category:</strong> Your type of establishment.</li>
+                    <li><strong>Location:</strong> City and address information.</li>
+                    <li><strong>Star Rating:</strong> Your establishment's star classification.</li>
+                    <li><strong>Action Buttons:</strong> View, Edit, or Manage Documents.</li>
+                </ul>
+                <p><strong>What You Can Do From the Dashboard:</strong> View details, update profiles, upload documents,
+                    and track registration status.</p>
+            </section>
+
+            <!-- Section 6: Managing Profile -->
+            <section id="managing-profile" class="doc-section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-hotel"></i></div>
+                    <h2 class="section-title">6. Managing Your Establishment Profile</h2>
+                </div>
+                <p>Your establishment profile is organized into logical sections. You can complete each section at your
+                    own pace—you do not have to fill everything in at once.</p>
+
+                <!-- 6.1 Basic Information -->
+                <div id="basic-info" style="scroll-margin-top: 90px;">
+                    <h4 style="color: var(--primary-teal); font-size: 1.1rem; margin-top: 1.5rem;">6.1 Basic Information
+                    </h4>
+                    <p>This is the foundation of your profile. Complete this first:</p>
+                    <ul>
+                        <li><strong>Trade Name:</strong> Your establishment's name (as customers know it).</li>
+                        <li><strong>Registration Name:</strong> Your official business registration name.</li>
+                        <li><strong>Specific Address:</strong> Complete street address.</li>
+                        <li><strong>Subcity and City:</strong> Administrative location details.</li>
+                        <li><strong>Star Category:</strong> Your establishment's star rating (1 to 5 stars).</li>
+                        <li><strong>Contact Information:</strong> Phone numbers and email addresses.</li>
+                        <li><strong>Reservation Contact:</strong> Direct booking phone number and contact person.</li>
+                    </ul>
+                </div>
+
+                <!-- 6.2 Accommodation -->
+                <div id="accommodation" style="scroll-margin-top: 90px;">
+                    <h4 style="color: var(--primary-teal); font-size: 1.1rem; margin-top: 1.5rem;">6.2 Accommodation
+                    </h4>
+                    <p>Detail your room inventory:</p>
+                    <ul>
+                        <li><strong>King Size Rooms:</strong> Number of king bed rooms.</li>
+                        <li><strong>Twin Bed Rooms:</strong> Number of rooms with two separate beds.</li>
+                        <li><strong>Junior Suites:</strong> Number of junior suite rooms.</li>
+                        <li><strong>Full Suites:</strong> Number of complete suite accommodations.</li>
+                        <li><strong>Presidential Suites:</strong> Number of premium suites.</li>
+                        <li><strong>Accessible Rooms:</strong> Number of wheelchair-accessible rooms.</li>
+                        <li><strong>VIP Check-in:</strong> Availability of special VIP check-in service.</li>
+                    </ul>
+                    <div class="callout">
+                        <div class="callout-icon"><i class="fas fa-calculator"></i></div>
+                        <div class="callout-content">The system automatically calculates your <strong>total
+                                rooms</strong> and <strong>total bed capacity</strong>.</div>
+                    </div>
+                </div>
+
+                <!-- 6.3 Food and Beverage -->
+                <div id="food-beverage" style="scroll-margin-top: 90px;">
+                    <h4 style="color: var(--primary-teal); font-size: 1.1rem; margin-top: 1.5rem;">6.3 Food and Beverage
+                    </h4>
+                    <p>Tell us about your dining options:</p>
+                    <ul>
+                        <li><strong>All-Day Dining:</strong> Restaurant with continuous service.</li>
+                        <li><strong>Specialty Restaurants:</strong> Different cuisine types you offer.</li>
+                        <li><strong>Coffee Shop:</strong> Café or beverage service.</li>
+                        <li><strong>Bars and Lounges:</strong> Number of bar or lounge areas.</li>
+                        <li><strong>Night Club:</strong> Evening entertainment venue.</li>
+                        <li><strong>Catering Services:</strong> Event catering capacity and details.</li>
+                        <li><strong>Special Dietary Options:</strong> Vegetarian, vegan, halal, or other options.</li>
+                    </ul>
+                </div>
+
+                <!-- 6.4 Meetings and Events -->
+                <div id="meetings-events" style="scroll-margin-top: 90px;">
+                    <h4 style="color: var(--primary-teal); font-size: 1.1rem; margin-top: 1.5rem;">6.4 Meetings and
+                        Events</h4>
+                    <p>Register your meeting and event facilities:</p>
+                    <ul>
+                        <li><strong>Room or Hall Name:</strong> What you call each space.</li>
+                        <li><strong>Room Type:</strong> Ballroom, conference room, boardroom, etc.</li>
+                        <li><strong>Dimensions:</strong> Width, length, and ceiling height.</li>
+                        <li><strong>Capacity:</strong> Maximum number of people the space can accommodate.</li>
+                        <li><strong>Setup Arrangements:</strong> Theater style, classroom, banquet, etc.</li>
+                    </ul>
+                </div>
+
+                <!-- 6.5 Facilities and Amenities -->
+                <div id="facilities-amenities" style="scroll-margin-top: 90px;">
+                    <h4 style="color: var(--primary-teal); font-size: 1.1rem; margin-top: 1.5rem;">6.5 Facilities and
+                        Amenities</h4>
+                    <p>Share what makes your establishment special:</p>
+                    <ul>
+                        <li><strong>Internet:</strong> Wi-Fi availability and bandwidth.</li>
+                        <li><strong>Pool:</strong> Type of pool (indoor, outdoor, or both).</li>
+                        <li><strong>Spa and Wellness:</strong> Spa services and massage availability.</li>
+                        <li><strong>Children's Facilities:</strong> Playground, daycare, kids club.</li>
+                        <li><strong>Green Spaces:</strong> Gardens, outdoor areas.</li>
+                    </ul>
+                </div>
+
+                <!-- 6.6 Accessibility Features -->
+                <div id="accessibility" style="scroll-margin-top: 90px;">
+                    <h4 style="color: var(--primary-teal); font-size: 1.1rem; margin-top: 1.5rem;">6.6 Accessibility
+                        Features</h4>
+                    <p>Describe how you welcome guests with disabilities:</p>
+                    <ul>
+                        <li><strong>Wheelchair Ramps:</strong> Accessible entry points.</li>
+                        <li><strong>Elevators:</strong> Number and type (wheelchair-accessible lifts).</li>
+                        <li><strong>Accessible Bathrooms:</strong> Public restrooms with accessibility features.</li>
+                    </ul>
+                </div>
+
+                <!-- 6.7 Safety and Security -->
+                <div id="safety-security" style="scroll-margin-top: 90px;">
+                    <h4 style="color: var(--primary-teal); font-size: 1.1rem; margin-top: 1.5rem;">6.7 Safety and
+                        Security</h4>
+                    <p>Confirm your security measures:</p>
+                    <ul>
+                        <li><strong>CCTV:</strong> Video surveillance in public areas.</li>
+                        <li><strong>Fire Safety:</strong> Last fire extinguisher inspection date, alarms, exits.</li>
+                        <li><strong>Smoke Detectors:</strong> In rooms and public areas.</li>
+                        <li><strong>Security Screening:</strong> Bag scanners and walk-through scanners.</li>
+                    </ul>
+                </div>
+
+                <!-- 6.8 Parking and Transport -->
+                <div id="parking-transport" style="scroll-margin-top: 90px;">
+                    <h4 style="color: var(--primary-teal); font-size: 1.1rem; margin-top: 1.5rem;">6.8 Parking and
+                        Transport</h4>
+                    <p>Information about transportation:</p>
+                    <ul>
+                        <li><strong>Parking Spaces:</strong> Number of covered and uncovered spaces.</li>
+                        <li><strong>Parking Services:</strong> Valet parking, self-parking.</li>
+                        <li><strong>Airport Transport:</strong> Shuttle service availability.</li>
+                        <li><strong>EV Charging:</strong> Electric vehicle charging station availability.</li>
+                    </ul>
+                </div>
+
+                <!-- 6.9 Technology and ICT -->
+                <div id="technology-ict" style="scroll-margin-top: 90px;">
+                    <h4 style="color: var(--primary-teal); font-size: 1.1rem; margin-top: 1.5rem;">6.9 Technology and
+                        ICT</h4>
+                    <ul>
+                        <li><strong>POS System:</strong> What point-of-sale system you use.</li>
+                        <li><strong>Booking System:</strong> Online reservation system details.</li>
+                        <li><strong>Guest Services:</strong> Mobile check-in, digital concierge, etc.</li>
+                    </ul>
+                </div>
+
+                <!-- 6.10 Staffing and Sustainability -->
+                <div id="staffing-sustainability" style="scroll-margin-top: 90px;">
+                    <h4 style="color: var(--primary-teal); font-size: 1.1rem; margin-top: 1.5rem;">6.10 Staffing and
+                        Sustainability</h4>
+                    <ul>
+                        <li><strong>Staff:</strong> Number of employees and languages spoken.</li>
+                        <li><strong>Certifications:</strong> Environmental, health, safety, and quality certifications.
+                        </li>
+                        <li><strong>Green Practices:</strong> Sustainability initiatives and waste management.</li>
+                    </ul>
+                </div>
+
+                <div class="callout" style="margin-top: 2rem;">
+                    <div class="callout-icon"><i class="fas fa-pen-fancy"></i></div>
+                    <div class="callout-content">
+                        <strong>Tips for Completing Your Profile:</strong>
+                        <ul style="margin-top: 0.5rem;">
+                            <li>Start with <strong>Basic Information</strong> first.</li>
+                            <li><strong>Save</strong> each section as you complete it.</li>
+                            <li>Be <strong>accurate and complete</strong>.</li>
+                            <li>Use <strong>clear, professional descriptions</strong>.</li>
+                            <li><strong>Update</strong> your profile regularly.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 7: Uploading Documents -->
+            <section id="uploading-documents" class="doc-section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                    <h2 class="section-title">7. Uploading Supporting Documents</h2>
+                </div>
+                <h4 style="color: var(--primary-teal);">Required Documents</h4>
+                <ul>
+                    <li><strong>Business License:</strong> Trade license or business registration certificate.</li>
+                    <li><strong>Tax Certificate:</strong> TIN certificate or tax clearance.</li>
+                    <li><strong>Property and Facility Photos:</strong> Professional photos of exterior, lobby, guest
+                        rooms, dining areas, meeting halls, and facilities.</li>
+                    <li><strong>Health and Safety Certificates:</strong> Food hygiene certificate, health inspection
+                        reports.</li>
+                    <li><strong>Fire Safety and Inspection:</strong> Fire safety inspection certificate, fire
+                        extinguisher maintenance records.</li>
+                    <li><strong>Environmental Permits:</strong> Environmental clearance or waste management permits.
+                    </li>
+                </ul>
+
+                <h4 style="color: var(--primary-teal); margin-top: 1.5rem;">How to Upload Documents</h4>
+                <ol class="step-list">
+                    <li class="step-item"><span class="step-title">From your dashboard</span> open your establishment
+                        profile.</li>
+                    <li class="step-item"><span class="step-title">Scroll to the "Attachments" or "Documents"</span>
+                        section.</li>
+                    <li class="step-item"><span class="step-title">Click "Add Document" or "Upload File"</span>.</li>
+                    <li class="step-item"><span class="step-title">Select the document category</span> from the
+                        dropdown.</li>
+                    <li class="step-item"><span class="step-title">Choose the file from your computer</span>.</li>
+                    <li class="step-item"><span class="step-title">Click "Upload"</span> and wait for confirmation.</li>
+                </ol>
+
+                <h4 style="color: var(--primary-teal);">File Requirements</h4>
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Requirement</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Accepted Formats</strong></td>
+                            <td>PDF, JPG, PNG, GIF, WebP</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Maximum File Size</strong></td>
+                            <td>Check with administrator for size limits</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Image Quality</strong></td>
+                            <td>Use clear, well-lit photos for best results</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Section 8: Best Practices -->
+            <section id="best-practices" class="doc-section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-check-circle"></i></div>
+                    <h2 class="section-title">8. Best Practices & Tips for Success</h2>
+                </div>
+                <p>To ensure a smooth registration and approval process:</p>
+                <ol class="step-list">
+                    <li class="step-item"><span class="step-title">Complete Your Profile Accurately</span> Double-check
+                        all information before saving. Provide realistic numbers for rooms, capacity, and amenities. Use
+                        professional descriptions.</li>
+                    <li class="step-item"><span class="step-title">Submit Required Documents Promptly</span> Upload all
+                        required licenses and certificates. Use high-quality, clear scans or photos. Ensure documents
+                        are legible and complete.</li>
+                    <li class="step-item"><span class="step-title">Keep Your Information Up-to-Date</span> Update your
+                        profile when you add facilities or services. Change contact information if phone or email
+                        changes. Keep certifications and permits current.</li>
+                    <li class="step-item"><span class="step-title">Respond Promptly to Requests</span> Check for
+                        messages from the commission office regularly. Provide requested additional information quickly.
+                        Ask for clarification if you do not understand a requirement.</li>
+                    <li class="step-item"><span class="step-title">Use a Secure Internet Connection</span> Avoid using
+                        public Wi-Fi for sensitive transactions. Change your password regularly. Never share your login
+                        credentials.</li>
+                </ol>
+            </section>
+
+            <!-- Section 9: Troubleshooting -->
+            <section id="troubleshooting" class="doc-section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-wrench"></i></div>
+                    <h2 class="section-title">9. Troubleshooting</h2>
+                </div>
+                <p><strong>Having Issues?</strong> Here is how to resolve common problems:</p>
+                <ul style="list-style: none; padding-left: 0;">
+                    <li
+                        style="padding: 0.75rem 1rem; background: #F8FAFC; border-radius: 6px; margin-bottom: 0.5rem; border-left: 3px solid var(--accent-gold);">
+                        <strong>Login fails or wrong username or password:</strong> Verify your credentials. If you
+                        forgot your password, contact the System Administrator for a reset.
+                    </li>
+                    <li
+                        style="padding: 0.75rem 1rem; background: #F8FAFC; border-radius: 6px; margin-bottom: 0.5rem; border-left: 3px solid var(--accent-gold);">
+                        <strong>I have not received my OTP code:</strong> Wait a few moments. Check your phone number.
+                        Request a new OTP code if it still does not arrive.
+                    </li>
+                    <li
+                        style="padding: 0.75rem 1rem; background: #F8FAFC; border-radius: 6px; margin-bottom: 0.5rem; border-left: 3px solid var(--accent-gold);">
+                        <strong>The OTP code is being rejected:</strong> The code may have expired (usually after 10
+                        minutes). Request a new OTP and enter it immediately.
+                    </li>
+                    <li
+                        style="padding: 0.75rem 1rem; background: #F8FAFC; border-radius: 6px; margin-bottom: 0.5rem; border-left: 3px solid var(--accent-gold);">
+                        <strong>My profile section will not save:</strong> Check your internet connection. Verify all
+                        required fields are filled. Try saving one field at a time.
+                    </li>
+                    <li
+                        style="padding: 0.75rem 1rem; background: #F8FAFC; border-radius: 6px; margin-bottom: 0.5rem; border-left: 3px solid var(--accent-gold);">
+                        <strong>File upload is failing:</strong> Check the file format (PDF, JPG, PNG, GIF, WebP). Make
+                        sure the file size is not too large.
+                    </li>
+                    <li
+                        style="padding: 0.75rem 1rem; background: #F8FAFC; border-radius: 6px; margin-bottom: 0.5rem; border-left: 3px solid var(--accent-gold);">
+                        <strong>The system says my TIN already exists:</strong> Your establishment may have been
+                        registered before. Contact the commission office with your TIN to retrieve your account.
+                    </li>
+                    <li
+                        style="padding: 0.75rem 1rem; background: #F8FAFC; border-radius: 6px; margin-bottom: 0.5rem; border-left: 3px solid var(--accent-gold);">
+                        <strong>My page keeps refreshing or displays incorrectly:</strong> Clear your browser cache and
+                        cookies. Try a different browser. Ensure you are using an up-to-date browser version.
+                    </li>
+                </ul>
+                <div class="callout">
+                    <div class="callout-icon"><i class="fas fa-headset"></i></div>
+                    <div class="callout-content"><strong>Still Having Issues?</strong> Contact the System Administrator
+                        or the Addis Ababa Tourism and MICE Commission office directly. See the <a href="#support"
+                            style="color: var(--primary-teal); font-weight: 600;">Support section</a> below.</div>
+                </div>
+            </section>
+
+            <!-- Section 10: Support -->
+            <section id="support" class="doc-section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="fas fa-headset"></i></div>
+                    <h2 class="section-title">10. Support & Contact Information</h2>
+                </div>
+                <p style="font-weight: 600; color: var(--primary-teal);">We are here to help!</p>
+                <div class="support-grid">
+                    <div class="support-card">
+                        <div class="label">Technical Issues</div>
+                        <div class="name">System Administrator</div>
+                        <a href="mailto:administrator@tourism.gov.et"><i class="fas fa-envelope"></i>
+                            administrator@tourism.gov.et</a><br />
+                        <span style="font-size: 0.85rem; color: var(--text-muted);"><i class="fas fa-phone"></i> +251 XX
+                            XXXX XXXX</span>
+                    </div>
+                    <div class="support-card">
+                        <div class="label">Registration Status</div>
+                        <div class="name">Registration Commission Office</div>
+                        <a href="mailto:registration@aatourism.gov.et"><i class="fas fa-envelope"></i>
+                            registration@aatourism.gov.et</a><br />
+                        <span style="font-size: 0.85rem; color: var(--text-muted);"><i class="fas fa-phone"></i> +251 XX
+                            XXXX XXXX</span>
+                    </div>
+                    <div class="support-card">
+                        <div class="label">Business Questions</div>
+                        <div class="name">Addis Ababa Tourism Commission</div>
+                        <a href="mailto:info@aatourism.gov.et"><i class="fas fa-envelope"></i>
+                            info@aatourism.gov.et</a><br />
+                        <span style="font-size: 0.85rem; color: var(--text-muted);"><i class="fas fa-phone"></i> +251 XX
+                            XXXX XXXX</span>
+                    </div>
+                </div>
+                <div
+                    style="margin-top: 1rem; padding: 1rem; background: #FFFBEB; border-radius: 8px; border: 1px dashed var(--accent-gold);">
+                    <p style="margin: 0; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                        <i class="fas fa-map-pin" style="color: var(--accent-gold); font-size: 1.1rem;"></i>
+                        <strong>Office Address:</strong> [Address to be filled in]
+                    </p>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="doc-footer">
+        <p>&copy; 2026 Addis Ababa Tourism Commission. All rights reserved. | <a href="/Account/Login">Return to
+                Login</a></p>
+    </footer>
+
+    <!-- Search & Active Nav Script -->
+    <script>
+        function filterDocs() {
+            const input = document.getElementById('docSearch').value.toLowerCase();
+            const sections = document.querySelectorAll('.doc-section');
+
+            sections.forEach(section => {
+                const text = section.textContent.toLowerCase();
+                if (text.includes(input)) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        }
+
+        // Highlight active nav item on scroll
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('.doc-section');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 120) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Export Functions
+        function exportPDF() {
+            const element = document.getElementById('mainContent');
+            const opt = {
+                margin: 0.5,
+                filename: 'User_Guide_AATMCDP.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, letterRendering: true, useCORS: true, logging: false },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+            const btn = document.querySelector('.btn-export-pdf');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+            btn.disabled = true;
+
+            html2pdf().set(opt).from(element).save().then(function () {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }).catch(function (err) {
+                console.error('PDF Export Error:', err);
+                alert('An error occurred while generating the PDF. Please try again.');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+        }
+
+
+        const btn = document.querySelector('.btn-export-word');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+        btn.disabled = true;
+
+    </script>
+</body>
+
+</html>

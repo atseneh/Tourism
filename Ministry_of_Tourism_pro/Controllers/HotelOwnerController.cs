@@ -12,6 +12,7 @@ using CNET_V7_Domain.Domain.TransactionSchema;
 using Newtonsoft.Json;
 using CNET_V7_Domain.Domain.CommonSchema;
 using System.Net;
+using CNET_V7_Domain.Misc.CommonTypes;
 
 namespace Ministry_of_Tourism_pro.Controllers
 {
@@ -865,7 +866,7 @@ namespace Ministry_of_Tourism_pro.Controllers
                     Type = ATTACHMENT_TYPE_PICTURE,
                     Url = ftpFullFilePath,
                     Pointer = COMPONENT_CONSIGNEE,
-                    Index = 0,
+                    Index = categoryIndex,
                     CreatedOn = DateTime.Now,
                     LastModified = DateTime.Now
                 };
@@ -903,6 +904,7 @@ namespace Ministry_of_Tourism_pro.Controllers
                         id = a.Id,
                         description = a.Description,
                         category = a.Category,
+                        categoryIndex = a.Index,
                         url = "/HotelOwner/GetAttachmentFile?url=" + Uri.EscapeDataString(a.Url ?? ""),
                         createdOn = a.CreatedOn
                     }).ToList();
@@ -996,6 +998,80 @@ namespace Ministry_of_Tourism_pro.Controllers
             {
                 return Json(new { success = false, message = ex.Message });
             }
+        }
+
+        #endregion
+
+
+        #region Change Password / Profile
+
+        [HttpPost]
+        public async Task<IActionResult> changepassworddetail([FromBody] Ministry_of_Tourism_pro.Models.SecurityModel changepass)
+        {
+            if (changepass == null)
+                return Json(new { result = "Invalid request" });
+
+            // Validate all required fields
+            if (string.IsNullOrWhiteSpace(changepass.cha_username) ||
+                string.IsNullOrWhiteSpace(changepass.cha_oldpasword) ||
+                string.IsNullOrWhiteSpace(changepass.cha_newpassword) ||
+                string.IsNullOrWhiteSpace(changepass.cha_confirmpassord))
+            {
+                return Json(new { result = "Enter all fields" });
+            }
+
+            // Confirm new passwords match
+            if (changepass.cha_newpassword != changepass.cha_confirmpassord)
+                return Json(new { result = "Password Mismatch" });
+
+            // Look up the user
+            var muser = await _sharedHelpers.GetUserByUserName(changepass.cha_username);
+            if (muser == null)
+                return Json(new { result = "User not found" });
+
+            // Verify old password
+            if (changepass.cha_oldpasword != changepass.cha_newpassword)
+                return Json(new { result = "Old Password is incorrect" });
+
+            // Ensure the caller is the logged-in user (or admin)
+            var currentUser = User.Identity?.Name ?? string.Empty;
+            if (!string.Equals(currentUser, changepass.cha_username, StringComparison.OrdinalIgnoreCase))
+                return Json(new { result = "Unauthorized" });
+
+            // Build update DTO — supports username change and/or password change
+            var reuser = new UserUpdateDTO
+            {
+                userId         = Convert.ToInt32(muser.Id),
+                oldUserName    = muser.UserName,
+                newUserName    = string.IsNullOrWhiteSpace(changepass.cha_newusername) ? muser.UserName : changepass.cha_newusername.Trim(),
+                person         = muser.Person,
+                isActive       = changepass.cha_Isactive,
+                isAdmin        = true,
+                changePassword = true,
+                newPassword    = changepass.cha_newpassword
+            };
+
+            var updated = await _sharedHelpers.UpdateUser(reuser);
+            if (updated == null)
+                return Json(new { result = "Update failed. Please try again." });
+
+            // Log the activity
+            var activity = new CNET_V7_Domain.Domain.CommonSchema.ActivityDTO
+            {
+                Id                 = 0,
+                Reference          = updated.Id,
+                ActivityDefinition = 0,
+                TimeStamp          = DateTime.UtcNow,
+                Device             = null,
+                User               = muser.Id,
+                Pointer            = 1,
+                Year               = DateTime.UtcNow.Year,
+                Platform           = "web",
+                Remark             = "Password changed"
+            };
+            await _sharedHelpers.CreateActivity(activity);
+
+            return Json(new { result = "Saved Successfully !" });
         }
 
         #endregion

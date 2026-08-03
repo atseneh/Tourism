@@ -1,772 +1,620 @@
-# Addis Ababa Tourism & MICE Commission Portal
+# Addis Ababa Tourism and MICE Commission Portal
+
 ## User Manual
 
+**System name:** Addis Ababa Tourism and MICE Commission Database Portal  
+**Application:** Ministry of Tourism Portal  
 **Version:** 1.0  
-**Last Updated:** June 2026  
-**Application:** Ministry of Tourism Portal (AATMCDP)
+**Updated:** August 2026
 
 ---
 
-# Table of Contents
+## 1. Introduction
 
-1. [Introduction](#1-introduction)
-2. [System Requirements & Access](#2-system-requirements--access)
-3. [Getting Started](#3-getting-started)
-   - 3.1 [Accessing the Portal](#31-accessing-the-portal)
-   - 3.2 [Login](#32-login)
-   - 3.3 [Pre-Registration (New Organizations)](#33-pre-registration-new-organizations)
-   - 3.4 [OTP Verification](#34-otp-verification)
-   - 3.5 [Logout](#35-logout)
-4. [User Roles & Permissions](#4-user-roles--permissions)
-5. [Hotel Owner Portal](#5-hotel-owner-portal)
-   - 5.1 [Dashboard](#51-dashboard)
-   - 5.2 [Registry Form Sections](#52-registry-form-sections)
-     - 5.2.1 [Basic Information](#521-basic-information)
-     - 5.2.2 [Accommodation Details](#522-accommodation-details)
-     - 5.2.3 [Food & Beverage Services](#523-food--beverage-services)
-     - 5.2.4 [Meetings & Events](#524-meetings--events)
-     - 5.2.5 [Public Facilities](#525-public-facilities)
-     - 5.2.6 [Accessibility](#526-accessibility)
-     - 5.2.7 [Safety & Security](#527-safety--security)
-     - 5.2.8 [Transport & Parking](#528-transport--parking)
-     - 5.2.9 [ICT & Guest Services](#529-ict--guest-services)
-     - 5.2.10 [Utilities & Resilience](#5210-utilities--resilience)
-     - 5.2.11 [Sustainability & Certifications](#5211-sustainability--certifications)
-     - 5.2.12 [Staffing & Languages](#5212-staffing--languages)
-     - 5.2.13 [Attachments / Documents](#5213-attachments--documents)
-   - 5.3 [Saving Sections](#53-saving-sections)
-6. [Commissioner Portal](#6-commissioner-portal)
-   - 6.1 [Overview Dashboard](#61-overview-dashboard)
-   - 6.2 [Pending Approvals](#62-pending-approvals)
-   - 6.3 [Reports](#63-reports)
-     - 6.3.1 [General Registry](#631-general-registry)
-     - 6.3.2 [Accommodation Infrastructure](#632-accommodation-infrastructure)
-     - 6.3.3 [Food & Beverage](#633-food--beverage)
-     - 6.3.4 [Meetings & Events](#634-meetings--events)
-     - 6.3.5 [Rating Summary](#635-rating-summary)
-     - 6.3.6 [Certified Facilities](#636-certified-facilities)
-     - 6.3.7 [MICE Destinations](#637-mice-destinations)
-     - 6.3.8 [Event Venues](#638-event-venues)
-     - 6.3.9 [Kitchen & POS Technology](#639-kitchen--pos-technology)
-     - 6.3.10 [Restaurant Seating](#6310-restaurant-seating)
-     - 6.3.11 [Bars & Lounge](#6311-bars--lounge)
-     - 6.3.12 [Accessibility Facilities](#6312-accessibility-facilities)
-     - 6.3.13 [Parking Capacity](#6313-parking-capacity)
-     - 6.3.14 [PPP Analytics](#6314-ppp-analytics)
-   - 6.4 [Approval / Rejection Workflow](#64-approval--rejection-workflow)
-7. [Admin Portal](#7-admin-portal)
-   - 7.1 [Evaluation Form](#71-evaluation-form)
-   - 7.2 [Submitting an Evaluation](#72-submitting-an-evaluation)
-8. [System Admin Portal](#8-system-admin-portal)
-   - 8.1 [User Management Dashboard](#81-user-management-dashboard)
-   - 8.2 [Creating a New User](#82-creating-a-new-user)
-   - 8.3 [Editing an Existing User](#83-editing-an-existing-user)
-   - 8.4 [Deleting a User](#84-deleting-a-user)
-   - 8.5 [User Roles Explained](#85-user-roles-explained)
-9. [Troubleshooting](#9-troubleshooting)
-10. [Appendices](#10-appendices)
-    - A. [Glossary of Terms](#a-glossary-of-terms)
-    - B. [Business Types Reference](#b-business-types-reference)
-    - C. [Attachment Category Reference](#c-attachment-category-reference)
-    - D. [Support Contact Information](#d-support-contact-information)
+The Addis Ababa Tourism and MICE Commission Portal is a web-based system used to register, manage, review, and report on tourism establishments. It supports hotels, restaurants, MICE venues, and related tourism businesses.
+
+The system helps establishment owners submit their business information, allows commission staff to review and approve registrations, and gives authorized users access to registry reports and operational summaries.
+
+### Main Uses
+
+- Register a new tourism establishment.
+- Verify a registrant using OTP/SMS.
+- Maintain establishment profile information.
+- Upload supporting documents and certificates.
+- Review pending establishment registrations.
+- Approve or reject establishments.
+- View and export tourism registry reports.
+- Manage system users and roles.
+- Submit establishment evaluation reports.
 
 ---
 
-# 1. Introduction
+## 2. User Roles
 
-The **Addis Ababa Tourism & MICE Commission Portal (AATMCDP)** is a centralized digital platform designed to register, manage, and monitor tourism establishments in Addis Ababa. The system provides a comprehensive registry for hotels, motels, lodges, resorts, guest houses, and other tourism-related properties.
+The system gives each user access according to their assigned role.
 
-### Key Objectives
+| Role | Main Purpose | Main Access |
+| --- | --- | --- |
+| SystemAdmin | Manage users and access rights | User management dashboard |
+| Commissioner | Review, approve, and report on establishments | Reports and pending approvals |
+| Admin | Submit evaluation reports | Evaluation form |
+| HotelOwner | Manage own establishment profile | Registry dashboard and profile forms |
 
-- **Digitize** the registration and licensing of tourism establishments
-- **Standardize** data collection across the hospitality industry
-- **Enable** efficient approval workflows for new establishments
-- **Generate** analytical reports to support decision-making and investment planning
-- **Promote** Addis Ababa as a premier MICE (Meetings, Incentives, Conferences, and Exhibitions) destination
-
-### Core Features
-
-- Online pre-registration and OTP-verified account creation
-- Comprehensive property registry with 14 data sections
-- Document attachment and management via FTP
-- Approval workflow (Hotel Owner → Commissioner)
-- Analytical reporting with 12+ report categories
-- User and role management
+If a user logs in but does not have a valid role, the system displays a no-privilege or access denied page.
 
 ---
 
-# 2. System Requirements & Access
+## 3. System Requirements
 
-### Access
-- **Web Browser** (Chrome 90+, Firefox 88+, Edge 90+, Safari 14+ recommended)
-- **Internet Connection** (Broadband recommended for file uploads)
+### Supported Browsers
 
-### Supported Devices
-- Desktop computers
-- Tablets
-- Mobile phones (responsive design)
+- Google Chrome
+- Microsoft Edge
+- Mozilla Firefox
+- Safari
 
-### URL
-- Access the portal via your organization's provided URL (typically hosted on an internal or cloud server)
+For the best experience, use a modern browser and a stable internet connection, especially when uploading files.
 
----
+### Devices
 
-# 3. Getting Started
-
-## 3.1 Accessing the Portal
-
-1. Open your web browser
-2. Navigate to the portal URL provided by your administrator
-3. You will be presented with the **Login page**
-
-## 3.2 Login
-
-The Login page features:
-- A visually rich left panel showcasing Addis Ababa landmarks
-- A glass-morphism login card on the right side
-
-**To log in:**
-
-1. Enter your **Username or Email** in the email field
-2. Enter your **Password**
-3. Check **"Remember me"** if you wish to stay logged in on the device
-4. Click the **"Sign In"** button
-
-**On successful login**, you will be redirected to your role-specific dashboard:
-- **Hotel Owner** → Hotel Owner Dashboard
-- **Commissioner** → Reports page
-- **Admin** → Admin Evaluation page
-- **System Admin** → User Management page
-
-**On failed login**, an error message will appear in Amharic and English:  
-*"የተጠቃሚ ስም ወይም የይለፍ ቃል ስህተት ነው። / Invalid username or password."*
-
-## 3.3 Pre-Registration (New Organizations)
-
-If your organization does not yet have an account, click **"No account? Pre-register here"** on the login page.
-
-**Steps to pre-register:**
-
-1. **Organization Name** – Enter the full legal name of your establishment
-2. **TIN (Tax Identification Number)** – Enter your organization's TIN
-3. **Phone Number** – A valid phone number for OTP verification
-4. **Email Address** – A valid email address
-5. **Category** – Select your business category from the dropdown (e.g., Hotel, Resort, Lodge)
-6. Click **"Register"**
-
-**After submission:**
-- The system validates that the TIN and Phone Number are not already registered
-- An SMS will be sent to your phone with a **Username** and default **Password** (`admin@123`)
-- Use these credentials to log in for the first time
-- It is recommended to change your password after first login (contact System Admin)
-
-### Pre-Registration Validation Rules
-
-| Field | Rule |
-|-------|------|
-| TIN | Must be unique - no duplicate TIN allowed |
-| Phone Number | Must be unique (except for test number 0929039787) |
-
-## 3.4 OTP Verification
-
-During pre-registration, the system verifies your phone number via OTP.
-
-**Two OTP providers are available** (configured by System Admin):
-
-### Option A: CNET OTP (Default)
-- Click **"Send OTP"** to receive a code via SMS
-- Enter the received code and click **"Verify OTP"**
-- The verification status will be displayed
-
-### Option B: Direct OTP (In-Memory)
-- Used as a fallback when CNET OTP is unavailable
-- The code is generated in-memory and sent via SMS
-- Same verification process as CNET OTP
-
-## 3.5 Logout
-
-Click the **Logout** button (typically in the navigation bar or profile menu) to end your session.  
-After logout, you will be redirected to the Login page.
+The portal can be used on desktop, tablet, or mobile devices. Data entry and report review are easiest on a desktop or laptop screen.
 
 ---
 
-# 4. User Roles & Permissions
+## 4. Accessing the System
 
-The system has four distinct user roles:
+1. Open your browser.
+2. Enter the portal URL provided by the system administrator.
+3. The login page will appear.
+4. Enter your username and password.
+5. Select **Remember me** only on a trusted private device.
+6. Click **Sign In**.
 
-| Role | Access Level | Primary Responsibilities |
-|------|-------------|------------------------|
-| **SystemAdmin** | Full System | Manage users, assign roles, system configuration |
-| **Commissioner** | Management | Review properties, approve/reject registrations, view reports |
-| **Admin** | Evaluation | Submit evaluations of tourism establishments |
-| **HotelOwner** | Self-Service | Register and manage own property profile |
+After login, the system opens the dashboard assigned to your role:
 
----
+- HotelOwner opens the hotel owner dashboard.
+- Commissioner opens the reports area.
+- Admin opens the evaluation page.
+- SystemAdmin opens user management.
 
-# 5. Hotel Owner Portal
-
-## 5.1 Dashboard
-
-The **Hotel Owner Dashboard** displays a list of all establishments registered under your account. Each property card shows:
-
-- **Trade Name** (Business name)
-- **Registration Name** (Legal name)
-- **TIN**
-- **Category** (e.g., Hotel, Resort)
-- **Star Rating**
-- **City & Subcity**
-- **Contact Information**
-- **Status** (Approved/Pending/Rejected)
-
-From the dashboard, you can:
-- **View Details** – Click on a property to see its full registry
-- **Edit Registry** – Update property information section by section
-- **Upload Documents** – Attach certificates, photos, and permits
-
-## 5.2 Registry Form Sections
-
-Each property registry is organized into **14 sections**. Each section can be saved independently to prevent data loss.
-
-### 5.2.1 Basic Information
-- **Trade Name** – The name under which the business operates
-- **Registration Name** – The legal/registered business name
-- **TIN** – Tax Identification Number (displayed, not editable)
-- **Business Category** – Type of establishment
-- **Specific Address** – Detailed physical address
-- **Subcity** – Select from dropdown
-- **City** – Default: Addis Ababa
-- **Region** – Default: Addis Ababa
-- **Star Category** – Star rating (e.g., 3 Star, 4 Star, 5 Star)
-- **Contact Information** – Primary phone/contact details
-- **Reservations Contact** – Reservation-specific contact number
-- **Latitude / Longitude** – GPS coordinates (optional)
-
-### 5.2.2 Accommodation Details
-- **King Size Rooms** – Number of rooms with king-size beds
-- **Twin Bed Rooms** – Number of rooms with twin beds
-- **Junior Suites** – Number of junior suites
-- **Suites** – Number of full suites
-- **Presidential Suites** – Number of presidential suites
-- **Accessible Rooms** – Number of rooms adapted for guests with disabilities
-- **VIP Check-In** – Whether VIP check-in service is available
-
-> **Note:** Total Rooms and Total Beds are calculated automatically based on your entries.
-
-### 5.2.3 Food & Beverage Services
-- **All-Day Dining** – Toggle: Is all-day dining available?
-- **All-Day Dining Seats** – Number of seats
-- **Specialty Restaurants** – List of specialty restaurants (add/remove items)
-  - Add restaurant name, type, cuisine, capacity, Halal option, Vegan option, and notes
-- **Coffee Shop** – Toggle: Is a coffee shop available?
-- **Bars Count** – Number of bars/lounges
-- **Night Club** – Toggle: Is a night club available?
-- **Delegation Catering** – Toggle: Can the property cater for delegations?
-- **Delegation Catering Max Pax** – Maximum capacity for delegation catering
-- **Refill Water Stations** – Toggle: Are water refill stations available?
-- **Veg/Vegan Options** – Toggle: Are vegetarian/vegan menu options available?
-- **No Single-Use Plastics** – Toggle: Has the property eliminated single-use plastics?
-
-### 5.2.4 Meetings & Events
-- **Meeting Rooms** – Add meeting rooms with details:
-  - Room name
-  - Type (Theater, Classroom, Banquet, Boardroom, U-Shape)
-  - Width (meters)
-  - Length (meters)
-  - Ceiling Height (meters)
-  - Capacity (number of people)
-  - Setting Arrangement
-
-> **Note:** Meeting room count, total space (sqm), and largest room capacities are calculated automatically.
-
-### 5.2.5 Public Facilities
-- **Internet Bandwidth (Download)** – Mbps
-- **Internet Bandwidth (Upload)** – Mbps
-- **Lobby Area** – Square meters
-- **Green Area** – Square meters
-- **Pool Available** – Toggle
-- **Pool Type** – Type of pool (e.g., Indoor, Outdoor, Rooftop)
-- **Spa Available** – Toggle
-- **Spa Gender** – Male, Female, or Unisex
-- **Massage Service** – Toggle
-- **Children's Playground** – Toggle
-- **Children's Day Care** – Toggle
-- **Staff Canteen** – Toggle
-
-### 5.2.6 Accessibility
-- **Wheelchair Ramps** – Toggle
-- **Elevators Count** – Number of elevators
-- **Elevators Wheelchair-Sized** – Toggle: Are elevators wheelchair accessible?
-- **Public Accessible Bathroom** – Toggle
-
-### 5.2.7 Safety & Security
-- **CCTV in Public Areas** – Toggle
-- **Fire Extinguishers Last Inspection** – Date of last inspection
-- **Hose Reels** – Toggle: Are fire hose reels installed?
-- **Smoke Detectors in Rooms** – Toggle
-- **Smoke Detectors in Public Areas** – Toggle
-- **Sprinkler Coverage** – Toggle
-- **Fire Alarm Control Panel** – Toggle
-- **Emergency Exits Count** – Number of emergency exits
-- **Bag Scanner** – Toggle
-- **Walk-Through Scanner** – Toggle
-- **Hand Scanner** – Toggle
-
-### 5.2.8 Transport & Parking
-- **Parking Spaces Count** – Total parking spaces
-- **Bus Parking Count** – Spaces for buses/coaches
-- **Valet Parking** – Toggle
-- **Parking Within 100m** – Toggle: Is alternative parking available within 100 meters?
-- **Shuttle to Airport** – Toggle
-- **Public Transport Within 500m** – Toggle
-- **EV Charging Points** – Number of electric vehicle charging stations
-- **EV Charger Types** – Types of EV chargers (e.g., Type 2, CCS, CHAdeMO)
-
-### 5.2.9 ICT & Guest Services
-- **WiFi Property-Wide** – Toggle
-- **WiFi Average Speed** – Mbps
-- **In-House Laundry** – Toggle
-- **Reception 24hr** – Toggle
-- **Passport Scanner** – Toggle
-- **Currency Scanner** – Toggle
-
-### 5.2.10 Utilities & Resilience
-- **Standby Generator Capacity** – KVA
-- **Standby Generator Coverage** – Areas covered by generator
-- **Water Treatment** – Toggle
-- **Waste Segregation** – Toggle
-- **Recycling** – Toggle
-- **Hazardous Waste Handling** – Toggle
-
-### 5.2.11 Sustainability & Certifications
-- **Sustainability Focal Point** – Name/title of the sustainability officer
-- **Sustainability Certification** – Type of certification (e.g., Green Key, EarthCheck)
-- **Other Eco Labels** – Additional eco-certifications
-- **Food Waste Program** – Toggle
-- **Sustainability Refill Water Stations** – Toggle
-- **Tourism Service Competence License Certificate** – Certificate number/status
-- **Fire Safety Certificate** – Certificate number/status
-- **Environmental Clearance Certificate** – Certificate number/status
-- **Food Safety & Hygiene Certificate** – Certificate number/status
-- **ISO Certification** – Certification number/status
-
-### 5.2.12 Staffing & Languages
-- **Line Staff Count** – Number of non-management employees
-- **Management Staff Count** – Number of management employees
-- **Total Staff** – Calculated automatically
-- **International Languages at Front Desk** – Languages spoken at reception
-
-### 5.2.13 Attachments / Documents
-
-The system supports uploading documents and images for each property.
-
-**Uploadable Document Categories:**
-1. Business License
-2. Tax Certificate (TIN)
-3. Property Photos
-4. Health & Safety Certificate
-5. Fire Safety Certificate
-6. Environmental Permit
-7. Other (Reference Documents)
-
-**To upload:**
-1. Select the document category
-2. Choose a file (PDF, JPG, PNG, GIF, WebP supported)
-3. Click **"Upload"**
-4. The file is uploaded to the secure FTP server and linked to your property
-
-**To view/download:** Click on an attached file to download or view it.
-
-**To delete:** Click the delete icon next to an attachment.
-
-## 5.3 Saving Sections
-
-Each section of the registry has a dedicated **"Save"** button. This allows you to:
-- Save progress without completing all sections
-- Save sections independently as you complete them
-- Avoid data loss
-
-After saving, a success message will confirm the update.
-
-The available save modes are:
-- **Basic** – Saves Basic Information fields
-- **Accommodation** – Saves accommodation details
-- **Food & Beverage** – Saves F&B section
-- **Meetings & Events** – Saves meetings/events data
-- **Public Facilities** – Saves public facilities
-- **Accessibility** – Saves accessibility data
-- **Safety & Security** – Saves safety/security data
-- **Transport & Parking** – Saves transport/parking
-- **ICT & Guest Services** – Saves ICT data
-- **Utilities & Resilience** – Saves utilities data
-- **Sustainability** – Saves sustainability/certifications
-- **Staffing** – Saves staffing data
-- **All** – Saves all sections at once
+To end your session, use **Logout** from the navigation area.
 
 ---
 
-# 6. Commissioner Portal
+## 5. New Establishment Pre-Registration
 
-## 6.1 Overview Dashboard
+New organizations can create an initial account from the login page.
 
-The **Commissioner Overview** page displays a list of all registered establishments across the system. This provides a high-level view of the entire tourism ecosystem.
+### Steps
 
-- View **Property Name**, **Category**, **City**, **Star Rating**, and **Status**
-- Click on a property to view detailed information
+1. Click **No account? Pre-register here**.
+2. Enter the organization name.
+3. Enter the TIN number.
+4. Enter a valid phone number.
+5. Enter an email address.
+6. Select the business category.
+7. Send and verify the OTP when prompted.
+8. Submit the registration.
 
-## 6.2 Pending Approvals
+After a successful registration, the system creates:
 
-The **Pending Approvals** page lists all newly registered (pre-registered) establishments that require review and approval.
+- An inactive organization record for review.
+- A head office/branch record.
+- An administrator user for the organization.
 
-Each item displays:
-- **Property Name**
-- **TIN**
-- **Code**
-- **Subcity**
-- **Star Rating**
-- **Current Status** (Active/Inactive)
+The default password is `admin@123`. The generated username and password are sent by SMS to the phone number entered during pre-registration.
 
-**Actions:**
-- **Approve** – Click to approve and activate the establishment
-- **Reject** – Click to reject with an optional comment
-- **View Details** – Click to see the full establishment profile
+### Validation Rules
 
-## 6.3 Reports
+- TIN must not already exist in the system.
+- Phone number must not already be registered to another organization.
+- OTP must be verified before registration can be completed.
 
-The **Reports** section provides comprehensive analytical data organized into multiple categories. Each report can be viewed in real-time based on the data in the system.
+---
 
-### 6.3.1 General Registry
-A master list of all establishments with:
-- Property Name, Category, City, Region
-- TIN, Phone, Email
-- Total Rooms, Total Beds
-- Total Units, Total Meeting Spaces
-- Star Rating, Manager Name, Specific Address
+## 6. OTP Verification
 
-### 6.3.2 Accommodation Infrastructure
-Breakdown of available room types across all properties:
-- Property Name
-- Room Type (King Size, Twin Bed, Junior Suite, Suite, Presidential, Accessible)
-- Bed Configuration
-- Count of each room type
-- Maximum Pax per room type
+The portal uses OTP verification during pre-registration.
 
-### 6.3.3 Food & Beverage
-Details of dining facilities:
-- Property Name
-- Facility Name
-- Specialization (cuisine type)
-- Seating capacity
-- Catering availability
+### How to Use OTP
 
-### 6.3.4 Meetings & Events
-Meeting venue details:
-- Property Name
-- Venue Name
-- Type (Theater, Classroom, Banquet, etc.)
-- Seating Capacity
-- Standing Capacity
-- Area in Square Meters
+1. Enter the phone number.
+2. Click **Send OTP**.
+3. Wait for the SMS verification code.
+4. Enter the code in the verification field.
+5. Click **Verify OTP**.
+6. Continue registration after the verification succeeds.
 
-### 6.3.5 Rating Summary
-Aggregated summary grouped by star rating:
-- Category (Star Rating)
-- Property Count
-- Total Rooms
-- Total Beds
-- Average Rooms per Property
+If the OTP expires or is rejected, request a new code and try again.
 
-### 6.3.6 Certified Facilities
-Establishments and their certification status:
-- Property Name, Category, City, Star Rating
-- Tourism License status
-- Fire Safety Certificate status
-- Environmental Clearance status
-- Food Safety Certificate status
-- ISO Certification status
-- **Overall Certification Status** (Fully Certified / Partially Certified / Minimally Certified / Uncertified / No Data)
+---
 
-### 6.3.7 MICE Destinations
-Properties suitable for MICE (Meetings, Incentives, Conferences, Exhibitions):
-- Property Name, Category, City, Star Rating
-- Meeting Rooms Count
-- Largest Capacity
-- Total Meeting Space (sqm)
-- WiFi Availability
-- Generator Availability
-- **MICE Score** (High / Medium / Low)
+## 7. Hotel Owner Guide
 
-### 6.3.8 Event Venues
-Detailed venue information:
-- Venue Name
+The HotelOwner role is used by establishment representatives to complete and maintain their registry profile.
+
+### 7.1 Dashboard
+
+The dashboard lists establishments linked to the logged-in owner. Each establishment may show:
+
+- Trade name
+- Registration name
+- TIN
+- Category
+- Code
+- Location
+- Star category
+- Contact details
+- Current status
+
+From the dashboard, users can view details, update registry data, and manage attachments.
+
+### 7.2 Updating Registry Information
+
+Registry information is organized into sections. Each section can be saved separately so users do not need to complete the entire profile at once.
+
+Common sections include:
+
+- Basic information
+- Accommodation
+- Food and beverage
+- Meetings and events
+- Public facilities
+- Accessibility
+- Safety and security
+- Transport and parking
+- ICT and guest services
+- Utilities and resilience
+- Sustainability and certifications
+- Staffing and languages
+- Attachments/documents
+
+### 7.3 Basic Information
+
+Use this section to maintain the main identity and location of the establishment:
+
+- Trade name
+- Registration name
+- Specific address
+- Subcity
+- City and region
+- Star category
+- Contact information
+- Reservation contact
+- Location information, where available
+
+### 7.4 Accommodation
+
+Use this section to enter room inventory:
+
+- King size rooms
+- Twin bed rooms
+- Junior suites
+- Suites
+- Presidential suites
+- Accessible rooms
+- VIP check-in availability
+
+Total rooms and total beds are calculated from the entered room counts.
+
+### 7.5 Food and Beverage
+
+Use this section to enter dining and catering information:
+
+- All-day dining availability and seats
+- Specialty restaurants
+- Coffee shop
+- Number of bars
+- Night club availability
+- Souvenir shops, if applicable
+- Delegation catering and maximum capacity
+- Water refill stations
+- Vegetarian or vegan options
+- Single-use plastic reduction
+
+For specialty restaurants, add the restaurant name, type, cuisine, capacity, halal option, vegan option, and notes.
+
+### 7.6 Meetings and Events
+
+Use this section to register meeting halls and event spaces.
+
+For each room or hall, enter:
+
+- Room name
 - Type
-- Setting Arrangement
-- Capacity, Width, Length, Ceiling Height
-- Area (sqm)
-
-### 6.3.9 Kitchen & POS Technology
-Technology integration status of properties:
-- Online Ordering System
-- Table Reservation
-- IP TV
-- WiFi
-- Restaurant Count
-- Meeting Room Count
-- **Integration Status** (Fully Integrated / Partially Integrated / Basic)
-
-### 6.3.10 Restaurant Seating
-Detailed restaurant seating information:
-- Restaurant Name
-- Cuisine Type
+- Width
+- Length
+- Ceiling height
 - Capacity
-- Halal/Vegan availability
-- All-Day Dining Seats
-- Notes
+- Setting arrangement
 
-### 6.3.11 Bars & Lounge
-Bar and lounge information:
-- Bars Count
-- Night Club availability
-- Coffee Shop availability
-- Delegation Catering availability
-- Veg/Vegan options
-- Refill Water Stations
+The system uses these values for MICE and event venue reports.
 
-### 6.3.12 Accessibility Facilities
-Accessibility features across properties:
-- Wheelchair Ramps
-- Elevators Count and Accessibility
-- Public Accessible Bathroom
-- Spa availability
-- Children's Playground and Day Care
+### 7.7 Public Facilities
 
-### 6.3.13 Parking Capacity
-Parking infrastructure details:
-- Total Parking Slots
-- Bus Parking Count
-- Valet Parking
-- Parking Within 100m
-- EV Charging Points and Types
+Use this section to record facilities available to guests:
 
-### 6.3.14 PPP Analytics
-Public-Private Partnership potential analysis:
-- Total Rooms and Beds
-- Meeting Rooms
-- WiFi and Generator availability
-- Sustainability Certification
-- Total Staff
-- **PPP Status** (PPP Ready / Potential PPP / Standard)
+- Internet bandwidth
+- Lobby area
+- Green area
+- Pool availability and type
+- Spa availability and gender service
+- Massage service
+- Children's playground
+- Child day care
+- Staff canteen
 
-## 6.4 Approval / Rejection Workflow
+### 7.8 Accessibility
 
-### Approve an Establishment
-1. Go to **Pending Approvals**
-2. Review the establishment's details
-3. Click **"Approve"**
-4. Confirmation: *"Establishment approved and activated."*
-5. The establishment's status is set to **Active** and it appears in all active reports
+Use this section to record inclusive access features:
 
-### Reject an Establishment
-1. Go to **Pending Approvals**
-2. Review the establishment's details
-3. Click **"Reject"**
-4. Enter an optional comment explaining the reason for rejection
-5. Confirmation: *"Establishment declined and deactivated."*
-6. The establishment remains **Inactive** and the owner can address the issues
+- Wheelchair ramps
+- Elevator count
+- Wheelchair-sized elevators
+- Public accessible bathroom
 
----
+### 7.9 Safety and Security
 
-# 7. Admin Portal
+Use this section to record safety controls:
 
-## 7.1 Evaluation Form
+- CCTV in public areas
+- Fire extinguisher last inspection date
+- Hose reels
+- Smoke detectors in rooms
+- Smoke detectors in public areas
+- Sprinkler coverage
+- Fire alarm control panel
+- Emergency exits
+- Bag scanner
+- Walk-through scanner
+- Hand scanner
 
-The **Admin** role has access to submit **Evaluations** of tourism establishments.
+### 7.10 Transport and Parking
 
-The Evaluation form includes:
-- **Establishment Name** – Name of the property being evaluated
-- **Date** – Date of evaluation
-- **Category-Based Evaluation** – Multiple evaluation categories with scoring:
-  - Each category has a description and rating input
-  - Categories cover various aspects of establishment quality
+Use this section to record transport services and parking capacity:
 
-## 7.2 Submitting an Evaluation
+- Parking spaces
+- Bus parking count
+- Valet parking
+- Parking within 100 meters
+- Airport shuttle
+- Public transport within 500 meters
+- EV charging points
+- EV charger types
 
-1. Fill in the **Establishment Name**
-2. Select the **Evaluation Date**
-3. Rate each evaluation category
-4. Click **"Submit"**
-5. A success message will appear: *"እንኳን ደስ አላችሁ! ሪፖርቱ በተሳካ ሁኔታ ተልኳል። / Report submitted successfully!"*
+### 7.11 ICT and Guest Services
 
----
+Use this section to record guest service technology:
 
-# 8. System Admin Portal
+- Property-wide Wi-Fi
+- Average Wi-Fi speed
+- In-house laundry
+- 24-hour reception
+- Passport scanner
+- Currency scanner
 
-## 8.1 User Management Dashboard
+### 7.12 Utilities and Resilience
 
-The **System Admin Dashboard** displays a table of all registered users in the system, showing:
-- **First Name**
-- **Second Name**
-- **Username**
-- **Role** (SystemAdmin, Commissioner, Admin, HotelOwner)
-- **Status** (Active/Inactive)
-- **Actions** (Edit, Delete)
+Use this section to record operational resilience:
 
-## 8.2 Creating a New User
+- Standby generator capacity
+- Generator coverage
+- Water treatment
+- Waste segregation
+- Recycling
+- Hazardous waste handling
 
-1. Click **"Create New User"**
-2. Fill in the following fields:
-   - **First Name**
-   - **Second Name**
-   - **Username** (must be unique)
-   - **Phone Number**
-   - **Password** (default: `admin@123` if left blank)
-   - **Role** (select from dropdown):
-     - System Administrator
-     - Hotel Administrator (Hotel Owner)
-     - Supervisor (Admin)
-     - General Manager (Commissioner)
-   - **Active** – Checkbox to make the user active immediately
-3. Click **"Save"**
-4. A success message will confirm the user creation
+### 7.13 Sustainability and Certifications
 
-## 8.3 Editing an Existing User
+Use this section to record sustainability and compliance information:
 
-1. Click **"Edit"** next to the user in the user table
-2. Modify the required fields:
-   - Name fields
-   - Username
-   - Password (leave blank to keep current)
-   - Role (changing role will update their permissions)
-   - Active/Inactive status
-3. Click **"Save"**
-4. A success message will confirm the update
+- Sustainability focal point
+- Sustainability certification
+- Other eco labels
+- Food waste program
+- Refill water stations
+- Tourism service competence license certificate
+- Fire safety certificate
+- Environmental clearance certificate
+- Food safety and hygiene certificate
+- ISO certification
 
-## 8.4 Deleting a User
+### 7.14 Staffing and Languages
 
-1. Click **"Delete"** next to the user in the user table
-2. Confirm the deletion
-3. The user is permanently removed from the system
+Use this section to enter human resource and guest communication information:
 
-## 8.5 User Roles Explained
+- Line staff count
+- Management staff count
+- International languages spoken at the front desk
 
-| Role Name | System Value | Description |
-|-----------|-------------|-------------|
-| **System Administrator** | SystemAdmin | Full system access - user management, configuration |
-| **Hotel Administrator** | HotelOwner | Can register and manage hotel properties |
-| **Supervisor** | Admin | Can submit evaluations of establishments |
-| **General Manager** | Commissioner | Can review, approve/reject, and view reports |
+Total staff is calculated from line staff and management staff.
+
+### 7.15 Saving a Section
+
+1. Open the establishment profile.
+2. Complete or update the required section.
+3. Click the section's **Save** button.
+4. Wait for the success message before leaving the page.
+
+If a save fails, check your internet connection and try again. For large profiles, save one section at a time.
 
 ---
 
-# 9. Troubleshooting
+## 8. Attachments and Documents
 
-## Login Issues
+HotelOwner users can upload supporting documents for an establishment.
 
-| Issue | Possible Cause | Solution |
-|-------|---------------|----------|
-| "Invalid username or password" | Incorrect credentials | Verify username and password with System Admin |
-| Account not active | Administrator has deactivated the account | Contact System Admin |
-| "No account? Pre-register here" | Organization not yet registered | Complete the Pre-Registration process |
+### Common Attachment Categories
 
-## Pre-Registration Issues
+| Category | Examples |
+| --- | --- |
+| Business License | Trade license or registration certificate |
+| Tax Certificate | TIN certificate or tax clearance |
+| Property Photos | Exterior, interior, rooms, halls |
+| Health and Safety Certificate | Hygiene or inspection documents |
+| Fire Safety Certificate | Fire inspection certificate |
+| Environmental Permit | Environmental clearance |
+| Other | Any additional supporting document |
 
-| Issue | Possible Cause | Solution |
-|-------|---------------|----------|
-| "This organization already exists" | TIN is already registered | Contact support or use existing credentials |
-| "This phone number is already registered" | Phone in use by another organization | Use a different phone number |
-| OTP not received | Network issues or incorrect number | Wait 2 minutes and request again; verify phone number |
+### Uploading a File
 
-## Registry Issues
+1. Open the establishment profile.
+2. Go to the attachments/documents area.
+3. Select the document category.
+4. Choose the file from your device.
+5. Click **Upload**.
+6. Wait for the confirmation message.
 
-| Issue | Possible Cause | Solution |
-|-------|---------------|----------|
-| Section save fails | Network connectivity | Check internet and try again; save sections individually |
-| Attachment upload fails | File too large or incorrect format | Ensure file is under 10MB and in supported format (PDF, JPG, PNG) |
-| Data not displaying | Session timeout | Log out and log in again |
+Supported file types include common document and image formats such as PDF, JPG, PNG, GIF, and WebP.
 
-## System Admin Issues
+### Viewing or Deleting Files
 
-| Issue | Possible Cause | Solution |
-|-------|---------------|----------|
-| Cannot create user | Username already exists | Use a unique username |
-| User cannot log in | Account inactive or wrong role assignment | Verify user is active and has correct role |
-| Role not appearing | Incorrect role mapping | Verify role selection in user settings |
-
-## Common Error Messages
-
-| Message | Meaning | Action |
-|---------|---------|--------|
-| "Error: Could not identify organization with hardcoded TIN." | System cannot find the default organization | Contact System Administrator |
-| "OTP service configuration is incomplete." | OTP API keys not configured | Contact System Administrator |
-| "Verification failed or expired" | OTP code is invalid or time has expired | Request a new OTP |
-| "Failed to save registration" | API error during registration | Contact support with the error details |
+- To view a file, click the file link in the attachment list.
+- To delete a file, use the delete action beside the attachment.
+- Deleted files are removed from the system record and the file storage location when possible.
 
 ---
 
-# 10. Appendices
+## 9. Commissioner Guide
 
-## A. Glossary of Terms
+The Commissioner role is used to review registrations, manage approvals, and access reports.
 
-| Term | Definition |
-|------|------------|
-| **AATMCDP** | Addis Ababa Tourism & MICE Commission Development Program |
-| **Consignee** | A registered entity (organization or person) in the system |
-| **Consignee Unit** | A branch or unit of an organization |
-| **GSL Type** | General Service Line - category classification (28 = Organization, 26 = Person) |
-| **MICE** | Meetings, Incentives, Conferences, and Exhibitions |
-| **OTP** | One-Time Password - a temporary verification code sent via SMS |
-| **PPP** | Public-Private Partnership |
-| **SMPP** | Short Message Peer-to-Peer protocol used for SMS delivery |
-| **TIN** | Tax Identification Number |
-| **FTP** | File Transfer Protocol used for document storage |
+### 9.1 Reports Center
 
-## B. Business Types Reference
+After login, Commissioner users are taken to the reports center. The reports center contains categories such as:
 
-When registering a property, the following business types are available:
+- Registry
+- MICE
+- Technology
+- Compliance
 
-| Business Type | Description |
-|--------------|-------------|
-| Hotel | Standard hotel accommodation |
-| Motel | Roadside/motorist accommodation |
-| Lodge | Nature/wilderness accommodation |
-| Resort | Full-service vacation destination |
-| Guest House | Small, home-like accommodation |
-| Pension | Budget-friendly accommodation |
-| Hostel | Dormitory-style budget accommodation |
-| Boutique Hotel | Small, stylish, themed hotel |
-| Eco Lodge | Environmentally-focused accommodation |
-| Safari Camp | Adventure/tourism camp accommodation |
-| Serviced Apartment | Apartment with hotel-like services |
-| Villa / Chalet | Private vacation home rental |
-| Heritage Inn | Historically significant property |
-| Conference Hotel | Hotel with large conference facilities |
-| Airport Hotel | Hotel near airport with transit facilities |
+Each category contains report tabs. The available reports include:
 
-## C. Attachment Category Reference
+- Hotel Registry
+- Room Inventory
+- Bed Capacity
+- Star Rating
+- Certified Facilities
+- Parking Capacity
+- Meeting and Conference Facilities
+- Conference Hall Capacity
+- MICE-Ready Facilities
+- MICE Destinations
+- Event Venues
+- Technology Systems
+- Kitchen and POS
+- Specialized Restaurants
+- Seating Capacity
+- Bars and Lounge
+- Health and Safety
+- Accessibility
+- Sustainability
+- PPP Analytics
 
-When uploading documents, use the following categories:
+### 9.2 Searching Reports
 
-| Index | Category | Typical Documents |
-|-------|----------|-------------------|
-| 1 | Business License | Trade license, business registration certificate |
-| 2 | Tax Certificate (TIN) | TIN certificate, tax clearance |
-| 3 | Property Photos | Exterior photos, interior photos, room photos |
-| 4 | Health & Safety Certificate | Health inspection reports, hygiene certificates |
-| 5 | Fire Safety Certificate | Fire department inspection, fire safety compliance |
-| 6 | Environmental Permit | Environmental impact assessment, clearance |
-| 7 | Other | Any other supporting documents |
+1. Open the reports center.
+2. Select a category.
+3. Select a report tab.
+4. Type in the search box.
+5. The report table filters to matching rows.
 
-## D. Support Contact Information
+### 9.3 Exporting Reports
 
-For technical support or questions regarding the system:
+1. Open the desired report.
+2. Use the search box if you only want filtered rows.
+3. Click **Export**.
+4. The system downloads the visible report data as a CSV file.
 
-- **System Administrator** – For user management, account issues, and access
-- **Commissioner Office** – For registration and approval inquiries
-- **IT Support** – For technical issues and system errors
+### 9.4 Printing Reports
 
-*Contact details are provided by your organization's administration.*
+1. Open the desired report.
+2. Click **Print**.
+3. Use the browser print dialog to choose printer, paper size, and layout.
+
+### 9.5 Pending Approvals
+
+The pending approvals page lists organizations that require review. Each item may show:
+
+- Property name
+- TIN
+- Code
+- Subcity
+- Specific address
+- Star rating
+- Active/inactive status
+- Preference/category
+
+### 9.6 Approving an Establishment
+
+1. Open **Pending Approvals**.
+2. Review the establishment information.
+3. Open details if more information is needed.
+4. Click **Approve**.
+5. Confirm the action.
+
+After approval, the establishment is activated and appears as approved in reports and registry views.
+
+### 9.7 Rejecting an Establishment
+
+1. Open **Pending Approvals**.
+2. Review the establishment information.
+3. Click **Reject**.
+4. Enter a rejection comment when needed.
+5. Confirm the action.
+
+After rejection, the establishment remains inactive. The owner should correct the submitted information or contact the commission office for follow-up.
 
 ---
 
-> **Addis Ababa Tourism & MICE Commission**  
-> *Land of Origins • Gateway to Africa*  
-> © 2026 AATMCDP - All Rights Reserved
+## 10. Admin Evaluation Guide
+
+The Admin role is used to submit establishment evaluations.
+
+### Steps
+
+1. Log in as an Admin user.
+2. Open the evaluation page.
+3. Enter or confirm the establishment name.
+4. Select the evaluation date.
+5. Complete the evaluation categories and ratings.
+6. Click **Submit**.
+7. Wait for the success message.
+
+The current evaluation page uses predefined evaluation categories.
+
+---
+
+## 11. System Admin Guide
+
+The SystemAdmin role is used to create, update, activate, deactivate, and delete users.
+
+### 11.1 User Management Dashboard
+
+The dashboard lists users with information such as:
+
+- First name
+- Second name
+- Username
+- Phone number
+- Role
+- Active status
+- Edit/delete actions
+
+### 11.2 Creating a User
+
+1. Open the SystemAdmin dashboard.
+2. Choose the option to create or add a user.
+3. Enter first name and second name.
+4. Enter a unique username.
+5. Enter phone number.
+6. Enter a password, or leave it blank to use the default password `admin@123`.
+7. Select the role.
+8. Set the user as active if they should log in immediately.
+9. Save the user.
+
+### 11.3 Editing a User
+
+1. Open the SystemAdmin dashboard.
+2. Select the user to edit.
+3. Update the name, username, phone, role, password, or active status.
+4. Leave the password blank if it should not be changed.
+5. Save the changes.
+
+### 11.4 Deactivating a User
+
+1. Edit the user.
+2. Turn off or uncheck the active status.
+3. Save the user.
+
+The user remains in the system but cannot use the account normally while inactive.
+
+### 11.5 Deleting a User
+
+1. Open the SystemAdmin dashboard.
+2. Select **Delete** for the user.
+3. Confirm the action.
+
+Delete users only when the account is no longer needed. For temporary access removal, deactivate the user instead.
+
+### 11.6 Role Mapping
+
+| Display Role | System Role | Typical User |
+| --- | --- | --- |
+| System Administrator | SystemAdmin | System administrator |
+| Hotel Administrator | HotelOwner | Establishment owner or representative |
+| Supervisor | Admin | Evaluation officer |
+| General Manager | Commissioner | Commissioner or authorized reviewer |
+
+---
+
+## 12. Recommended Operating Procedures
+
+### For Hotel Owners
+
+- Complete the basic information section first.
+- Save each section after entering data.
+- Upload required licenses and certificates before review.
+- Keep room, meeting, parking, and certification data accurate.
+- Contact the commission office if the registration is rejected.
+
+### For Commissioners
+
+- Review all establishment details before approval.
+- Use rejection comments to explain required corrections.
+- Use reports to monitor registry completeness and facility capacity.
+- Export reports when sharing data outside the portal.
+
+### For System Administrators
+
+- Assign the minimum role required for each user.
+- Deactivate users who should no longer access the system.
+- Avoid sharing default passwords.
+- Encourage users to change default passwords after first login.
+
+---
+
+## 13. Troubleshooting
+
+| Problem | Likely Cause | What to Do |
+| --- | --- | --- |
+| Login fails | Wrong username or password | Check credentials or contact SystemAdmin |
+| User opens no-privilege page | User has no valid role | Ask SystemAdmin to assign a role |
+| OTP not received | Phone issue, SMS delay, or service issue | Wait briefly, verify the number, and request another OTP |
+| OTP rejected | Code expired or entered incorrectly | Request a new OTP |
+| TIN already exists | Organization was previously registered | Contact support or use existing credentials |
+| Phone already exists | Phone number is linked to another organization | Use another number or contact support |
+| Registry section does not save | Network/API issue or invalid data | Review fields, save again, or try one section at a time |
+| Attachment upload fails | File issue or storage connection issue | Check file type/size and retry |
+| Report data looks incomplete | Establishment profile is incomplete | Ask the owner to update missing profile sections |
+| Export does not download | Browser blocked download | Allow downloads and try again |
+
+---
+
+## 14. Glossary
+
+| Term | Meaning |
+| --- | --- |
+| AATMCDP | Addis Ababa Tourism and MICE Commission Database Portal |
+| Attachment | Uploaded document or image linked to an establishment |
+| Commissioner | User who reviews registrations and reports |
+| Consignee | Organization or person record in the connected CNET system |
+| Establishment | Tourism business registered in the portal |
+| HotelOwner | User who manages an establishment profile |
+| MICE | Meetings, Incentives, Conferences, and Exhibitions |
+| OTP | One-Time Password sent by SMS for verification |
+| PPP | Public-Private Partnership |
+| Registry | The official profile record of an establishment |
+| SystemAdmin | User who manages user accounts and roles |
+| TIN | Tax Identification Number |
+
+---
+
+## 15. Support
+
+For account access, password reset, role assignment, or technical issues, contact the System Administrator.
+
+For registration status, approval questions, or rejected applications, contact the Commissioner office or the assigned review officer.
+
+For document requirements and operational policy questions, contact the Addis Ababa Tourism and MICE Commission.
+

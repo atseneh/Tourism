@@ -155,17 +155,26 @@ namespace Ministry_of_Tourism_pro.Common
 
             return xrolemapper;
         }
-        public virtual async Task<UserDTO?> UpdateUser(Ministry_of_Tourism_pro.Models.UserUpdateDTO userDto)
+        public virtual async Task<UserDTO> UpdateUser(CNET_V7_Domain.Misc.CommonTypes.UserUpdateDTO _userDTO)
         {
-            var response = await _httpClient.PostAsJsonAsync("CommonLibrary/update_user", userDto);
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var content = await response.Content.ReadAsStringAsync();
-                var result = JsonConvert.DeserializeObject<CNET_V7_Domain.Misc.ResponseModel<UserDTO>>(content);
-                return result?.Data;
+                var response = await _httpClient.PostAsJsonAsync("CommonLibrary/update_user_emc_uuemc", _userDTO);
+
+                var jsysconstDto_ = await response.Content.ReadAsStringAsync();
+                var data = JsonConvert.DeserializeObject<ResponseModel<UserDTO>>(jsysconstDto_);
+                return data.Data;
+
+            }
+            catch (Exception e)
+            {
+
+                Debug.WriteLine(e.Message);
             }
             return null;
-        }
+
+        }  
+
 
         public virtual async Task<UserDTO?> CreateUser(UserDTO _userDTO)
         {

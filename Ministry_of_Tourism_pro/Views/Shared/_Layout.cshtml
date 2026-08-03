@@ -202,7 +202,7 @@
                         <div class="fw-bold small" style="color: var(--navy-deep); font-weight: 700;">@User.Identity.Name</div>
                         <div style="font-size: 0.7rem; color: var(--text-muted);">Hotel Owner</div>
                     </div>
-                    <div class="user-avatar">
+                    <div class="user-avatar" id="profileAvatarBtn" title="Profile & Change Password" style="cursor: pointer;">
                         @(User.Identity.Name?.Substring(0, Math.Min(2, User.Identity.Name.Length)).ToUpper() ?? "U")
                     </div>
                     <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline">
@@ -221,10 +221,269 @@
 
     <div id="mobileSidebarBackdrop" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(2px); z-index: 1050;"></div>
 
+    <!-- ===================== Profile & Change Password Modal ===================== -->
+    <div id="profileModalBackdrop" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:9000;" onclick="closeProfileModal()"></div>
+    <div id="profileModal" role="dialog" aria-modal="true" aria-label="Profile Settings" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:min(440px, 95vw); background:#fff; border-radius:16px; box-shadow:0 24px 60px rgba(0,0,0,0.2); z-index:9001; overflow:hidden; font-family:'Inter','Outfit',sans-serif;">
+
+        <!-- Modal Header -->
+        <div style="background:linear-gradient(135deg,#10383A 0%,#0a2425 100%); color:white; padding:1.25rem 1.5rem; display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:0.75rem;">
+                <div style="width:42px;height:42px;background:rgba(218,161,18,0.2);border:1.5px solid rgba(218,161,18,0.5);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;">
+                    @(User.Identity?.Name?.Substring(0, Math.Min(2, User.Identity.Name?.Length ?? 0)).ToUpper() ?? "U")
+                </div>
+                <div>
+                    <div style="font-weight:700; font-size:0.95rem;">@User.Identity?.Name</div>
+                    <div style="font-size:0.72rem; opacity:0.7;">Profile Settings</div>
+                </div>
+            </div>
+            <button onclick="closeProfileModal()" style="background:rgba(255,255,255,0.1);border:none;color:white;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;" title="Close">&times;</button>
+        </div>
+
+        <!-- Tab Bar -->
+        <div style="display:flex; border-bottom:1px solid #E2E8F0;">
+            <button class="profile-tab active" id="tabChangePass" onclick="switchTab('changepass')" style="flex:1;padding:0.75rem;background:none;border:none;font-weight:600;font-size:0.85rem;color:#10383A;border-bottom:2px solid #DAA112;cursor:pointer;">
+                <i class="fas fa-lock" style="margin-right:0.4rem;color:#DAA112;"></i>Change Password
+            </button>
+            <button class="profile-tab" id="tabChangeUser" onclick="switchTab('changeuser')" style="flex:1;padding:0.75rem;background:none;border:none;font-weight:600;font-size:0.85rem;color:#64748B;border-bottom:2px solid transparent;cursor:pointer;">
+                <i class="fas fa-user-pen" style="margin-right:0.4rem;"></i>Change Username
+            </button>
+        </div>
+
+        <!-- Change Password Panel -->
+        <div id="panelChangePass" style="padding:1.5rem;">
+            <div id="cpAlert" style="display:none; padding:0.75rem 1rem; border-radius:8px; font-size:0.85rem; margin-bottom:1rem;"></div>
+
+            <div style="margin-bottom:1rem;">
+                <label style="display:block;font-size:0.8rem;font-weight:600;color:#334155;margin-bottom:0.35rem;">Current Password</label>
+                <div style="position:relative;">
+                    <i class="fas fa-lock" style="position:absolute;left:0.85rem;top:50%;transform:translateY(-50%);color:#94A3B8;font-size:0.85rem;"></i>
+                    <input type="password" id="cpOldPassword" placeholder="Enter current password" style="width:100%;padding:0.65rem 1rem 0.65rem 2.5rem;border:1px solid #CBD5E1;border-radius:8px;font-size:0.9rem;box-sizing:border-box;transition:border-color 0.2s;" onfocus="this.style.borderColor='#DAA112'" onblur="this.style.borderColor='#CBD5E1'" />
+                </div>
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label style="display:block;font-size:0.8rem;font-weight:600;color:#334155;margin-bottom:0.35rem;">New Password</label>
+                <div style="position:relative;">
+                    <i class="fas fa-key" style="position:absolute;left:0.85rem;top:50%;transform:translateY(-50%);color:#94A3B8;font-size:0.85rem;"></i>
+                    <input type="password" id="cpNewPassword" placeholder="Enter new password" oninput="checkPassStrength(this.value)" style="width:100%;padding:0.65rem 1rem 0.65rem 2.5rem;border:1px solid #CBD5E1;border-radius:8px;font-size:0.9rem;box-sizing:border-box;transition:border-color 0.2s;" onfocus="this.style.borderColor='#DAA112'" onblur="this.style.borderColor='#CBD5E1'" />
+                </div>
+                <div id="passStrengthBar" style="height:4px;border-radius:4px;margin-top:0.4rem;background:#E2E8F0;transition:all 0.3s;"><div id="passStrengthFill" style="height:100%;width:0;border-radius:4px;transition:all 0.3s;"></div></div>
+                <div id="passStrengthLabel" style="font-size:0.72rem;color:#94A3B8;margin-top:0.2rem;"></div>
+            </div>
+            <div style="margin-bottom:1.5rem;">
+                <label style="display:block;font-size:0.8rem;font-weight:600;color:#334155;margin-bottom:0.35rem;">Confirm New Password</label>
+                <div style="position:relative;">
+                    <i class="fas fa-check-double" style="position:absolute;left:0.85rem;top:50%;transform:translateY(-50%);color:#94A3B8;font-size:0.85rem;"></i>
+                    <input type="password" id="cpConfirmPassword" placeholder="Confirm new password" style="width:100%;padding:0.65rem 1rem 0.65rem 2.5rem;border:1px solid #CBD5E1;border-radius:8px;font-size:0.9rem;box-sizing:border-box;transition:border-color 0.2s;" onfocus="this.style.borderColor='#DAA112'" onblur="this.style.borderColor='#CBD5E1'" />
+                </div>
+            </div>
+
+            <div style="display:flex;gap:0.75rem;">
+                <button onclick="submitChangePassword()" id="btnSavePassword" style="flex:1;background:linear-gradient(135deg,#DAA112 0%,#b9840c 100%);color:white;border:none;border-radius:8px;padding:0.7rem;font-weight:700;font-size:0.9rem;cursor:pointer;transition:all 0.3s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <i class="fas fa-save" style="margin-right:0.4rem;"></i>Save Password
+                </button>
+                <form asp-controller="Account" asp-action="Logout" method="post" style="flex:1;margin:0;">
+                    <button type="submit" style="width:100%;background:#10383A;color:white;border:none;border-radius:8px;padding:0.7rem;font-weight:700;font-size:0.9rem;cursor:pointer;transition:all 0.3s;" onmouseover="this.style.background='#0a2425'" onmouseout="this.style.background='#10383A'">
+                        <i class="fas fa-sign-out-alt" style="margin-right:0.4rem;"></i>Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Change Username Panel -->
+        <div id="panelChangeUser" style="display:none; padding:1.5rem;">
+            <div id="cuAlert" style="display:none; padding:0.75rem 1rem; border-radius:8px; font-size:0.85rem; margin-bottom:1rem;"></div>
+
+            <div style="margin-bottom:1rem;">
+                <label style="display:block;font-size:0.8rem;font-weight:600;color:#334155;margin-bottom:0.35rem;">Current Username</label>
+                <div style="position:relative;">
+                    <i class="fas fa-user" style="position:absolute;left:0.85rem;top:50%;transform:translateY(-50%);color:#94A3B8;font-size:0.85rem;"></i>
+                    <input type="text" id="cuCurrentUser" placeholder="Current username" style="width:100%;padding:0.65rem 1rem 0.65rem 2.5rem;border:1px solid #CBD5E1;border-radius:8px;font-size:0.9rem;box-sizing:border-box;background:#F8FAFC;" readonly />
+                </div>
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label style="display:block;font-size:0.8rem;font-weight:600;color:#334155;margin-bottom:0.35rem;">New Username</label>
+                <div style="position:relative;">
+                    <i class="fas fa-user-edit" style="position:absolute;left:0.85rem;top:50%;transform:translateY(-50%);color:#94A3B8;font-size:0.85rem;"></i>
+                    <input type="text" id="cuNewUsername" placeholder="Enter new username" style="width:100%;padding:0.65rem 1rem 0.65rem 2.5rem;border:1px solid #CBD5E1;border-radius:8px;font-size:0.9rem;box-sizing:border-box;transition:border-color 0.2s;" onfocus="this.style.borderColor='#DAA112'" onblur="this.style.borderColor='#CBD5E1'" />
+                </div>
+            </div>
+            <div style="margin-bottom:1.5rem;">
+                <label style="display:block;font-size:0.8rem;font-weight:600;color:#334155;margin-bottom:0.35rem;">Current Password (to confirm)</label>
+                <div style="position:relative;">
+                    <i class="fas fa-lock" style="position:absolute;left:0.85rem;top:50%;transform:translateY(-50%);color:#94A3B8;font-size:0.85rem;"></i>
+                    <input type="password" id="cuPassword" placeholder="Enter your current password" style="width:100%;padding:0.65rem 1rem 0.65rem 2.5rem;border:1px solid #CBD5E1;border-radius:8px;font-size:0.9rem;box-sizing:border-box;transition:border-color 0.2s;" onfocus="this.style.borderColor='#DAA112'" onblur="this.style.borderColor='#CBD5E1'" />
+                </div>
+            </div>
+
+            <div style="display:flex;gap:0.75rem;">
+                <button onclick="submitChangeUsername()" id="btnSaveUsername" style="flex:1;background:linear-gradient(135deg,#DAA112 0%,#b9840c 100%);color:white;border:none;border-radius:8px;padding:0.7rem;font-weight:700;font-size:0.9rem;cursor:pointer;transition:all 0.3s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <i class="fas fa-save" style="margin-right:0.4rem;"></i>Save Username
+                </button>
+                <form asp-controller="Account" asp-action="Logout" method="post" style="flex:1;margin:0;">
+                    <button type="submit" style="width:100%;background:#10383A;color:white;border:none;border-radius:8px;padding:0.7rem;font-weight:700;font-size:0.9rem;cursor:pointer;transition:all 0.3s;" onmouseover="this.style.background='#0a2425'" onmouseout="this.style.background='#10383A'">
+                        <i class="fas fa-sign-out-alt" style="margin-right:0.4rem;"></i>Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- ========================= End Profile Modal ========================= -->
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script>
+        var _loggedInUsername = '@User.Identity?.Name';
+
+        // ---- Profile Modal ----
+        function openProfileModal() {
+            document.getElementById('profileModal').style.display = 'block';
+            document.getElementById('profileModalBackdrop').style.display = 'block';
+            document.getElementById('cuCurrentUser').value = _loggedInUsername;
+            clearAlerts();
+        }
+        function closeProfileModal() {
+            document.getElementById('profileModal').style.display = 'none';
+            document.getElementById('profileModalBackdrop').style.display = 'none';
+            clearAlerts();
+        }
+        function clearAlerts() {
+            var a = document.getElementById('cpAlert');
+            var b = document.getElementById('cuAlert');
+            if (a) { a.style.display='none'; a.textContent=''; }
+            if (b) { b.style.display='none'; b.textContent=''; }
+        }
+        function switchTab(tab) {
+            var cp = document.getElementById('panelChangePass');
+            var cu = document.getElementById('panelChangeUser');
+            var tPass = document.getElementById('tabChangePass');
+            var tUser = document.getElementById('tabChangeUser');
+            clearAlerts();
+            if (tab === 'changepass') {
+                cp.style.display = 'block'; cu.style.display = 'none';
+                tPass.style.color='#10383A'; tPass.style.borderBottom='2px solid #DAA112';
+                tUser.style.color='#64748B'; tUser.style.borderBottom='2px solid transparent';
+            } else {
+                cp.style.display = 'none'; cu.style.display = 'block';
+                tUser.style.color='#10383A'; tUser.style.borderBottom='2px solid #DAA112';
+                tPass.style.color='#64748B'; tPass.style.borderBottom='2px solid transparent';
+            }
+        }
+        function showAlert(elId, msg, isSuccess) {
+            var el = document.getElementById(elId);
+            el.textContent = msg;
+            el.style.display = 'block';
+            el.style.background = isSuccess ? '#D1FAE5' : '#FEE2E2';
+            el.style.color = isSuccess ? '#065F46' : '#991B1B';
+            el.style.border = isSuccess ? '1px solid #6EE7B7' : '1px solid #FCA5A5';
+        }
+        function checkPassStrength(val) {
+            var fill = document.getElementById('passStrengthFill');
+            var label = document.getElementById('passStrengthLabel');
+            var score = 0;
+            if (val.length >= 8) score++;
+            if (/[A-Z]/.test(val)) score++;
+            if (/[0-9]/.test(val)) score++;
+            if (/[^A-Za-z0-9]/.test(val)) score++;
+            var colors = ['#EF4444','#F97316','#EAB308','#22C55E'];
+            var labels = ['Weak','Fair','Good','Strong'];
+            var pct = score > 0 ? (score / 4 * 100) + '%' : '0%';
+            fill.style.width = pct;
+            fill.style.background = colors[Math.max(score-1,0)];
+            label.textContent = val.length > 0 ? labels[Math.max(score-1,0)] : '';
+            label.style.color = colors[Math.max(score-1,0)];
+        }
+
+        // Change Password submission
+        function submitChangePassword() {
+            var btn = document.getElementById('btnSavePassword');
+            var oldPass = document.getElementById('cpOldPassword').value.trim();
+            var newPass = document.getElementById('cpNewPassword').value.trim();
+            var confirm = document.getElementById('cpConfirmPassword').value.trim();
+            clearAlerts();
+            if (!oldPass || !newPass || !confirm) { showAlert('cpAlert','Please fill in all fields.',false); return; }
+            if (newPass !== confirm) { showAlert('cpAlert','New passwords do not match.',false); return; }
+            if (newPass.length < 6) { showAlert('cpAlert','Password must be at least 6 characters.',false); return; }
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:0.4rem;"></i>Saving...';
+            $.ajax({
+                url: '/HotelOwner/changepassworddetail',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    cha_username: _loggedInUsername,
+                    cha_oldpasword: oldPass,
+                    cha_newpassword: newPass,
+                    cha_confirmpassord: confirm,
+                    cha_Isactive: true
+                }),
+                success: function(res) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-save" style="margin-right:0.4rem;"></i>Save Password';
+                    if (res.result === 'Saved Successfully !') {
+                        showAlert('cpAlert', '\u2713 Password changed! Logging out for security…', true);
+                        setTimeout(function() {
+                            document.querySelector('#panelChangePass form').submit();
+                        }, 1800);
+                    } else {
+                        showAlert('cpAlert', res.result || 'An error occurred.', false);
+                    }
+                },
+                error: function() {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-save" style="margin-right:0.4rem;"></i>Save Password';
+                    showAlert('cpAlert','Network error. Please try again.', false);
+                }
+            });
+        }
+
+        // Change Username submission
+        function submitChangeUsername() {
+            var btn = document.getElementById('btnSaveUsername');
+            var newUser = document.getElementById('cuNewUsername').value.trim();
+            var pass = document.getElementById('cuPassword').value.trim();
+            clearAlerts();
+            if (!newUser || !pass) { showAlert('cuAlert','Please fill in all fields.',false); return; }
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:0.4rem;"></i>Saving...';
+            $.ajax({
+                url: '/HotelOwner/changepassworddetail',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    cha_username: _loggedInUsername,
+                    cha_newusername: newUser,
+                    cha_oldpasword: pass,
+                    cha_newpassword: pass,
+                    cha_confirmpassord: pass,
+                    cha_Isactive: true
+                }),
+                success: function(res) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-save" style="margin-right:0.4rem;"></i>Save Username';
+                    if (res.result === 'Saved Successfully !') {
+                        showAlert('cuAlert', '\u2713 Username changed! Logging out for security…', true);
+                        setTimeout(function() {
+                            document.querySelector('#panelChangeUser form').submit();
+                        }, 1800);
+                    } else {
+                        showAlert('cuAlert', res.result || 'An error occurred.', false);
+                    }
+                },
+                error: function() {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-save" style="margin-right:0.4rem;"></i>Save Username';
+                    showAlert('cuAlert','Network error. Please try again.', false);
+                }
+            });
+        }
+
         $(document).ready(function () {
+            // Profile Avatar click
+            $('#profileAvatarBtn').on('click', function(e) {
+                e.stopPropagation();
+                openProfileModal();
+            });
+
             // Desktop Toggle
             $('#sidebarToggle').on('click', function () {
                 $('.sidebar').toggleClass('collapsed');

@@ -708,9 +708,66 @@
                 margin: 0;
             }
         }
+
+        /* Floating Documentation Button: Top-Left on Desktop & Tab, Bottom-Left on Mobile */
+        .floating-doc-btn {
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            z-index: 9999;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            padding: 0.6rem 1.25rem;
+            background: rgba(16, 56, 58, 0.88);
+            color: #ffffff !important;
+            border: 1px solid rgba(218, 161, 18, 0.4);
+            border-radius: 50px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            text-decoration: none !important;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .floating-doc-btn:hover {
+            background: var(--primary-teal);
+            color: white !important;
+            border-color: var(--accent-gold);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 28px rgba(16, 56, 58, 0.4);
+        }
+
+        .floating-doc-btn i {
+            color: var(--accent-gold);
+            font-size: 1rem;
+            transition: transform 0.2s ease;
+        }
+
+        .floating-doc-btn:hover i {
+            transform: scale(1.15);
+        }
+
+        @@media (max-width: 768px) {
+            .floating-doc-btn {
+                top: auto !important;
+                bottom: 1.5rem !important;
+                left: 1.5rem !important;
+                right: auto !important;
+                padding: 0.6rem 1.15rem !important;
+                font-size: 0.82rem !important;
+                background: rgba(16, 56, 58, 0.94) !important;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+            }
+        }
     </style>
 </head>
 <body>
+    <a href="/documentation.html" target="_blank" class="floating-doc-btn" title="Open User Documentation in a new tab">
+        <i class="fas fa-book-open"></i> <span>Documentation</span>
+    </a>
     <div class="login-container">
         <!-- Left Pane: Showcase Images -->
         <div class="login-left-pane">
@@ -726,21 +783,21 @@
                     <img src="/logo/logo.svg" alt="AATC Logo" />
                 </div>
                 <h1 class="brand-title">Addis Ababa</h1>
-                <h2 class="brand-subtitle">Tourism & MICE Commission</h2>
-                <div class="brand-tagline">Land of Origins • Gateway to Africa</div>
+                <h2 class="brand-subtitle">Tourism Commission</h2>
+                <div class="brand-tagline">Visit Addis Ababa</div>
                 
                 <div class="brand-stats">
                     <div class="stat-pill">
                         <i class="fas fa-hotel"></i>
-                        <span>Premium Hotels</span>
+                        <span>Hotel/Resort </span>
                     </div>
                     <div class="stat-pill">
                         <i class="fas fa-utensils"></i>
-                        <span>Fine Dining</span>
+                        <span>Food/Beverage </span>
                     </div>
                     <div class="stat-pill">
                         <i class="fas fa-handshake"></i>
-                        <span>World-class MICE</span>
+                        <span>MICE Destination</span>
                     </div>
                 </div>
             </div>

@@ -5050,9 +5050,7 @@
                     var panelId = dz.closest('.attach-panel')?.id;
                     var catIdx = panelId ? parseInt(panelId.replace('attachPanel_', '')) : 0;
                     if (e.dataTransfer.files.length > 0) {
-                        for (var i = 0; i < e.dataTransfer.files.length; i++) {
-                            uploadAttachmentFile(e.dataTransfer.files[i], catIdx);
-                        }
+                        handleMultipleUploads(e.dataTransfer.files, catIdx);
                     }
                 });
             });
@@ -5061,46 +5059,68 @@
         function handleAttachFileSelect(input) {
             var catIdx = parseInt(input.getAttribute('data-cat-index'));
             if (input.files && input.files.length > 0) {
-                for (var i = 0; i < input.files.length; i++) {
-                    uploadAttachmentFile(input.files[i], catIdx);
-                }
+                handleMultipleUploads(input.files, catIdx);
             }
             input.value = ''; // reset so same file can be selected again
         }
 
         async function uploadAttachmentFile(file, categoryIndex) {
+            await handleMultipleUploads([file], categoryIndex);
+        }
+
+        async function handleMultipleUploads(files, categoryIndex) {
             var consigneeId = $('#editorConsigneeId').val();
             if (!consigneeId) {
                 Swal.fire('Error', 'Please select an establishment first.', 'warning');
                 return;
             }
-            var formData = new FormData();
-            formData.append('file', file);
-            formData.append('consigneeId', consigneeId);
-            formData.append('categoryIndex', categoryIndex);
 
-            // Show uploading indicator
-            var listEl = document.getElementById('fileList_' + categoryIndex);
-            var tempId = 'uploading_' + Date.now();
-            var tempHtml = `<div id="${tempId}" class="attach-file-item" style="opacity:.6;"><div class="file-info"><span class="attach-upload-spinner"></span><span class="file-name">Uploading ${file.name}...</span></div></div>`;
-            if (listEl) listEl.insertAdjacentHTML('afterbegin', tempHtml);
+            var successCount = 0;
+            var failCount = 0;
+            var totalFiles = files.length;
 
-            try {
-                var resp = await fetch('/HotelOwner/UploadAttachment', { method: 'POST', body: formData });
-                var result = await resp.json();
-                var tempEl = document.getElementById(tempId);
-                if (tempEl) tempEl.remove();
+            for (var i = 0; i < totalFiles; i++) {
+                var file = files[i];
+                var tempId = 'uploading_' + Date.now() + '_' + i + '_' + Math.floor(Math.random() * 1000);
+                var listEl = document.getElementById('fileList_' + categoryIndex);
+                var tempHtml = `<div id="${tempId}" class="attach-file-item" style="opacity:.6;"><div class="file-info"><span class="attach-upload-spinner"></span><span class="file-name">Uploading ${file.name}...</span></div></div>`;
+                if (listEl) listEl.insertAdjacentHTML('afterbegin', tempHtml);
 
-                if (result.success) {
-                    Swal.fire({ icon: 'success', title: 'Uploaded', text: result.message, timer: 1500, showConfirmButton: false });
-                    await loadAttachments(consigneeId);
-                } else {
-                    Swal.fire('Error', result.message || 'Upload failed.', 'error');
+                try {
+                    var formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('consigneeId', consigneeId);
+                    formData.append('categoryIndex', categoryIndex);
+
+                    var resp = await fetch('/HotelOwner/UploadAttachment', { method: 'POST', body: formData });
+                    var result = await resp.json();
+                    var tempEl = document.getElementById(tempId);
+                    if (tempEl) tempEl.remove();
+
+                    if (result.success) {
+                        successCount++;
+                    } else {
+                        failCount++;
+                    }
+                } catch (err) {
+                    var tempEl = document.getElementById(tempId);
+                    if (tempEl) tempEl.remove();
+                    failCount++;
                 }
-            } catch (err) {
-                var tempEl = document.getElementById(tempId);
-                if (tempEl) tempEl.remove();
-                Swal.fire('Error', 'Upload failed: ' + err.message, 'error');
+            }
+
+            await loadAttachments(consigneeId);
+
+            if (successCount > 0 && failCount === 0) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Uploaded',
+                    text: totalFiles === 1 ? 'Attachment saved successfully!' : `${successCount} attachments saved successfully!`,
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            } else if (failCount > 0) {
+                Swal.fire('Notice', `${successCount} file(s) uploaded successfully, ${failCount} failed.`, failCount === totalFiles ? 'error' : 'warning');
             }
         }
 
@@ -5127,8 +5147,13 @@
             // Group by category and render
             _allAttachments.forEach(function(att) {
                 // Find which panel index this category maps to
-                var panelIdx = _attachCategoryIds.indexOf(att.category);
-                if (panelIdx === -1) panelIdx = _attachCategoryIds.length - 1; // fallback to last (Other)
+                var panelIdx = -1;
+                if (att.categoryIndex !== undefined && att.categoryIndex !== null && att.categoryIndex >= 0 && att.categoryIndex < _attachCategoryIds.length) {
+                    panelIdx = att.categoryIndex;
+                } else {
+                    panelIdx = _attachCategoryIds.indexOf(att.category);
+                    if (panelIdx === -1) panelIdx = _attachCategoryIds.length - 1; // fallback to last (Other)
+                }
                 var listEl = document.getElementById('fileList_' + panelIdx);
                 if (!listEl) return;
 
@@ -5147,7 +5172,12 @@
 
             // Update folder counts on sidebar buttons
             for (var i = 0; i < _attachCategoryIds.length; i++) {
-                var count = _allAttachments.filter(a => a.category === _attachCategoryIds[i]).length;
+                var count = _allAttachments.filter(a => {
+                    if (a.categoryIndex !== undefined && a.categoryIndex !== null && a.categoryIndex >= 0 && a.categoryIndex < _attachCategoryIds.length) {
+                        return a.categoryIndex === i;
+                    }
+                    return _attachCategoryIds.indexOf(a.category) === i;
+                }).length;
                 var btn = document.querySelector(`.attach-cat-btn[data-cat-index="${i}"]`);
                 if (btn) {
                     var badge = btn.querySelector('.cat-badge');

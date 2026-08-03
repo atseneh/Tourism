@@ -2,6 +2,21 @@ using System.ComponentModel.DataAnnotations;
 using CNET_V7_Domain.Domain.ConsigneeSchema;
 using CNET_V7_Domain.Domain.SecuritySchema;
 
+// SecurityModel for change password action
+namespace Ministry_of_Tourism_pro.Models
+{
+    public class SecurityModel
+    {
+        public string? cha_username { get; set; }
+        public string? cha_newusername { get; set; }
+        public string? cha_oldpasword { get; set; }
+        public string? cha_newpassword { get; set; }
+        public string? cha_confirmpassord { get; set; }
+        public string? cha_passwordtype { get; set; }
+        public bool cha_Isactive { get; set; }
+    }
+}
+
 namespace Ministry_of_Tourism_pro.Models
 {
     public class ConsigneeListViewModel
