@@ -1,6 +1,7 @@
 using CNET_V7_Domain.Domain.TransactionSchema;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ministry_of_Tourism_pro.Common;
 using Ministry_of_Tourism_pro.Models;
@@ -728,5 +729,109 @@ namespace Ministry_of_Tourism_pro.Controllers
 
         public IActionResult NoPrivilege() => View();
         public IActionResult AccessDenied() => View();
+
+        #region Change Password / Profile
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> changepassworddetail([FromBody] Ministry_of_Tourism_pro.Models.SecurityModel changepass)
+        {
+            if (changepass == null)
+                return Json(new { result = "Invalid request" });
+
+            var currentUser = User.Identity?.Name ?? string.Empty;
+            if (string.IsNullOrEmpty(currentUser))
+                return Json(new { result = "Unauthorized" });
+
+            // Always enforce current logged in user
+            changepass.cha_username = currentUser;
+
+            // Validate current password was provided
+            if (string.IsNullOrWhiteSpace(changepass.cha_oldpasword))
+            {
+                return Json(new { result = "Please enter your current password" });
+            }
+
+            bool isUsernameChange = !string.IsNullOrWhiteSpace(changepass.cha_newusername) &&
+                                    !string.Equals(currentUser, changepass.cha_newusername.Trim(), StringComparison.OrdinalIgnoreCase);
+
+            bool isPasswordChange = !string.IsNullOrWhiteSpace(changepass.cha_newpassword) &&
+                                    !string.Equals(changepass.cha_oldpasword, changepass.cha_newpassword);
+
+            if (!isUsernameChange && !isPasswordChange)
+            {
+                return Json(new { result = "No changes requested" });
+            }
+
+            if (isPasswordChange)
+            {
+                if (changepass.cha_newpassword != changepass.cha_confirmpassord)
+                    return Json(new { result = "New passwords do not match" });
+
+                if (changepass.cha_newpassword.Length < 6)
+                    return Json(new { result = "Password must be at least 6 characters" });
+            }
+
+            // Verify current password against authentication API
+            var authResult = await _authManager.AuthenticateUser(currentUser, changepass.cha_oldpasword, CNET_WebConstantes.HARDCODED_BRANCH.ToString());
+            if (authResult == null || !authResult.Success || authResult.Data == null)
+            {
+                return Json(new { result = "Old Password is incorrect" });
+            }
+
+            // Look up user record
+            var muser = await _sharedHelpers.GetUserByUserName(currentUser);
+            if (muser == null)
+                return Json(new { result = "User not found" });
+
+            string targetUsername = isUsernameChange ? changepass.cha_newusername.Trim() : muser.UserName;
+
+            // If username is changing, ensure new username is not already registered
+            if (isUsernameChange)
+            {
+                var existingUser = await _sharedHelpers.GetUserByUserName(targetUsername);
+                if (existingUser != null && existingUser.Id != muser.Id)
+                {
+                    return Json(new { result = "Username already exists. Please choose a different username." });
+                }
+            }
+
+            // Build update DTO
+            var reuser = new CNET_V7_Domain.Misc.CommonTypes.UserUpdateDTO
+            {
+                userId         = Convert.ToInt32(muser.Id),
+                oldUserName    = muser.UserName,
+                newUserName    = targetUsername,
+                person         = muser.Person,
+                isActive       = changepass.cha_Isactive,
+                isAdmin        = true,
+                changePassword = isPasswordChange,
+                newPassword    = isPasswordChange ? changepass.cha_newpassword : null
+            };
+
+            var updated = await _sharedHelpers.UpdateUser(reuser);
+            if (updated == null)
+                return Json(new { result = "Update failed. Please try again." });
+
+            // Log activity
+            var activity = new CNET_V7_Domain.Domain.CommonSchema.ActivityDTO
+            {
+                Id                 = 0,
+                Reference          = updated.Id,
+                ActivityDefinition = 0,
+                TimeStamp          = DateTime.UtcNow,
+                Device             = null,
+                User               = muser.Id,
+                Pointer            = 1,
+                Year               = DateTime.UtcNow.Year,
+                Platform           = "web",
+                Remark             = isUsernameChange ? (isPasswordChange ? "Username & Password changed" : "Username changed") : "Password changed"
+            };
+            await _sharedHelpers.CreateActivity(activity);
+
+            return Json(new { result = "Saved Successfully !" });
+        }
+
+        #endregion
     }
 }

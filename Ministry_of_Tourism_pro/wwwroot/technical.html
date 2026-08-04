@@ -1,0 +1,249 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Technical Overview - Addis Ababa Tourism Portal</title>
+    <meta name="description" content="Technical overview of the Addis Ababa Ministry of Tourism digital platform." />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
+    <style>
+        :root{--primary-teal:#10383A;--primary-dark:#0a2425;--accent-gold:#DAA112;--accent-gold-light:#f5cf68;--accent-hover:#b9840c;--bg-light:#F4F5F6;--card-bg:#FFFFFF;--text-dark:#1E293B;--text-muted:#64748B;--border-color:#E2E8F0;--sidebar-width:260px}
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg-light);line-height:1.65;display:flex;flex-direction:column;min-height:100vh}
+        .doc-header{background:linear-gradient(135deg,var(--primary-teal) 0%,var(--primary-dark) 100%);color:white;padding:.8rem 2rem;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+        .header-brand{display:flex;align-items:center;gap:.8rem;text-decoration:none;color:white}
+        .header-brand img{width:38px;height:38px;background:white;border-radius:50%;padding:4px;border:2px solid var(--accent-gold)}
+        .header-brand-title{font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:-.5px}
+        .header-brand-title span{color:var(--accent-gold)}
+        .header-actions{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap}
+        .btn-action{padding:.4rem 1rem;border-radius:6px;text-decoration:none;font-weight:600;font-size:.8rem;transition:all .2s;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem}
+        .btn-gold{background:linear-gradient(135deg,var(--accent-gold),var(--accent-hover));color:white;box-shadow:0 2px 8px rgba(218,161,18,.3)}
+        .btn-ghost{background:rgba(255,255,255,.12);color:white;border:1px solid rgba(255,255,255,.2)}
+        .btn-ghost:hover{background:rgba(255,255,255,.22)}
+        .header-badge{font-size:.72rem;font-weight:700;padding:.25rem .65rem;border-radius:2rem;background:rgba(218,161,18,.2);color:var(--accent-gold-light);border:1px solid rgba(218,161,18,.35);white-space:nowrap}
+        .layout{display:flex;flex:1;min-height:0}
+        .sidebar{width:var(--sidebar-width);flex-shrink:0;background:white;border-right:1px solid var(--border-color);position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto;padding:1.5rem 0}
+        .sidebar-section-label{font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);padding:.5rem 1.5rem .4rem}
+        .sidebar-link{display:flex;align-items:center;gap:.65rem;padding:.55rem 1.5rem;font-size:.83rem;font-weight:500;color:var(--text-dark);text-decoration:none;border-left:3px solid transparent;transition:all .15s}
+        .sidebar-link:hover{background:#f1f5f9;color:var(--primary-teal)}
+        .sidebar-link.active{border-left-color:var(--accent-gold);background:#fef9ec;color:var(--primary-teal);font-weight:700}
+        .sidebar-link i{width:16px;text-align:center;color:var(--accent-gold);font-size:.8rem}
+        .main-content{flex:1;padding:2rem 2.5rem;max-width:960px}
+        .hero-banner{background:linear-gradient(135deg,var(--primary-teal) 0%,#1a5558 50%,var(--primary-dark) 100%);border-radius:1.25rem;padding:2.5rem;margin-bottom:2rem;color:white;position:relative;overflow:hidden}
+        .hero-banner::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:rgba(218,161,18,.12)}
+        .hero-banner::after{content:'';position:absolute;bottom:-60px;left:30%;width:280px;height:280px;border-radius:50%;background:rgba(255,255,255,.04)}
+        .hero-eyebrow{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--accent-gold);margin-bottom:.6rem}
+        .hero-title{font-family:'Outfit',sans-serif;font-size:2rem;font-weight:800;line-height:1.2;margin-bottom:.75rem}
+        .hero-subtitle{font-size:.9rem;color:rgba(255,255,255,.75);max-width:580px}
+        .hero-chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.25rem}
+        .hero-chip{font-size:.72rem;font-weight:700;padding:.3rem .75rem;border-radius:2rem;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.9)}
+        .doc-section{margin-bottom:2.5rem;scroll-margin-top:80px}
+        .section-header{display:flex;align-items:center;gap:.85rem;margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:2px solid var(--border-color)}
+        .section-icon{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--primary-teal),#1a5558);display:flex;align-items:center;justify-content:center;color:var(--accent-gold);font-size:1rem;flex-shrink:0}
+        .section-title{font-family:'Outfit',sans-serif;font-size:1.25rem;font-weight:800;color:var(--primary-teal)}
+        .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:1rem}
+        .tech-card{background:white;border:1px solid var(--border-color);border-radius:.85rem;padding:1.1rem 1.25rem;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+        .tech-card:hover{border-color:var(--accent-gold);box-shadow:0 4px 16px rgba(218,161,18,.12);transform:translateY(-2px)}
+        .tech-card-icon{font-size:1.5rem;margin-bottom:.6rem}
+        .tech-card-label{font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:.2rem}
+        .tech-card-name{font-weight:700;color:var(--text-dark);font-size:.9rem}
+        .tech-card-desc{font-size:.75rem;color:var(--text-muted);margin-top:.25rem}
+        .info-card{background:white;border:1px solid var(--border-color);border-radius:.85rem;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04);margin-bottom:1rem}
+        .info-row{display:flex;align-items:flex-start;gap:1rem;padding:.9rem 1.25rem;border-bottom:1px solid #f1f5f9}
+        .info-row:last-child{border-bottom:none}
+        .info-row-icon{width:30px;height:30px;border-radius:8px;background:#eff6ff;display:flex;align-items:center;justify-content:center;color:var(--primary-teal);font-size:.85rem;flex-shrink:0;margin-top:1px}
+        .info-row-title{font-weight:700;font-size:.85rem;color:var(--text-dark)}
+        .info-row-desc{font-size:.78rem;color:var(--text-muted);margin-top:.15rem}
+        .security-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem}
+        .sec-card{background:white;border:1px solid var(--border-color);border-radius:.85rem;padding:1.1rem 1.25rem;display:flex;gap:.85rem;align-items:flex-start;box-shadow:0 1px 3px rgba(0,0,0,.04);transition:all .2s}
+        .sec-card:hover{border-color:#10b981;box-shadow:0 4px 12px rgba(16,185,129,.1)}
+        .sec-badge{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+        .sec-green{background:#d1fae5;color:#065f46}.sec-blue{background:#dbeafe;color:#1e40af}.sec-orange{background:#fed7aa;color:#9a3412}.sec-purple{background:#ede9fe;color:#5b21b6}
+        .sec-title{font-weight:700;font-size:.85rem;color:var(--text-dark)}.sec-desc{font-size:.75rem;color:var(--text-muted);margin-top:.2rem}
+        .deploy-steps{display:flex;flex-direction:column;gap:.75rem}
+        .deploy-step{display:flex;gap:1rem;align-items:flex-start;background:white;border:1px solid var(--border-color);border-radius:.85rem;padding:1rem 1.25rem}
+        .step-num{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--primary-teal),#1a5558);color:white;font-weight:800;font-size:.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .step-title{font-weight:700;font-size:.88rem;color:var(--text-dark)}.step-desc{font-size:.78rem;color:var(--text-muted);margin-top:.2rem}
+        code{background:#f1f5f9;color:#1e40af;padding:.1rem .4rem;border-radius:4px;font-size:.8rem;font-family:monospace}
+        .dev-card{background:linear-gradient(135deg,var(--primary-teal) 0%,#1a5558 100%);border-radius:1rem;padding:1.75rem 2rem;color:white;display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap}
+        .dev-avatar{width:72px;height:72px;border-radius:50%;background:rgba(218,161,18,.25);border:3px solid var(--accent-gold);display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0}
+        .dev-name{font-family:'Outfit',sans-serif;font-size:1.2rem;font-weight:800}
+        .dev-role{font-size:.82rem;color:rgba(255,255,255,.7);margin-top:.15rem}
+        .dev-tags{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.75rem}
+        .dev-tag{font-size:.72rem;font-weight:700;padding:.25rem .65rem;border-radius:2rem;background:rgba(218,161,18,.2);border:1px solid rgba(218,161,18,.35);color:var(--accent-gold-light)}
+        .alert{border-radius:.75rem;padding:.9rem 1.1rem;margin-bottom:1rem;display:flex;gap:.75rem;align-items:flex-start;font-size:.83rem}
+        .alert-info{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af}.alert-success{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534}
+        .alert i{margin-top:2px}
+        footer{background:var(--primary-teal);color:rgba(255,255,255,.7);text-align:center;padding:1rem 2rem;font-size:.78rem}
+        footer span{color:var(--accent-gold)}
+        @media(max-width:768px){.sidebar{display:none}.main-content{padding:1.25rem}.hero-title{font-size:1.5rem}}
+    </style>
+</head>
+<body>
+
+<header class="doc-header">
+    <a class="header-brand" href="/">
+        <img src="/logo/tourism-logo.png" alt="Logo" onerror="this.style.display='none'">
+        <div><div class="header-brand-title">Addis Ababa <span>Tourism</span> Portal</div></div>
+    </a>
+    <div class="header-actions">
+        <span class="header-badge"><i class="fas fa-server" style="margin-right:4px;"></i>IIS Deployment</span>
+        <a href="/documentation.html" class="btn-action btn-ghost"><i class="fas fa-book"></i> User Manual</a>
+        <button class="btn-action btn-gold" onclick="exportPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
+    </div>
+</header>
+
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-section-label">Navigation</div>
+        <a href="#stack"        class="sidebar-link active"><i class="fas fa-layer-group"></i> Technology Stack</a>
+        <a href="#architecture" class="sidebar-link"><i class="fas fa-sitemap"></i> Architecture</a>
+        <a href="#security"     class="sidebar-link"><i class="fas fa-shield-halved"></i> Security</a>
+        <a href="#deployment"   class="sidebar-link"><i class="fas fa-server"></i> IIS Deployment</a>
+        <a href="#developer"    class="sidebar-link"><i class="fas fa-code"></i> Developer</a>
+    </aside>
+
+    <main class="main-content" id="pdf-content">
+
+        <div class="hero-banner">
+            <div class="hero-eyebrow"><i class="fas fa-microchip"></i>&nbsp; Technical Overview</div>
+            <h1 class="hero-title">Addis Ababa Tourism<br>Registration Platform</h1>
+            <p class="hero-subtitle">A concise technical reference covering the technology stack, security guarantees, and IIS server deployment of the Ministry of Tourism digital system.</p>
+            <div class="hero-chips">
+                <span class="hero-chip"><i class="fas fa-code-branch"></i> ASP.NET Core 6</span>
+                <span class="hero-chip"><i class="fas fa-database"></i> SQL Server</span>
+                <span class="hero-chip"><i class="fas fa-lock"></i> Role-Based Auth</span>
+                <span class="hero-chip"><i class="fas fa-server"></i> Windows IIS</span>
+                <span class="hero-chip"><i class="fas fa-cloud"></i> REST API Backend</span>
+            </div>
+        </div>
+
+        <!-- STACK -->
+        <section class="doc-section" id="stack">
+            <div class="section-header">
+                <div class="section-icon"><i class="fas fa-layer-group"></i></div>
+                <h2 class="section-title">Technology Stack</h2>
+            </div>
+            <div class="cards-grid">
+                <div class="tech-card"><div class="tech-card-icon">⚡</div><div class="tech-card-label">Backend Framework</div><div class="tech-card-name">ASP.NET Core 6</div><div class="tech-card-desc">MVC pattern · Razor Views · Async/Await</div></div>
+                <div class="tech-card"><div class="tech-card-icon">🗄️</div><div class="tech-card-label">Database</div><div class="tech-card-name">Microsoft SQL Server</div><div class="tech-card-desc">Relational DB with stored procedures</div></div>
+                <div class="tech-card"><div class="tech-card-icon">🌐</div><div class="tech-card-label">API Layer</div><div class="tech-card-name">CNET V7 REST API</div><div class="tech-card-desc">Internal service bus · JSON responses</div></div>
+                <div class="tech-card"><div class="tech-card-icon">🎨</div><div class="tech-card-label">Frontend</div><div class="tech-card-name">Vanilla HTML / CSS / JS</div><div class="tech-card-desc">Bootstrap · FontAwesome · jQuery</div></div>
+                <div class="tech-card"><div class="tech-card-icon">🔐</div><div class="tech-card-label">Authentication</div><div class="tech-card-name">ASP.NET Identity</div><div class="tech-card-desc">Cookie-based · Claim roles</div></div>
+                <div class="tech-card"><div class="tech-card-icon">🖥️</div><div class="tech-card-label">Web Server</div><div class="tech-card-name">Windows IIS 10</div><div class="tech-card-desc">HTTPS · App Pool · .NET 6 Hosting Bundle</div></div>
+                <div class="tech-card"><div class="tech-card-icon">📦</div><div class="tech-card-label">Data Serialization</div><div class="tech-card-name">Newtonsoft.Json</div><div class="tech-card-desc">DTO mapping · Partial views</div></div>
+                <div class="tech-card"><div class="tech-card-icon">📁</div><div class="tech-card-label">File Storage</div><div class="tech-card-name">FTP Server</div><div class="tech-card-desc">Attachment uploads · Document storage</div></div>
+            </div>
+        </section>
+
+        <!-- ARCHITECTURE -->
+        <section class="doc-section" id="architecture">
+            <div class="section-header">
+                <div class="section-icon"><i class="fas fa-sitemap"></i></div>
+                <h2 class="section-title">Architecture Overview</h2>
+            </div>
+            <div class="info-card">
+                <div class="info-row"><div class="info-row-icon"><i class="fas fa-user"></i></div><div class="info-row-body"><div class="info-row-title">Presentation Layer — MVC Views</div><div class="info-row-desc">Razor <code>.cshtml</code> views served by ASP.NET Core controllers. Role-specific dashboards for HotelOwner, Admin, Commissioner, and SystemAdmin.</div></div></div>
+                <div class="info-row"><div class="info-row-icon"><i class="fas fa-gears"></i></div><div class="info-row-body"><div class="info-row-title">Application Layer — Controllers + Services</div><div class="info-row-desc">Business logic separated into <code>IHotelService</code>, <code>SharedHelpers</code>, and domain controllers. DTOs used for all data transfer.</div></div></div>
+                <div class="info-row"><div class="info-row-icon"><i class="fas fa-cloud"></i></div><div class="info-row-body"><div class="info-row-title">Data Layer — CNET V7 REST API</div><div class="info-row-desc">All database reads/writes go through an internal REST API (<code>GetFilterData</code>, <code>GetFilterDynamic</code>, <code>SendReqAsync</code>). No direct DB access from the web app.</div></div></div>
+                <div class="info-row"><div class="info-row-icon"><i class="fas fa-database"></i></div><div class="info-row-body"><div class="info-row-title">Persistence — SQL Server + FTP</div><div class="info-row-desc">Structured hotel and infrastructure data in SQL Server. Binary attachments stored on a dedicated FTP server and referenced by URL.</div></div></div>
+            </div>
+            <div class="alert alert-info"><i class="fas fa-info-circle"></i><div>The web application never connects directly to SQL Server. All data access is brokered through the CNET V7 API layer, ensuring data integrity and a single point of change.</div></div>
+        </section>
+
+        <!-- SECURITY -->
+        <section class="doc-section" id="security">
+            <div class="section-header">
+                <div class="section-icon"><i class="fas fa-shield-halved"></i></div>
+                <h2 class="section-title">Security Guarantees</h2>
+            </div>
+            <div class="security-grid">
+                <div class="sec-card"><div class="sec-badge sec-green"><i class="fas fa-user-lock"></i></div><div><div class="sec-title">Role-Based Access Control</div><div class="sec-desc">Four roles: <strong>HotelOwner, Admin, Commissioner, SystemAdmin</strong>. Every action is decorated with <code>[Authorize(Roles=...)]</code>. Cross-role access returns 403.</div></div></div>
+                <div class="sec-card"><div class="sec-badge sec-blue"><i class="fas fa-cookie-bite"></i></div><div><div class="sec-title">Secure Cookie Authentication</div><div class="sec-desc">ASP.NET Identity issues <code>HttpOnly</code>, <code>SameSite=Strict</code> session cookies. Sessions expire on browser close by default.</div></div></div>
+                <div class="sec-card"><div class="sec-badge sec-purple"><i class="fas fa-shield-virus"></i></div><div><div class="sec-title">Anti-Forgery Tokens (CSRF)</div><div class="sec-desc">All state-changing POST endpoints are protected with ASP.NET's built-in CSRF anti-forgery token validation.</div></div></div>
+                <div class="sec-card"><div class="sec-badge sec-orange"><i class="fas fa-lock"></i></div><div><div class="sec-title">HTTPS Enforcement</div><div class="sec-desc">IIS redirects all HTTP to HTTPS. TLS certificates are bound to the site. <code>UseHsts()</code> is active in production.</div></div></div>
+                <div class="sec-card"><div class="sec-badge sec-green"><i class="fas fa-eye-slash"></i></div><div><div class="sec-title">No Direct DB Access</div><div class="sec-desc">The web layer holds no SQL connection strings. All queries route through CNET V7 API, isolating SQL Server from the public-facing app.</div></div></div>
+                <div class="sec-card"><div class="sec-badge sec-blue"><i class="fas fa-file-shield"></i></div><div><div class="sec-title">Input Validation &amp; DTOs</div><div class="sec-desc">All incoming data is bound through strongly-typed DTOs with model state validation, preventing injection and binding attacks.</div></div></div>
+                <div class="sec-card"><div class="sec-badge sec-purple"><i class="fas fa-key"></i></div><div><div class="sec-title">Hashed Passwords</div><div class="sec-desc">ASP.NET Identity uses PBKDF2 with HMAC-SHA256. Plaintext passwords are never stored or logged.</div></div></div>
+                <div class="sec-card"><div class="sec-badge sec-orange"><i class="fas fa-scroll"></i></div><div><div class="sec-title">Audit Logging</div><div class="sec-desc">Approval, rejection, and critical state changes are captured in server logs with timestamps and user identity.</div></div></div>
+            </div>
+        </section>
+
+        <!-- DEPLOYMENT -->
+        <section class="doc-section" id="deployment">
+            <div class="section-header">
+                <div class="section-icon"><i class="fas fa-server"></i></div>
+                <h2 class="section-title">IIS Deployment</h2>
+            </div>
+            <div class="alert alert-success" style="margin-bottom:1.25rem;"><i class="fas fa-check-circle"></i><div>Published as a self-contained <strong>ASP.NET Core 6</strong> app hosted on <strong>Windows Server with IIS 10</strong>. The CNET V7 API runs as a separate IIS site on the same server network.</div></div>
+            <div class="deploy-steps">
+                <div class="deploy-step"><div class="step-num">1</div><div><div class="step-title">Install Prerequisites</div><div class="step-desc">Install <strong>.NET 6 Hosting Bundle</strong> on the Windows Server. Enable <strong>IIS</strong> with <strong>ASP.NET Core Module (ANCM)</strong>.</div></div></div>
+                <div class="deploy-step"><div class="step-num">2</div><div><div class="step-title">Publish the Application</div><div class="step-desc">Run <code>dotnet publish -c Release -o ./publish</code>. Copy output to the server's site root (e.g. <code>C:\inetpub\tourism-portal</code>).</div></div></div>
+                <div class="deploy-step"><div class="step-num">3</div><div><div class="step-title">Configure IIS Application Pool</div><div class="step-desc">Create an App Pool with <strong>No Managed Code</strong> (.NET CLR Version). Assign it to the website with sufficient folder permissions.</div></div></div>
+                <div class="deploy-step"><div class="step-num">4</div><div><div class="step-title">Set Production appsettings.json</div><div class="step-desc">Update <code>appsettings.json</code> with production API base URL, FTP credentials, and SMTP settings before deployment.</div></div></div>
+                <div class="deploy-step"><div class="step-num">5</div><div><div class="step-title">Bind HTTPS Certificate</div><div class="step-desc">In IIS Site Bindings add HTTPS on port 443. Assign the TLS certificate. Enable <strong>HTTP → HTTPS redirect</strong> via URL Rewrite module.</div></div></div>
+                <div class="deploy-step"><div class="step-num">6</div><div><div class="step-title">Verify &amp; Smoke Test</div><div class="step-desc">Login with each role, verify CNET V7 API connectivity, and check the <code>Logs/</code> folder for startup errors.</div></div></div>
+            </div>
+        </section>
+
+        <!-- DEVELOPER -->
+        <section class="doc-section" id="developer">
+            <div class="section-header">
+                <div class="section-icon"><i class="fas fa-code"></i></div>
+                <h2 class="section-title">Developer Information</h2>
+            </div>
+            <div class="dev-card">
+                <div class="dev-avatar">👨‍💻</div>
+                <div>
+                    <div class="dev-name">Full-Stack Developer</div>
+                    <div class="dev-role">Ministry of Tourism Digital Transformation Team &mdash; Addis Ababa, Ethiopia</div>
+                    <div class="dev-tags">
+                        <span class="dev-tag">ASP.NET Core 6</span>
+                        <span class="dev-tag">C#</span>
+                        <span class="dev-tag">SQL Server</span>
+                        <span class="dev-tag">REST API Design</span>
+                        <span class="dev-tag">IIS Administration</span>
+                        <span class="dev-tag">MVC Architecture</span>
+                    </div>
+                </div>
+            </div>
+            <div class="info-card" style="margin-top:1.25rem;">
+                <div class="info-row"><div class="info-row-icon"><i class="fas fa-calendar"></i></div><div class="info-row-body"><div class="info-row-title">Project Timeline</div><div class="info-row-desc">Developed and delivered as part of the Ministry of Tourism establishment registration and sector approval digitization initiative — 2025/2026.</div></div></div>
+                <div class="info-row"><div class="info-row-icon"><i class="fas fa-code-branch"></i></div><div class="info-row-body"><div class="info-row-title">Version Control</div><div class="info-row-desc">Source code managed with Git. Repository hosted internally with structured branching per role feature area.</div></div></div>
+                <div class="info-row"><div class="info-row-icon"><i class="fas fa-envelope"></i></div><div class="info-row-body"><div class="info-row-title">Technical Support</div><div class="info-row-desc">For technical inquiries, configuration issues, or feature requests, contact the development team through the Ministry of Tourism IT department.</div></div></div>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<footer>
+    &copy; 2026 <span>Addis Ababa Ministry of Tourism</span> &mdash; Technical Overview &mdash; Confidential Internal Document
+</footer>
+
+<script>
+    const sections = document.querySelectorAll('.doc-section');
+    const links = document.querySelectorAll('.sidebar-link');
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(s => { if (window.scrollY >= s.offsetTop - 100) current = s.id; });
+        links.forEach(l => {
+            l.classList.remove('active');
+            if (l.getAttribute('href') === '#' + current) l.classList.add('active');
+        });
+    });
+    links.forEach(l => l.addEventListener('click', function() {
+        links.forEach(x => x.classList.remove('active'));
+        this.classList.add('active');
+    }));
+    function exportPDF() {
+        const el = document.getElementById('pdf-content');
+        html2pdf().set({ margin: 10, filename: 'Tourism-Portal-Technical-Overview.pdf', image: { type: 'jpeg', quality: 0.95 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(el).save();
+    }
+</script>
+</body>
+</html>

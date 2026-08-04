@@ -130,6 +130,7 @@ namespace Ministry_of_Tourism_pro.Application.DTOs
         // Transport & Parking
         public int? ParkingSpacesCount { get; set; }
         public int? BusParkingCount { get; set; }
+        public bool? ShuttleToCop { get; set; }
         public bool? ShuttleToAirport { get; set; }
         public bool? PublicTransportWithin500m { get; set; }
         public bool? ValetParking { get; set; }
